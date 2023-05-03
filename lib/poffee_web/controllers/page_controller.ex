@@ -6,4 +6,9 @@ defmodule PoffeeWeb.PageController do
     # so skip the default app layout.
     render(conn, :home, layout: false)
   end
+
+  def demo(conn, _params) do
+    # Test page
+    render(conn, :demo, layout: false)
+  end
 end

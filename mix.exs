@@ -50,9 +50,11 @@ defmodule Poffee.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
-      {:ash, "~> 2.8"},
+      {:ash, "~> 2.9"},
       {:ash_phoenix, "~> 1.2"},
-      {:ash_postgres, "~> 1.3"}
+      {:ash_postgres, "~> 1.3"},
+      {:ash_authentication, "~> 3.10"},
+      {:ash_authentication_phoenix, "~> 1.7"}
     ]
   end
 

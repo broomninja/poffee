@@ -8,9 +8,8 @@
 import Config
 
 config :poffee,
-  ecto_repos: [Poffee.Repo]
-
-# ash_apis: [Poffee.Accounts, Poffee.Posts]
+  ecto_repos: [Poffee.Repo],
+  ash_apis: [Poffee.Accounts]
 
 # Configures the endpoint
 config :poffee, PoffeeWeb.Endpoint,
