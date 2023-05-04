@@ -30,10 +30,20 @@ if config_env() == :prod do
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
+  %URI{host: database_host} = URI.parse(database_url)
+
   config :poffee, Poffee.Repo,
-    # ssl: true,
+    ssl: true,
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
+    ssl_opts: [
+      verify: :verify_peer,
+      cacertfile: Path.join(:code.priv_dir(:poffee), "cert/cacert.pem"),
+      server_name_indication: to_charlist(database_host),
+      customize_hostname_check: [
+        match_fun: :public_key.pkix_verify_hostname_match_fun(:https)
+      ]
+    ],
     socket_options: maybe_ipv6
 
   # The secret key base is used to sign/encrypt cookies and other secrets.
@@ -47,6 +57,8 @@ if config_env() == :prod do
       environment variable SECRET_KEY_BASE is missing.
       You can generate one by calling: mix phx.gen.secret
       """
+
+  config :poffee, signing_secret: secret_key_base
 
   host = System.get_env("PHX_HOST") || "example.com"
   port = String.to_integer(System.get_env("PORT") || "4000")

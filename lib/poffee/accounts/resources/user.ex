@@ -3,7 +3,7 @@ defmodule Poffee.Accounts.User do
     data_layer: AshPostgres.DataLayer,
     extensions: [AshAuthentication]
 
-  alias AshHq.Calculations.Decrypt
+  # alias AshHq.Calculations.Decrypt
 
   attributes do
     uuid_primary_key :id
@@ -33,7 +33,11 @@ defmodule Poffee.Accounts.User do
       enabled?(true)
       token_resource(Poffee.Accounts.Token)
 
-      signing_secret(Application.compile_env(:poffee, PoffeeWeb.Endpoint)[:secret_key_base])
+      # signing_secret(Application.compile_env(:poffee, PoffeeWeb.Endpoint)[:secret_key_base])
+      signing_secret(fn _, _ ->
+        # Application.fetch_env(:poffee, PoffeeWeb.Endpoint)[:secret_key_base]
+          Application.fetch_env(:poffee, :signing_secret)
+      end)
     end
   end
 
@@ -47,7 +51,7 @@ defmodule Poffee.Accounts.User do
   end
 
   validations do
-    validate match(:email, ~r/^[^\s]+@[^\s]+$/), message: "must have the @ sign and no spaces"
+    validate match(:email, ~r/^[^\s]+@[^\s]+$/), message: "invalid email"
   end
 
   # calculations do
