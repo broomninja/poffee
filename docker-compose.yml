@@ -1,11 +1,13 @@
 version: "3"
 
 services:
-  webapp:
+  poffee:
     container_name: poffee
     restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
     environment:
       - DATABASE_URL=${DATABASE_URL}
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+      - PHX_HOST=${PHX_HOST}
     build:
       context: .
       dockerfile: Dockerfile
@@ -19,7 +21,9 @@ services:
     ports:
       - "${WEBAPP_PORT:-4000}:${WEBAPP_PORT:-4000}"
     networks:
-      - poffee_network
+      - caddy_network
 
 networks:
-  poffee_network:
+  caddy_network:
+    name: main_baas
+    external: true

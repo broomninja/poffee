@@ -54,7 +54,7 @@ COPY lib lib
 
 COPY assets assets
 
-ARG SECRET_KEY_BASE
+ENV SECRET_KEY_BASE
 
 # Changes to config/runtime.exs don't require recompiling the code
 COPY config/runtime.exs config/
@@ -66,12 +66,14 @@ RUN mix assets.deploy
 RUN mix compile
 
 # DB setup
-ARG DATABASE_URL
-RUN mix ash_postgres.create
-RUN mix ash_postgres.migrate
+ENV DATABASE_URL
+# RUN mix ash_postgres.create
+# RUN mix ash_postgres.migrate
 
 COPY rel rel
 RUN mix release
+
+_build/prod/rel/hello_migrations/bin/hello_migrations eval "HelloMigrations.Release.migrate"
 
 ######################################################################
 
@@ -92,7 +94,7 @@ ENV LC_ALL en_US.UTF-8
 WORKDIR "/app"
 RUN chown nobody /app
 
-ARG MIX_ENV="prod"
+ENV MIX_ENV="prod"
 ARG APP_NAME="poffee"
 
 # Only copy the final release from the build stage
@@ -100,4 +102,4 @@ COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/${APP_NAME} .
 
 USER nobody
 
-CMD ["/app/bin/server"]
+CMD ["sh", "-c", "/app/bin/migrate && /app/bin/server"]
