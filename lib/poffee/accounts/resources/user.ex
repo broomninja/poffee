@@ -3,7 +3,7 @@ defmodule Poffee.Accounts.User do
     data_layer: AshPostgres.DataLayer,
     extensions: [AshAuthentication]
 
-  alias AshHq.Calculations.Decrypt
+  # alias AshHq.Calculations.Decrypt
 
   attributes do
     uuid_primary_key :id

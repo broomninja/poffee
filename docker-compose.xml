@@ -1,0 +1,26 @@
+version: "3.8"
+
+  webapp:
+    container_name: poffee
+    restart: "${DOCKER_RESTART_POLICY:-unless-stopped}"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - SECRET_KEY_BASE=${SECRET_KEY_BASE}
+      - PHX_SERVER=true
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - ELIXIR_VERSION=${ELIXIR_VERSION:-1.14.4}
+        - OTP_VERSION=${OTP_VERSION:-25.3.1}
+        - DEBIAN_VERSION=${DEBIAN_VERSION:-bullseye-20230227-slim}
+        - MIX_ENv=prod
+    ports:
+      - "${WEBAPP_PORT:-4000}:${WEBAPP_PORT:-4000}"
+    networks:
+      - poffee_network
+
+networks:
+  poffee_network:
+
+

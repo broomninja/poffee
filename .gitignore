@@ -35,3 +35,11 @@ poffee-*.tar
 npm-debug.log
 /assets/node_modules/
 
+# vscode
+/.elixir_ls/
+
+# env and secrets
+.env
+.env.*
+.decrypted~secret*
+.secrets
