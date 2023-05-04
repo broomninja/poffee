@@ -35,7 +35,8 @@ defmodule Poffee.Accounts.User do
 
       # signing_secret(Application.compile_env(:poffee, PoffeeWeb.Endpoint)[:secret_key_base])
       signing_secret(fn _, _ ->
-        Application.fetch_env(:poffee, PoffeeWeb.Endpoint)[:secret_key_base]
+        # Application.fetch_env(:poffee, PoffeeWeb.Endpoint)[:secret_key_base]
+          Application.fetch_env(:poffee, :signing_secret)
       end)
     end
   end

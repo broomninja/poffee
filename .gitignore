@@ -41,5 +41,6 @@ npm-debug.log
 # env and secrets
 .env
 .env.*
+!.env.example
 .decrypted~secret*
 .secrets
