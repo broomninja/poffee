@@ -66,6 +66,7 @@ RUN mix assets.deploy
 RUN mix compile
 
 # DB setup
+ARG DATABASE_URL
 RUN mix ash_postgres.create
 RUN mix ash_postgres.migrate
 
