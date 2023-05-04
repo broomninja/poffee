@@ -19,10 +19,6 @@ ARG DEBIAN_VERSION=bullseye-20230227-slim
 ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
 ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
 
-# set ENV
-ARG APP_NAME="poffee"
-ARG MIX_ENV="prod"
-
 FROM ${BUILDER_IMAGE} as builder
 
 # install build dependencies
@@ -38,6 +34,10 @@ RUN mix local.hex --force && \
 
 # install mix dependencies
 COPY mix.exs mix.lock ./
+
+ARG MIX_ENV="prod"
+RUN echo MIX_ENV=$MIX_ENV
+
 RUN mix deps.get --only $MIX_ENV
 RUN mkdir config
 
@@ -45,6 +45,7 @@ RUN mkdir config
 # to ensure any relevant config change will trigger the dependencies
 # to be re-compiled.
 COPY config/config.exs config/${MIX_ENV}.exs config/
+
 RUN mix deps.compile
 
 COPY priv priv
@@ -53,14 +54,20 @@ COPY lib lib
 
 COPY assets assets
 
+ARG SECRET_KEY_BASE
+
+# Changes to config/runtime.exs don't require recompiling the code
+COPY config/runtime.exs config/
+
 # compile assets
 RUN mix assets.deploy
 
 # Compile the release
 RUN mix compile
 
-# Changes to config/runtime.exs don't require recompiling the code
-COPY config/runtime.exs config/
+# DB setup
+RUN mix ash_postgres.create
+RUN mix ash_postgres.migrate
 
 COPY rel rel
 RUN mix release
@@ -83,6 +90,9 @@ ENV LC_ALL en_US.UTF-8
 
 WORKDIR "/app"
 RUN chown nobody /app
+
+ARG MIX_ENV="prod"
+ARG APP_NAME="poffee"
 
 # Only copy the final release from the build stage
 COPY --from=builder --chown=nobody:root /app/_build/${MIX_ENV}/rel/${APP_NAME} ./

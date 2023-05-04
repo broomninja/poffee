@@ -33,7 +33,10 @@ defmodule Poffee.Accounts.User do
       enabled?(true)
       token_resource(Poffee.Accounts.Token)
 
-      signing_secret(Application.compile_env(:poffee, PoffeeWeb.Endpoint)[:secret_key_base])
+      # signing_secret(Application.compile_env(:poffee, PoffeeWeb.Endpoint)[:secret_key_base])
+      signing_secret(fn _, _ ->
+        Application.fetch_env(:poffee, PoffeeWeb.Endpoint)[:secret_key_base]
+      end)
     end
   end
 
