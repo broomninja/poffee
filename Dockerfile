@@ -35,8 +35,7 @@ RUN mix local.hex --force && \
 # install mix dependencies
 COPY mix.exs mix.lock ./
 
-ARG MIX_ENV="prod"
-RUN echo MIX_ENV=$MIX_ENV
+ENV MIX_ENV="prod"
 
 RUN mix deps.get --only $MIX_ENV
 RUN mkdir config
@@ -54,7 +53,7 @@ COPY lib lib
 
 COPY assets assets
 
-ENV SECRET_KEY_BASE
+ARG SECRET_KEY_BASE
 
 # Changes to config/runtime.exs don't require recompiling the code
 COPY config/runtime.exs config/
@@ -66,14 +65,12 @@ RUN mix assets.deploy
 RUN mix compile
 
 # DB setup
-ENV DATABASE_URL
+ARG DATABASE_URL
 # RUN mix ash_postgres.create
 # RUN mix ash_postgres.migrate
 
 COPY rel rel
 RUN mix release
-
-_build/prod/rel/hello_migrations/bin/hello_migrations eval "HelloMigrations.Release.migrate"
 
 ######################################################################
 

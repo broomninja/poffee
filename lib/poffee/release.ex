@@ -12,11 +12,6 @@ defmodule Poffee.Release do
     end
   end
 
-  def migrate_all do
-    load_app()
-    migrate()
-  end
-
   def rollback(repo, version) do
     load_app()
     {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :down, to: version))
@@ -38,6 +33,7 @@ defmodule Poffee.Release do
   end
 
   defp load_app do
+    Application.ensure_all_started(:ssl)
     Application.load(@app)
   end
 end
