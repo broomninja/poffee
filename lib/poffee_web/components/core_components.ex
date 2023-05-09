@@ -148,7 +148,7 @@ defmodule PoffeeWeb.CoreComponents do
     <.flash
       id="disconnected"
       kind={:error}
-      title="We can't find the internet"
+      title="Problem connecting to server"
       phx-disconnected={show("#disconnected")}
       phx-connected={hide("#disconnected")}
       hidden

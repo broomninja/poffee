@@ -1,6 +1,8 @@
 import Config
 
-# Configure your database
+####################################
+# Repo
+####################################
 config :poffee, Poffee.Repo,
   username: "postgres",
   password: "postgres",
@@ -10,6 +12,14 @@ config :poffee, Poffee.Repo,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 
+config :poffee, :generators,
+  migration: true,
+  binary_id: true,
+  sample_binary_id: "11111111-1111-1111-1111-111111111111"
+
+####################################
+# Web Endpoint
+####################################
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #
@@ -62,11 +72,14 @@ config :poffee, PoffeeWeb.Endpoint,
     ]
   ]
 
-# Enable dev routes for dashboard and mailbox
-config :poffee, dev_routes: true
+####################################
+# Misc
+####################################
+# Disable swoosh api client as it is only required for production adapters.
+config :swoosh, :api_client, false
 
 # Do not include metadata nor timestamps in development logs
-config :logger, :console, format: "[$level] $message\n"
+# config :logger, :console, format: "[$level] $message\n"
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.
@@ -74,6 +87,3 @@ config :phoenix, :stacktrace_depth, 20
 
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime
-
-# Disable swoosh api client as it is only required for production adapters.
-config :swoosh, :api_client, false

@@ -16,8 +16,8 @@ defmodule Poffee.Application do
       {Phoenix.PubSub, name: Poffee.PubSub},
       # Start Finch
       {Finch, name: Poffee.Finch},
-      # AshAuth
-      {AshAuthentication.Supervisor, otp_app: :poffee},
+      # Start FunWithFlags
+      FunWithFlags.Supervisor,
       # Start the Endpoint (http/https)
       PoffeeWeb.Endpoint
       # Start a worker by calling: Poffee.Worker.start_link(arg)
