@@ -246,14 +246,13 @@ defmodule PoffeeWeb.UserAuth do
   Used for routes that require the user to have an admin role.
 
   """
-  def require_authenticated_admin(%{assigns: %{current_user: user}} = conn, _opts) do
+  def require_authenticated_admin(%{assigns: %{current_user: user}} = conn, _opts)
+      when user != nil do
     if Accounts.admin?(user) do
-      Logger.debug("require_authenticated_admin is admin")
       conn
     else
       conn
       |> put_flash(:error, @require_admin_text)
-      |> maybe_store_return_to()
       |> redirect(to: signed_in_path(conn))
       |> halt()
     end
@@ -274,6 +273,7 @@ defmodule PoffeeWeb.UserAuth do
   end
 
   defp maybe_store_return_to(%{method: "GET"} = conn) do
+    # Logger.debug("adding :user_return_to " <> current_path(conn))
     put_session(conn, :user_return_to, current_path(conn))
   end
 

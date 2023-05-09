@@ -80,8 +80,9 @@ defmodule Poffee.MixProject do
       {:observer_cli, "~> 1.7"},
 
       # dev and test deps
-      {:exsync, "~> 0.2", only: :dev},
-      {:file_system, "~> 0.2"},
+      {:ecto_dev_logger, "~> 0.9"},
+      # {:exsync, "~> 0.2", only: :dev},
+      # {:file_system, "~> 0.2"},
       {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.2.0", runtime: Mix.env() == :dev},
       {:floki, ">= 0.34.2", only: :test},
