@@ -17,6 +17,7 @@ defmodule PoffeeWeb.FeatureCase do
     quote do
       use Wallaby.Feature
 
+      import Poffee.AccountsFixtures
       import PoffeeWeb.Factory
       import PoffeeWeb.FeatureCase
       import Wallaby.Query

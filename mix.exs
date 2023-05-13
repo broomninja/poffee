@@ -9,8 +9,16 @@ defmodule Poffee.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      preferred_cli_env: [e2e: :test, "test.watch": :test, "test.all": :test],
-      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [
+        e2e: :test,
+        "test.watch": :test,
+        "test.all": :test,
+        coveralls: :test,
+        "coveralls.detail": :test,
+        "coveralls.post": :test,
+        "coveralls.html": :test
+      ],
+      test_coverage: [tool: ExCoveralls, test_task: "test.all"],
       deps: deps()
     ]
   end
@@ -44,7 +52,9 @@ defmodule Poffee.MixProject do
       {:phoenix, "~> 1.7.2"},
       {:phoenix_ecto, "~> 4.4"},
       {:phoenix_html, "~> 3.3"},
-      {:phoenix_live_view, "~> 0.18.18"},
+      # {:phoenix_live_view, path: "../phoenix_live_view", override: true},
+      {:phoenix_live_view, github: "phoenixframework/phoenix_live_view", override: true},
+      # {:phoenix_live_view, "~> 0.18.18"},
       {:phoenix_live_dashboard, "~> 0.7.2"},
       {:phoenix_live_reload, "~> 1.4", only: :dev},
       {:phoenix_pubsub, "~> 2.0"},
@@ -61,9 +71,10 @@ defmodule Poffee.MixProject do
       {:swoosh, "~> 1.3"},
       {:finch, "~> 0.13"},
 
-      # logic / feature flag
+      # rules / feature flag
       {:fun_with_flags, "~> 1.10.1"},
       {:opus, "~> 0.8"},
+      {:let_me, "~> 1.1"},
 
       # metrics
       {:telemetry_metrics, "~> 0.6"},
@@ -85,9 +96,11 @@ defmodule Poffee.MixProject do
       # {:file_system, "~> 0.2"},
       {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},
       {:tailwind, "~> 0.2.0", runtime: Mix.env() == :dev},
+      {:dialyxir, "~> 1.3", only: [:dev], runtime: false},
+      {:gradient, github: "esl/gradient", only: [:dev], runtime: false},
+      {:typed_ecto_schema, "~> 0.4.1", runtime: false},
       {:floki, ">= 0.34.2", only: :test},
       {:excoveralls, "~> 0.16", only: :test},
-      {:dialyxir, "~> 1.3", only: [:dev], runtime: false},
       {:ex_machina, "~> 2.7", only: :test},
       {:wallaby, "~> 0.30", only: :test, runtime: false}
     ]

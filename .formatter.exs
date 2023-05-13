@@ -1,7 +1,8 @@
 [
   import_deps: [
     :ecto,
-    :phoenix
+    :phoenix,
+    :let_me
   ],
   subdirectories: ["priv/*/migrations"],
   plugins: [Phoenix.LiveView.HTMLFormatter],

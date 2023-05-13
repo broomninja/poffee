@@ -4,8 +4,8 @@ import Config
 # Repo
 ####################################
 config :poffee, Poffee.Repo,
-  username: "postgres",
-  password: "postgres",
+  username: "pgdb_user_poffee",
+  password: "pgdb_password_poffee",
   hostname: "localhost",
   database: "poffee_dev",
   stacktrace: true,

@@ -21,7 +21,7 @@ defmodule PoffeeWeb.UserSettingsLiveTest do
 
       assert {:redirect, %{to: path, flash: flash}} = redirect
       assert path == ~p"/users/log_in"
-      assert %{"error" => "You must log in to access the requested page."} = flash
+      assert %{"error" => "Please login to proceed."} = flash
     end
   end
 
@@ -204,7 +204,7 @@ defmodule PoffeeWeb.UserSettingsLiveTest do
       assert {:redirect, %{to: path, flash: flash}} = redirect
       assert path == ~p"/users/log_in"
       assert %{"error" => message} = flash
-      assert message == "You must log in to access the requested page."
+      assert message == "Please login to proceed."
     end
   end
 end

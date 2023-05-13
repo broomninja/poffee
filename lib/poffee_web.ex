@@ -84,7 +84,9 @@ defmodule PoffeeWeb do
       # HTML escaping functionality
       import Phoenix.HTML
       # Core UI components and translation
-      import PoffeeWeb.CoreComponents
+      import PoffeeWeb.Components.Core
+      import PoffeeWeb.Components.Icon
+
       import PoffeeWeb.Gettext
 
       # Shortcut for generating JS commands

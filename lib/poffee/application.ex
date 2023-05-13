@@ -24,13 +24,15 @@ defmodule Poffee.Application do
       # {Poffee.Worker, arg}
     ]
 
-    # Replace default Repo logging
-    Ecto.DevLogger.install(Poffee.Repo)
-
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Poffee.Supervisor]
-    Supervisor.start_link(children, opts)
+    result = Supervisor.start_link(children, opts)
+
+    # Replace default Repo logging
+    Ecto.DevLogger.install(Poffee.Repo)
+
+    result
   end
 
   # Tell Phoenix to update the endpoint configuration

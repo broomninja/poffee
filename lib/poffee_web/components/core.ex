@@ -1,4 +1,4 @@
-defmodule PoffeeWeb.CoreComponents do
+defmodule PoffeeWeb.Components.Core do
   @moduledoc """
   Provides core UI components.
 

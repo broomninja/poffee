@@ -4,6 +4,8 @@ defmodule Poffee.Accounts do
   """
 
   import Ecto.Query, warn: false
+  import Ecto.Changeset
+
   alias Poffee.Repo
 
   alias Poffee.Accounts.{User, UserToken, UserNotifier}
@@ -368,9 +370,35 @@ defmodule Poffee.Accounts do
   end
 
   @doc """
+  Set admin rights for the given user.
+
+  > This is a database action.
+  """
+  def promote_to_admin(actor, user) do
+    if admin?(actor) do
+      user
+      |> change(role: :role_admin)
+      |> Repo.update()
+    end
+  end
+
+  @doc """
+  Removes admin rights from the given user.
+
+  > This is a database action.
+  """
+  def demote_admin(actor, user) do
+    if admin?(actor) do
+      user
+      |> change(role: :role_user)
+      |> Repo.update()
+    end
+  end
+
+  @doc """
   Returns true if user role is :role_admin
   """
-  def admin?(%User{role: role} = _user) do
-    role == :role_admin
-  end
+  @spec admin?(User.t()) :: boolean()
+  def admin?(%User{role: role} = _user), do: role == :role_admin
+  def admin?(_user), do: false
 end

@@ -21,6 +21,8 @@ defmodule PoffeeWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :demo
+    get "/demo", PageController, :demo
+    live "/demolive", DemoLive, :new
   end
 
   # Other scopes may use custom stacks.
@@ -43,12 +45,20 @@ defmodule PoffeeWeb.Router do
       live_session :require_authenticated_admin,
         on_mount: [
           PoffeeWeb.Hooks.AllowEctoSandbox,
-          {PoffeeWeb.UserAuth, :ensure_admin}
+          {PoffeeWeb.UserAuthLive, :ensure_admin}
         ] do
       end
 
       forward "/mailbox", Plug.Swoosh.MailboxPreview
-      live_dashboard "/dashboard", metrics: PoffeeWeb.Telemetry
+
+      live_dashboard "/system",
+        ecto_repos: [Poffee.Repo],
+        ecto_psql_extras_options: [
+          long_running_queries: [threshold: "200 milliseconds"]
+        ],
+        # metrics_history:
+        #   if(Config.env() == :dev, do: {PoffeeWeb.TelemetryStorage, :metrics_history, []}),
+        metrics: PoffeeWeb.Telemetry
     end
   end
 
@@ -67,7 +77,7 @@ defmodule PoffeeWeb.Router do
     live_session :redirect_if_user_is_authenticated,
       on_mount: [
         PoffeeWeb.Hooks.AllowEctoSandbox,
-        {PoffeeWeb.UserAuth, :redirect_if_user_is_authenticated}
+        {PoffeeWeb.UserAuthLive, :redirect_if_user_is_authenticated}
       ] do
       live "/users/register", UserRegistrationLive, :new
       live "/users/log_in", UserLoginLive, :new
@@ -84,7 +94,7 @@ defmodule PoffeeWeb.Router do
     live_session :require_authenticated_user,
       on_mount: [
         PoffeeWeb.Hooks.AllowEctoSandbox,
-        {PoffeeWeb.UserAuth, :ensure_authenticated}
+        {PoffeeWeb.UserAuthLive, :ensure_authenticated}
       ] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
@@ -99,7 +109,7 @@ defmodule PoffeeWeb.Router do
     live_session :current_user,
       on_mount: [
         PoffeeWeb.Hooks.AllowEctoSandbox,
-        {PoffeeWeb.UserAuth, :mount_current_user}
+        {PoffeeWeb.UserAuthLive, :mount_current_user}
       ] do
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new

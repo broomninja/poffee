@@ -9,14 +9,14 @@ defmodule Poffee.Accounts.User do
     :role_admin
   ])
 
-  schema "users" do
+  typed_schema "users" do
     field :email, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
     field :role, RolesEnum, default: :role_user
 
-    timestamps()
+    timestamps(type: :utc_datetime_usec)
   end
 
   @doc """

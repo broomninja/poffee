@@ -4,10 +4,11 @@ defmodule PoffeeWeb.UserAuthTest do
   alias Phoenix.LiveView
   alias Poffee.Accounts
   alias PoffeeWeb.UserAuth
+  alias PoffeeWeb.UserAuthLive
   import Poffee.AccountsFixtures
 
   @remember_me_cookie "_pineapple_login_web_user_remember_me"
-  @require_authenticated_text "You must log in to access the requested page."
+  @require_authenticated_text "Please login to proceed."
   @require_admin_text "You do not have permission to view the requested page."
 
   setup %{conn: conn} do
@@ -125,7 +126,7 @@ defmodule PoffeeWeb.UserAuthTest do
       session = conn |> put_session(:user_token, user_token) |> get_session()
 
       {:cont, updated_socket} =
-        UserAuth.on_mount(:mount_current_user, %{}, session, %LiveView.Socket{})
+        UserAuthLive.on_mount(:mount_current_user, %{}, session, %LiveView.Socket{})
 
       assert updated_socket.assigns.current_user.id == user.id
     end
@@ -135,7 +136,7 @@ defmodule PoffeeWeb.UserAuthTest do
       session = conn |> put_session(:user_token, user_token) |> get_session()
 
       {:cont, updated_socket} =
-        UserAuth.on_mount(:mount_current_user, %{}, session, %LiveView.Socket{})
+        UserAuthLive.on_mount(:mount_current_user, %{}, session, %LiveView.Socket{})
 
       assert updated_socket.assigns.current_user == nil
     end
@@ -144,7 +145,7 @@ defmodule PoffeeWeb.UserAuthTest do
       session = conn |> get_session()
 
       {:cont, updated_socket} =
-        UserAuth.on_mount(:mount_current_user, %{}, session, %LiveView.Socket{})
+        UserAuthLive.on_mount(:mount_current_user, %{}, session, %LiveView.Socket{})
 
       assert updated_socket.assigns.current_user == nil
     end
@@ -156,7 +157,7 @@ defmodule PoffeeWeb.UserAuthTest do
       session = conn |> put_session(:user_token, user_token) |> get_session()
 
       {:cont, updated_socket} =
-        UserAuth.on_mount(:ensure_authenticated, %{}, session, %LiveView.Socket{})
+        UserAuthLive.on_mount(:ensure_authenticated, %{}, session, %LiveView.Socket{})
 
       assert updated_socket.assigns.current_user.id == user.id
     end
@@ -170,7 +171,7 @@ defmodule PoffeeWeb.UserAuthTest do
         assigns: %{__changed__: %{}, flash: %{}}
       }
 
-      {:halt, updated_socket} = UserAuth.on_mount(:ensure_authenticated, %{}, session, socket)
+      {:halt, updated_socket} = UserAuthLive.on_mount(:ensure_authenticated, %{}, session, socket)
       assert updated_socket.assigns.current_user == nil
     end
 
@@ -182,7 +183,7 @@ defmodule PoffeeWeb.UserAuthTest do
         assigns: %{__changed__: %{}, flash: %{}}
       }
 
-      {:halt, updated_socket} = UserAuth.on_mount(:ensure_authenticated, %{}, session, socket)
+      {:halt, updated_socket} = UserAuthLive.on_mount(:ensure_authenticated, %{}, session, socket)
       assert updated_socket.assigns.current_user == nil
     end
   end
@@ -193,7 +194,7 @@ defmodule PoffeeWeb.UserAuthTest do
       session = conn |> put_session(:user_token, user_token) |> get_session()
 
       assert {:halt, _updated_socket} =
-               UserAuth.on_mount(
+               UserAuthLive.on_mount(
                  :redirect_if_user_is_authenticated,
                  %{},
                  session,
@@ -205,7 +206,7 @@ defmodule PoffeeWeb.UserAuthTest do
       session = conn |> get_session()
 
       assert {:cont, _updated_socket} =
-               UserAuth.on_mount(
+               UserAuthLive.on_mount(
                  :redirect_if_user_is_authenticated,
                  %{},
                  session,

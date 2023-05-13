@@ -5,6 +5,8 @@ defmodule PoffeeWeb.UserAuth do
   import Phoenix.Controller
 
   alias Poffee.Accounts
+  alias Poffee.Accounts.User
+  alias PoffeeWeb.Constant
 
   require Logger
 
@@ -14,9 +16,6 @@ defmodule PoffeeWeb.UserAuth do
   @max_age 60 * 60 * 24 * 60
   @remember_me_cookie "_pineapple_login_web_user_remember_me"
   @remember_me_options [sign: true, max_age: @max_age, same_site: "Lax"]
-
-  @require_authenticated_text "You must log in to access the requested page."
-  @require_admin_text "You do not have permission to view the requested page."
 
   @doc """
   Logs the user in.
@@ -30,6 +29,7 @@ defmodule PoffeeWeb.UserAuth do
   disconnected on log out. The line can be safely removed
   if you are not using LiveView.
   """
+  @spec log_in_user(Plug.Conn.t(), User.t(), map()) :: Plug.Conn.t()
   def log_in_user(conn, user, params \\ %{}) do
     token = Accounts.generate_user_session_token(user)
     user_return_to = get_session(conn, :user_return_to)
@@ -80,6 +80,7 @@ defmodule PoffeeWeb.UserAuth do
 
   It clears all session data for safety. See renew_session.
   """
+  @spec log_out_user(Plug.Conn.t()) :: Plug.Conn.t()
   def log_out_user(conn) do
     user_token = get_session(conn, :user_token)
     user_token && Accounts.delete_user_session_token(user_token)
@@ -98,6 +99,7 @@ defmodule PoffeeWeb.UserAuth do
   Authenticates the user by looking into the session
   and remember me token.
   """
+  @spec fetch_current_user(Plug.Conn.t(), Keyword.t()) :: Plug.Conn.t()
   def fetch_current_user(conn, _opts) do
     {user_token, conn} = ensure_user_token(conn)
     user = user_token && Accounts.get_user_by_session_token(user_token)
@@ -119,101 +121,9 @@ defmodule PoffeeWeb.UserAuth do
   end
 
   @doc """
-  Handles mounting and authenticating the current_user in LiveViews.
-
-  ## `on_mount` arguments
-
-    * `:mount_current_user` - Assigns current_user
-      to socket assigns based on user_token, or nil if
-      there's no user_token or no matching user.
-
-    * `:ensure_authenticated` - Authenticates the user from the session,
-      and assigns the current_user to socket assigns based
-      on user_token.
-      Redirects to login page if there's no logged user.
-
-    * `:redirect_if_user_is_authenticated` - Authenticates the user from the session.
-      Redirects to signed_in_path if there's a logged user.
-
-  ## Examples
-
-  Use the `on_mount` lifecycle macro in LiveViews to mount or authenticate
-  the current_user:
-
-      defmodule PoffeeWeb.PageLive do
-        use PoffeeWeb, :live_view
-
-        on_mount {PoffeeWeb.UserAuth, :mount_current_user}
-        ...
-      end
-
-  Or use the `live_session` of your router to invoke the on_mount callback:
-
-      live_session :authenticated, on_mount: [{PoffeeWeb.UserAuth, :ensure_authenticated}] do
-        live "/profile", ProfileLive, :index
-      end
-  """
-  def on_mount(:mount_current_user, _params, session, socket) do
-    {:cont, mount_current_user(session, socket)}
-  end
-
-  # def on_mount(:ensure_admin, _params, _session, %{assigns: %{current_user: user}} = socket) do
-
-  def on_mount(:ensure_admin, _params, session, socket) do
-    socket = mount_current_user(session, socket)
-    current_user = socket.assigns.current_user
-    Logger.debug("on_mount:ensure_admin: #inspect(current_user, pretty: true)}")
-
-    if current_user && Accounts.admin?(current_user) do
-      {:cont, socket}
-    else
-      # TODO: store_return_to before redirect
-      socket =
-        socket
-        |> Phoenix.LiveView.put_flash(:error, @require_admin_text)
-        |> Phoenix.LiveView.redirect(to: signed_in_path(socket))
-
-      {:halt, socket}
-    end
-  end
-
-  def on_mount(:ensure_authenticated, _params, session, socket) do
-    socket = mount_current_user(session, socket)
-
-    if socket.assigns.current_user do
-      {:cont, socket}
-    else
-      socket =
-        socket
-        |> Phoenix.LiveView.put_flash(:error, @require_authenticated_text)
-        # TODO: store_return_to
-        |> Phoenix.LiveView.redirect(to: ~p"/users/log_in")
-
-      {:halt, socket}
-    end
-  end
-
-  def on_mount(:redirect_if_user_is_authenticated, _params, session, socket) do
-    socket = mount_current_user(session, socket)
-
-    if socket.assigns.current_user do
-      {:halt, Phoenix.LiveView.redirect(socket, to: signed_in_path(socket))}
-    else
-      {:cont, socket}
-    end
-  end
-
-  defp mount_current_user(session, socket) do
-    Phoenix.Component.assign_new(socket, :current_user, fn ->
-      if user_token = session["user_token"] do
-        Accounts.get_user_by_session_token(user_token)
-      end
-    end)
-  end
-
-  @doc """
   Used for routes that require the user to not be authenticated.
   """
+  @spec redirect_if_user_is_authenticated(Plug.Conn.t(), Keyword.t()) :: Plug.Conn.t()
   def redirect_if_user_is_authenticated(conn, _opts) do
     if conn.assigns[:current_user] do
       conn
@@ -230,12 +140,13 @@ defmodule PoffeeWeb.UserAuth do
   If you want to enforce the user email is confirmed before
   they use the application at all, here would be a good place.
   """
+  @spec require_authenticated_user(Plug.Conn.t(), Keyword.t()) :: Plug.Conn.t()
   def require_authenticated_user(conn, _opts) do
     if conn.assigns[:current_user] do
       conn
     else
       conn
-      |> put_flash(:error, @require_authenticated_text)
+      |> put_flash(:error, Constant.require_authenticated_text())
       |> maybe_store_return_to()
       |> redirect(to: ~p"/users/log_in")
       |> halt()
@@ -252,7 +163,7 @@ defmodule PoffeeWeb.UserAuth do
       conn
     else
       conn
-      |> put_flash(:error, @require_admin_text)
+      |> put_flash(:error, Constant.require_admin_text())
       |> redirect(to: signed_in_path(conn))
       |> halt()
     end
@@ -260,7 +171,7 @@ defmodule PoffeeWeb.UserAuth do
 
   def require_authenticated_admin(conn, _opts) do
     conn
-    |> put_flash(:error, @require_authenticated_text)
+    |> put_flash(:error, Constant.require_authenticated_text())
     |> maybe_store_return_to()
     |> redirect(to: ~p"/users/log_in")
     |> halt()
@@ -273,11 +184,13 @@ defmodule PoffeeWeb.UserAuth do
   end
 
   defp maybe_store_return_to(%{method: "GET"} = conn) do
-    # Logger.debug("adding :user_return_to " <> current_path(conn))
+    # %{request_path: request_path, query_string: query_string} = conn
+    # return_to = if query_string == "", do: request_path, else: request_path <> "?" <> query_string
+    # put_session(conn, :user_return_to, return_to)
     put_session(conn, :user_return_to, current_path(conn))
   end
 
   defp maybe_store_return_to(conn), do: conn
 
-  defp signed_in_path(_conn), do: ~p"/"
+  def signed_in_path(_conn), do: ~p"/"
 end
