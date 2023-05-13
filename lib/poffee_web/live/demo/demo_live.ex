@@ -10,12 +10,23 @@ defmodule PoffeeWeb.DemoLive do
     <a href="/">
       <img src={~p"/images/logo.svg"} width="36" />
     </a>
+    <div class="">
+      Hero: <.icon name="hero-phone-x-mark-solid" class="h-6 w-6 animate-spin  preserve-3d" />
+    </div>
+
+    <span class="">
+      Tabler: <.tabler_icon name="tabler-refresh" class="ml-1 w-8 h-8 animate-spin preserve-3d " />
+    </span>
+
+    <span class="" style="display: inline-flex; transform-style: preserve">
+      Tabler: <.tabler_icon name="tabler-abc" class="ml-1 w-10 h-10 animate-spin preserve-3d" />
+    </span>
 
     <div class="mt-4 flex items-end justify-between">
-      <.icon_button
+      <.tabler_icon_button
         icon="tabler-trash-x"
         label="Login"
-        color={:alert}
+        color={:warning}
         phx-click={show_modal("login-modal")}
         size={:md}
       />
