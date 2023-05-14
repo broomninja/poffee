@@ -6,7 +6,7 @@ defmodule PoffeeWeb.UserAuth do
 
   alias Poffee.Accounts
   alias Poffee.Accounts.User
-  alias PoffeeWeb.Constant
+  alias Poffee.Constant
 
   require Logger
 

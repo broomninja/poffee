@@ -3,6 +3,8 @@ defmodule Poffee.Accounts.User do
   import Ecto.Changeset
   import EctoEnum
 
+  alias Poffee.Constant
+
   defenum(RolesEnum, :role, [
     :role_user,
     # :role_sub_owner,
@@ -55,7 +57,7 @@ defmodule Poffee.Accounts.User do
     |> validate_format(:email, ~r/^[\w-\.]+@([\w-]+\.)+[\w-]{2,}$/,
       message: "invalid email format"
     )
-    |> validate_length(:email, max: 250)
+    |> validate_length(:email, max: Constant.email_max_length())
     |> maybe_validate_unique_email(opts)
   end
 

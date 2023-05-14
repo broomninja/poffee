@@ -50,31 +50,26 @@
   </header>
   <main>
     <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-567
       <div class="px-4 py-8 sm:px-0">
-123
         <div class="border-4 border-gray-200 border-dashed rounded-lg h-96">
-        
-                    <div class="mt-4 flex items-end justify-between">
-      <.tabler_icon_button
-        icon="tabler-trash-x"
-        label="Login"
-        color={:warning}
-        phx-click={show_modal("login-modal")}
-        size={:md}
-      />
-    </div>
-            <.modal id="login-modal" on_cancel={hide_modal("login-modal")}>
-      <.header>
-        Login
-        <:subtitle>
-          Please sign in
-        </:subtitle>
-      </.header>
-    </.modal>
-    
-    </div>
-here
+          <div class="mt-4 flex items-end justify-between">
+            <.tabler_icon_button
+              icon="tabler-trash-x"
+              label="Login"
+              color={:warning}
+              phx-click={show_modal("login-modal")}
+              size={:md}
+            />
+          </div>
+          <.modal id="login-modal" on_cancel={hide_modal("login-modal")}>
+            <.header>
+              Login
+              <:subtitle>
+                Please sign in
+              </:subtitle>
+            </.header>
+          </.modal>
+        </div>
       </div>
     </div>
   </main>

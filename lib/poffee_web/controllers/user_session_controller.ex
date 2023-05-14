@@ -2,6 +2,7 @@ defmodule PoffeeWeb.UserSessionController do
   use PoffeeWeb, :controller
 
   alias Poffee.Accounts
+  alias Poffee.Constant
   alias PoffeeWeb.UserAuth
 
   def create(conn, %{"_action" => "registered"} = params) do
@@ -29,7 +30,7 @@ defmodule PoffeeWeb.UserSessionController do
       # In order to prevent user enumeration attacks, don't disclose whether the email is registered.
       conn
       |> put_flash(:error, "Invalid email or password")
-      |> put_flash(:email, String.slice(email, 0, 160))
+      |> put_flash(:email, String.slice(email, 0, Constant.email_max_length()))
       |> redirect(to: ~p"/users/log_in")
     end
   end

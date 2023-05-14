@@ -5,7 +5,7 @@ defmodule PoffeeWeb.UserAuthLive do
   Helpers for authenticating users in liveviews
   """
   alias Poffee.Accounts
-  alias PoffeeWeb.Constant
+  alias Poffee.Constant
   alias PoffeeWeb.UserAuth
   alias Phoenix.LiveView
   alias Phoenix.LiveView.Socket

@@ -153,7 +153,14 @@ defmodule PoffeeWeb.CoreComponents do
       phx-connected={hide("#disconnected")}
       hidden
     >
-      Attempting to reconnect <.icon name="hero-arrow-path" class="ml-1 h-3 w-3 animate-spin" />
+      Attempting to reconnect
+      <%!-- 
+        FIX for firefox bug that displays black border when icon is spinning
+        see https://github.com/iconify/iconify/issues/214#issuecomment-1500860362
+       --%>
+      <span style="display: inline-flex; transform-style: preserve-3d">
+        <.icon name="hero-arrow-path" class="ml-1 h-3 w-3 animate-spin" />
+      </span>
     </.flash>
     """
   end
