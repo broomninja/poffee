@@ -17,23 +17,13 @@ defmodule Poffee.Release do
     {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :down, to: version))
   end
 
-  defp repos do
-    apis()
-    |> Enum.flat_map(fn api ->
-      api
-      |> Ash.Api.Info.resources()
-      |> Enum.filter(&(AshPostgres.DataLayer in Spark.extensions(&1)))
-      |> Enum.map(&AshPostgres.DataLayer.Info.repo/1)
-    end)
-    |> Enum.uniq()
-  end
-
-  defp apis do
-    Application.fetch_env!(@app, :ash_apis)
+  def repos do
+    Application.fetch_env!(@app, :ecto_repos)
   end
 
   defp load_app do
-    Application.ensure_all_started(:ssl)
     Application.load(@app)
+    # ssl required when connecting to ssl DB
+    {:ok, _} = Application.ensure_all_started(:ssl)
   end
 end

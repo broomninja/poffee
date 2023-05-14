@@ -85,6 +85,8 @@ defmodule PoffeeWeb do
       import Phoenix.HTML
       # Core UI components and translation
       import PoffeeWeb.CoreComponents
+      import PoffeeWeb.Components.TablerIcon
+
       import PoffeeWeb.Gettext
 
       # Shortcut for generating JS commands

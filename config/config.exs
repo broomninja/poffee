@@ -7,11 +7,16 @@
 # General application configuration
 import Config
 
-config :poffee,
-  ecto_repos: [Poffee.Repo],
-  ash_apis: [Poffee.Accounts]
+####################################
+# Repo
+####################################
+config :poffee, ecto_repos: [Poffee.Repo]
 
-# Configures the endpoint
+config :poffee, Poffee.Repo, migration_primary_key: [type: :uuid]
+
+####################################
+# Web Endpoint
+####################################
 config :poffee, PoffeeWeb.Endpoint,
   url: [host: "localhost"],
   render_errors: [
@@ -19,9 +24,16 @@ config :poffee, PoffeeWeb.Endpoint,
     layout: false
   ],
   pubsub_server: Poffee.PubSub,
-  live_view: [signing_salt: "eII60wnm"]
+  live_view: [
+    signing_salt: "eII60wnm",
+    # the idle time in ms, before compressing its own memory and state
+    # default is 15secs
+    hibernate_after: 15000
+  ]
 
-# Configures the mailer
+####################################
+# Mailer / SMTP
+####################################
 #
 # By default it uses the "Local" adapter which stores the emails
 # locally. You can see the emails in your browser, at "/dev/mailbox".
@@ -30,7 +42,33 @@ config :poffee, PoffeeWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :poffee, Poffee.Mailer, adapter: Swoosh.Adapters.Local
 
-# Configure esbuild (the version is required)
+####################################
+# FunWithFlags 
+####################################
+config :fun_with_flags, :cache,
+  enabled: true,
+  # in seconds (10 mins)
+  ttl: 600
+
+# see https://github.com/tompave/fun_with_flags/issues/35#issuecomment-466809949
+config :fun_with_flags, :cache_bust_notifications,
+  enabled: true,
+  adapter: FunWithFlags.Notifications.PhoenixPubSub,
+  client: Poffee.PubSub
+
+config :fun_with_flags, :persistence,
+  adapter: FunWithFlags.Store.Persistent.Ecto,
+  repo: Poffee.Repo
+
+####################################
+# Admin
+####################################
+# Enable admin routes for dashboard and mailbox
+config :poffee, admin_routes: true
+
+####################################
+# esbuild (the version is required)
+####################################
 config :esbuild,
   version: "0.17.11",
   default: [
@@ -40,7 +78,9 @@ config :esbuild,
     env: %{"NODE_PATH" => Path.expand("../deps", __DIR__)}
   ]
 
-# Configure tailwind (the version is required)
+####################################
+# tailwind (the version is required)
+####################################
 config :tailwind,
   version: "3.2.7",
   default: [
@@ -52,18 +92,21 @@ config :tailwind,
     cd: Path.expand("../assets", __DIR__)
   ]
 
+####################################
+# Logger
+####################################
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:request_id]
 
+####################################
 # Use Jason for JSON parsing in Phoenix
+####################################
 config :phoenix, :json_library, Jason
 
-# For backwards compatibility, the following configuration is required.
-# see https://ash-hq.org/docs/guides/ash/latest/get-started#temporary-config for more details
-config :ash, :use_all_identities_in_manage_relationship?, false
-
+####################################
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
+####################################
 import_config "#{config_env()}.exs"

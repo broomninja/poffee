@@ -1,3 +1,4 @@
+<.flash_group flash={@flash} />
 <nav class="bg-gray-800">
   <div class="px-2 mx-auto max-w-7xl sm:px-6 lg:px-8">
     <div class="relative flex items-center justify-between h-16">
@@ -5,12 +6,19 @@
         <div class="block ml-6">
           <div class="flex space-x-4">
             <div class="px-3 py-2 text-xl font-medium text-white ">
-              Ash Demo
+              Poffee Demo 2
             </div>
           </div>
         </div>
       </div>
       <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+        <a href="/">
+          <%!-- Home --%>
+          <img src={~p"/images/logo.svg"} width="36" />
+        </a>
+        <a href="/demolive">
+          Demo <%!-- <img src={~p"/images/logo.svg"} width="36" /> --%>
+        </a>
         <%= if @current_user do %>
           <span class="px-3 py-2 text-sm font-medium text-white rounded-md">
             <%= @current_user.email %>
@@ -43,7 +51,25 @@
   <main>
     <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div class="px-4 py-8 sm:px-0">
-        <div class="border-4 border-gray-200 border-dashed rounded-lg h-96"></div>
+        <div class="border-4 border-gray-200 border-dashed rounded-lg h-96">
+          <div class="mt-4 flex items-end justify-between">
+            <.tabler_icon_button
+              icon="tabler-trash-x"
+              label="Login"
+              color={:warning}
+              phx-click={show_modal("login-modal")}
+              size={:md}
+            />
+          </div>
+          <.modal id="login-modal" on_cancel={hide_modal("login-modal")}>
+            <.header>
+              Login
+              <:subtitle>
+                Please sign in
+              </:subtitle>
+            </.header>
+          </.modal>
+        </div>
       </div>
     </div>
   </main>

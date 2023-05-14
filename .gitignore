@@ -44,3 +44,7 @@ npm-debug.log
 !.env.example
 .decrypted~secret*
 .secrets
+
+# wallaby
+/screenshots/
+
