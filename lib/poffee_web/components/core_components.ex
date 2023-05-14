@@ -101,6 +101,7 @@ defmodule PoffeeWeb.CoreComponents do
   attr :flash, :map, default: %{}, doc: "the map of flash messages to display"
   attr :title, :string, default: nil
   attr :kind, :atom, values: [:info, :error], doc: "used for styling and flash lookup"
+  attr :auto_hide, :boolean, default: false, doc: "auto hides after X secs, see app.js"
   attr :rest, :global, doc: "the arbitrary HTML attributes to add to the flash container"
 
   slot :inner_block, doc: "the optional inner block that renders the flash message"
@@ -111,6 +112,7 @@ defmodule PoffeeWeb.CoreComponents do
       :if={msg = render_slot(@inner_block) || Phoenix.Flash.get(@flash, @kind)}
       id={@id}
       phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
+      phx-hook={@auto_hide && "FlashAutoHide"}
       role="alert"
       class={[
         "fixed top-2 right-2 w-80 sm:w-96 z-50 rounded-lg p-3 ring-1",
@@ -143,8 +145,8 @@ defmodule PoffeeWeb.CoreComponents do
 
   def flash_group(assigns) do
     ~H"""
-    <.flash kind={:info} title="Success!" flash={@flash} />
-    <.flash kind={:error} title="Error!" flash={@flash} />
+    <.flash kind={:info} title="Success!" flash={@flash} auto_hide={true}/>
+    <.flash kind={:error} title="Error!" flash={@flash} auto_hide={true} />
     <.flash
       id="disconnected"
       kind={:error}

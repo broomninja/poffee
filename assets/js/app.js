@@ -22,16 +22,35 @@ import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import topbar from "../vendor/topbar";
 
+let Hooks = {};
+
+Hooks.FlashAutoHide = {
+  mounted() {
+    let hide = () =>
+      liveSocket.execJS(this.el, this.el.getAttribute('phx-click'));
+    this.timer = setTimeout(() => hide(), 5000);
+    this.el.addEventListener('phx:hide-start', () => clearTimeout(this.timer));
+    this.el.addEventListener('mouseover', () => {
+      clearTimeout(this.timer);
+      this.timer = setTimeout(() => hide(), 5000);
+    });
+  },
+  destroyed() {
+    clearTimeout(this.timer);
+  },
+};
+
 let csrfToken = document
   .querySelector("meta[name='csrf-token']")
   .getAttribute("content");
 let liveSocket = new LiveSocket("/live", Socket, {
   params: { _csrf_token: csrfToken },
+  hooks: Hooks,
 });
 
 // Show progress bar on live navigation and form submits
-topbar.config({ barColors: { 0: "#41c" }, shadowColor: "rgba(0, 0, 0, .3)" });
-window.addEventListener("phx:page-loading-start", (_info) => topbar.show(220));
+topbar.config({ barColors: { 0: "#39e" }, shadowColor: "rgba(0, 0, 0, .3)" });
+window.addEventListener("phx:page-loading-start", (_info) => topbar.show(180));
 window.addEventListener("phx:page-loading-stop", (_info) => topbar.hide());
 
 // connect if there are any LiveViews on the page
