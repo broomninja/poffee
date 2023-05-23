@@ -4,50 +4,7 @@ defmodule PoffeeWeb.UserRegistrationLive do
   alias Poffee.Accounts
   alias Poffee.Accounts.User
 
-  def render(assigns) do
-    ~H"""
-    <div class="mx-auto max-w-sm">
-      <.header class="text-center">
-        Register for an account
-        <:subtitle>
-          Already registered?
-          <.link navigate={~p"/users/log_in"} class="font-semibold text-brand hover:underline">
-            Sign in
-          </.link>
-          to your account now.
-        </:subtitle>
-      </.header>
-
-      <.simple_form
-        for={@form}
-        id="registration_form"
-        phx-submit="save"
-        phx-change="validate"
-        phx-trigger-action={@trigger_submit}
-        action={~p"/users/log_in?_action=registered"}
-        method="post"
-      >
-        <.error :if={@check_errors}>
-          Oops, something went wrong! Please check the errors below.
-        </.error>
-
-        <.input field={@form[:email]} type="email" label="Email" required phx-debounce="blur" />
-        <.input
-          field={@form[:password]}
-          type="password"
-          label="Password"
-          required
-          phx-debounce="blur"
-        />
-
-        <:actions>
-          <.button phx-disable-with="Creating account..." class="w-full">Create an account</.button>
-        </:actions>
-      </.simple_form>
-    </div>
-    """
-  end
-
+  @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
     changeset = Accounts.change_user_registration(%User{})
 
@@ -59,6 +16,16 @@ defmodule PoffeeWeb.UserRegistrationLive do
     {:ok, socket, temporary_assigns: [form: nil]}
   end
 
+  @impl Phoenix.LiveView
+  def handle_params(%{"user_return_to" => user_return_to} = _params, _uri, socket) do
+    {:noreply, assign(socket, user_return_to: user_return_to)}
+  end
+
+  def handle_params(_params, _uri, socket) do
+    {:noreply, socket}
+  end
+
+  @impl Phoenix.LiveView
   def handle_event("save", %{"user" => user_params}, socket) do
     case Accounts.register_user(user_params) do
       {:ok, user} ->
@@ -89,5 +56,58 @@ defmodule PoffeeWeb.UserRegistrationLive do
     else
       assign(socket, form: form)
     end
+  end
+
+  @impl Phoenix.LiveView
+  def render(assigns) do
+    ~H"""
+    <div class="mx-auto max-w-sm">
+      <.header class="text-center">
+        Register for an account
+        <:subtitle>
+          Already registered?
+          <.link
+            navigate={
+              Routes.user_login_path(PoffeeWeb.Endpoint, :new,
+                user_return_to: assigns[:user_return_to] || []
+              )
+            }
+            class="font-semibold text-brand hover:underline"
+          >
+            Sign in
+          </.link>
+          to your account now.
+        </:subtitle>
+      </.header>
+
+      <.simple_form
+        for={@form}
+        id="registration_form"
+        phx-submit="save"
+        phx-change="validate"
+        phx-trigger-action={@trigger_submit}
+        action={~p"/users/log_in?_action=registered"}
+        method="post"
+      >
+        <.error :if={@check_errors}>
+          Oops, something went wrong! Please check the errors below.
+        </.error>
+
+        <.input field={@form[:email]} type="email" label="Email" required phx-debounce="blur" />
+        <.input
+          field={@form[:password]}
+          type="password"
+          label="Password"
+          required
+          phx-debounce="blur"
+        />
+        <.input field={@form[:user_return_to]} type="hidden" value={assigns[:user_return_to]} />
+
+        <:actions>
+          <.button phx-disable-with="Creating account..." class="w-full">Create an account</.button>
+        </:actions>
+      </.simple_form>
+    </div>
+    """
   end
 end

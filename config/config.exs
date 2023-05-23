@@ -18,6 +18,7 @@ config :poffee, Poffee.Repo, migration_primary_key: [type: :uuid]
 # Web Endpoint
 ####################################
 config :poffee, PoffeeWeb.Endpoint,
+  adapter: Bandit.PhoenixAdapter,
   url: [host: "localhost"],
   render_errors: [
     formats: [html: PoffeeWeb.ErrorHTML, json: PoffeeWeb.ErrorJSON],

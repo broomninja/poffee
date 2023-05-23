@@ -33,7 +33,7 @@ config :poffee, PoffeeWeb.Endpoint,
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {0, 0, 0, 0}, port: 4000],
   check_origin: false,
-  code_reloader: true,
+  code_reloader: false,
   debug_errors: true,
   secret_key_base: "iNvUKbkYP3u1pa78Ws16v8eObw4n0eUnUF2qbP5/Psi3DsDiViWvhdiAQ69bdTlR",
   watchers: [

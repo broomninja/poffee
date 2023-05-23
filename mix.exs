@@ -52,12 +52,16 @@ defmodule Poffee.MixProject do
       {:phoenix, "~> 1.7.2"},
       {:phoenix_ecto, "~> 4.4"},
       {:phoenix_html, "~> 3.3"},
-      # {:phoenix_live_view, path: "../phoenix_live_view", override: true},
+      {:phoenix_pubsub, "~> 2.0"},
+      {:bandit, "~> 1.0-pre"},
+
+      # liveview
+      # {:phoenix_live_view, path: "../broomninja/phoenix_live_view", override: true},
       {:phoenix_live_view, github: "phoenixframework/phoenix_live_view", override: true},
       # {:phoenix_live_view, "~> 0.18.18"},
       {:phoenix_live_dashboard, "~> 0.7.2"},
+      {:phoenix_live_session, path: "../broomninja/phoenix_live_session", override: true},
       {:phoenix_live_reload, "~> 1.4", only: :dev},
-      {:phoenix_pubsub, "~> 2.0"},
 
       # auth
       {:bcrypt_elixir, "~> 3.0"},

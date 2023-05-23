@@ -44,16 +44,22 @@ defmodule PoffeeWeb do
 
       import Plug.Conn
       import PoffeeWeb.Gettext
+      alias PoffeeWeb.Router.Helpers, as: Routes
 
       unquote(verified_routes())
     end
   end
 
-  def live_view do
+  def live_view(opts \\ []) do
     quote do
-      use Phoenix.LiveView,
-        layout: {PoffeeWeb.Layouts, :app}
-
+      @opts Keyword.merge(
+              [
+                layout: {PoffeeWeb.Layouts, :live}
+                # container: {:div, class: "relative h-screen flex overflow-hidden bg-white"}
+              ],
+              unquote(opts)
+            )
+      use Phoenix.LiveView, @opts
       unquote(html_helpers())
     end
   end
@@ -103,6 +109,8 @@ defmodule PoffeeWeb do
         endpoint: PoffeeWeb.Endpoint,
         router: PoffeeWeb.Router,
         statics: PoffeeWeb.static_paths()
+
+      alias PoffeeWeb.Router.Helpers, as: Routes
     end
   end
 
@@ -111,5 +119,9 @@ defmodule PoffeeWeb do
   """
   defmacro __using__(which) when is_atom(which) do
     apply(__MODULE__, which, [])
+  end
+
+  defmacro __using__({which, opts}) when is_atom(which) do
+    apply(__MODULE__, which, [opts])
   end
 end

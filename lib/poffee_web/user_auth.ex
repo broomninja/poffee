@@ -7,6 +7,7 @@ defmodule PoffeeWeb.UserAuth do
   alias Poffee.Accounts
   alias Poffee.Accounts.User
   alias Poffee.Constant
+  alias Poffee.Utils
 
   require Logger
 
@@ -32,19 +33,27 @@ defmodule PoffeeWeb.UserAuth do
   @spec log_in_user(Plug.Conn.t(), User.t(), map()) :: Plug.Conn.t()
   def log_in_user(conn, user, params \\ %{}) do
     token = Accounts.generate_user_session_token(user)
-    user_return_to = get_session(conn, :user_return_to)
 
     conn
     |> renew_session()
     |> put_token_in_session(token)
     |> write_remember_me_cookie(token, params)
-    |> redirect(to: user_return_to || signed_in_path(conn))
+    |> redirect_user_after_login(params)
+  end
+
+  @doc """
+  Returns to the previous page or redirects to home.
+  """
+  def redirect_user_after_login(conn, params \\ %{}) do
+    redirect_to = validate_return_to(params["user_return_to"], signed_in_path(conn))
+
+    conn
+    |> redirect(to: redirect_to)
   end
 
   # defp maybe_write_remember_me_cookie(conn, token, %{"remember_me" => "true"}) do
   #   put_resp_cookie(conn, @remember_me_cookie, token, @remember_me_options)
   # end
-
   # defp maybe_write_remember_me_cookie(conn, _token, _params) do
   #   conn
   # end
@@ -89,10 +98,12 @@ defmodule PoffeeWeb.UserAuth do
       PoffeeWeb.Endpoint.broadcast(live_socket_id, "disconnect", %{})
     end
 
+    redirect_to = validate_return_to(conn.query_params["user_return_to"], ~p"/")
+
     conn
     |> renew_session()
     |> delete_resp_cookie(@remember_me_cookie)
-    |> redirect(to: ~p"/")
+    |> redirect(to: redirect_to)
   end
 
   @doc """
@@ -126,8 +137,11 @@ defmodule PoffeeWeb.UserAuth do
   @spec redirect_if_user_is_authenticated(Plug.Conn.t(), Keyword.t()) :: Plug.Conn.t()
   def redirect_if_user_is_authenticated(conn, _opts) do
     if conn.assigns[:current_user] do
+
+      redirect_to = validate_return_to(conn.query_params["user_return_to"], signed_in_path(conn))
+
       conn
-      |> redirect(to: signed_in_path(conn))
+      |> redirect(to: redirect_to)
       |> halt()
     else
       conn
@@ -141,39 +155,47 @@ defmodule PoffeeWeb.UserAuth do
   they use the application at all, here would be a good place.
   """
   @spec require_authenticated_user(Plug.Conn.t(), Keyword.t()) :: Plug.Conn.t()
+  def require_authenticated_user(%{assigns: %{current_user: user}} = conn, _opts)
+      when not is_nil(user) do
+    conn
+  end
+
   def require_authenticated_user(conn, _opts) do
-    if conn.assigns[:current_user] do
-      conn
-    else
-      conn
-      |> put_flash(:error, Constant.require_authenticated_text())
-      |> maybe_store_return_to()
-      |> redirect(to: ~p"/users/log_in")
-      |> halt()
-    end
+    return_to_param = current_path(conn)
+    redirect_to = Routes.user_login_path(conn, :new, user_return_to: return_to_param)
+
+    # Logger.debug("[require_authenticated_user] redirect to = #{redirect_to}")
+
+    conn
+    |> put_flash(:warn, Constant.require_authenticated_text())
+    |> redirect(to: redirect_to)
+    |> halt()
   end
 
   @doc """
   Used for routes that require the user to have an admin role.
 
   """
+  @spec require_authenticated_admin(Plug.Conn.t(), Keyword.t()) :: Plug.Conn.t()
   def require_authenticated_admin(%{assigns: %{current_user: user}} = conn, _opts)
-      when user != nil do
+      when not is_nil(user) do
     if Accounts.admin?(user) do
       conn
     else
       conn
-      |> put_flash(:error, Constant.require_admin_text())
+      |> put_flash(:warn, Constant.require_admin_text())
       |> redirect(to: signed_in_path(conn))
       |> halt()
     end
   end
 
   def require_authenticated_admin(conn, _opts) do
+    return_to_param = current_path(conn)
+    redirect_to = Routes.user_login_path(conn, :new, user_return_to: return_to_param)
+
     conn
-    |> put_flash(:error, Constant.require_authenticated_text())
-    |> maybe_store_return_to()
-    |> redirect(to: ~p"/users/log_in")
+    |> put_flash(:warn, Constant.require_authenticated_text())
+    |> redirect(to: redirect_to)
     |> halt()
   end
 
@@ -183,14 +205,22 @@ defmodule PoffeeWeb.UserAuth do
     |> put_session(:live_socket_id, "users_sessions:#{Base.url_encode64(token)}")
   end
 
-  defp maybe_store_return_to(%{method: "GET"} = conn) do
-    # %{request_path: request_path, query_string: query_string} = conn
-    # return_to = if query_string == "", do: request_path, else: request_path <> "?" <> query_string
-    # put_session(conn, :user_return_to, return_to)
-    put_session(conn, :user_return_to, current_path(conn))
-  end
+  # defp maybe_store_return_to(%{method: "GET"} = conn) do
+  #   put_session(conn, :user_return_to, current_path(conn))
+  # end
+  # defp maybe_store_return_to(conn), do: conn
 
-  defp maybe_store_return_to(conn), do: conn
+  def validate_return_to(return_to, default_value) do
+    # Logger.debug(
+    #   "[validate_return_to] return_to = #{return_to}, default_value = #{default_value}"
+    # )
+
+    if Utils.valid_local_url?(return_to) do
+      return_to
+    else
+      default_value
+    end
+  end
 
   def signed_in_path(_conn), do: ~p"/"
 end

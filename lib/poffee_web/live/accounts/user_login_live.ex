@@ -1,6 +1,25 @@
 defmodule PoffeeWeb.UserLoginLive do
   use PoffeeWeb, :live_view
 
+  require Logger
+
+  @impl Phoenix.LiveView
+  def mount(_params, _session, socket) do
+    email = live_flash(socket.assigns.flash, :email)
+    form = to_form(%{"email" => email}, as: "user")
+    {:ok, assign(socket, form: form), temporary_assigns: [form: form]}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_params(%{"user_return_to" => user_return_to} = _params, _uri, socket) do
+    {:noreply, assign(socket, user_return_to: user_return_to)}
+  end
+
+  def handle_params(_params, _uri, socket) do
+    {:noreply, socket}
+  end
+
+  @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""
     <div class="mx-auto max-w-sm">
@@ -8,7 +27,14 @@ defmodule PoffeeWeb.UserLoginLive do
         Sign in to account
         <:subtitle>
           Don't have an account?
-          <.link navigate={~p"/users/register"} class="font-semibold text-brand hover:underline">
+          <.link
+            navigate={
+              Routes.user_registration_path(PoffeeWeb.Endpoint, :new,
+                user_return_to: assigns[:user_return_to] || []
+              )
+            }
+            class="font-semibold text-brand hover:underline"
+          >
             Sign up
           </.link>
           for an account now.
@@ -18,6 +44,7 @@ defmodule PoffeeWeb.UserLoginLive do
       <.simple_form for={@form} id="login_form" action={~p"/users/log_in"} phx-update="ignore">
         <.input field={@form[:email]} type="email" label="Email" required />
         <.input field={@form[:password]} type="password" label="Password" required />
+        <.input field={@form[:user_return_to]} type="hidden" value={assigns[:user_return_to]} />
 
         <:actions>
           <%!-- <.input field={@form[:remember_me]} type="checkbox" label="Keep me logged in" /> --%>
@@ -33,11 +60,5 @@ defmodule PoffeeWeb.UserLoginLive do
       </.simple_form>
     </div>
     """
-  end
-
-  def mount(_params, _session, socket) do
-    email = live_flash(socket.assigns.flash, :email)
-    form = to_form(%{"email" => email}, as: "user")
-    {:ok, assign(socket, form: form), temporary_assigns: [form: form]}
   end
 end

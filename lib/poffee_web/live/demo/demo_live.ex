@@ -1,12 +1,48 @@
 defmodule PoffeeWeb.DemoLive do
   use PoffeeWeb, :live_view
 
+  require Logger
+
+  @impl Phoenix.LiveView
+  def mount(_params, session, socket) do
+    socket =
+      socket
+      # |> PhoenixLiveSession.maybe_subscribe(session)
+      |> put_session_assigns(session)
+
+    {:ok, socket}
+  end
+
+  defp put_session_assigns(socket, session) do
+    assign_new(socket, :current_user, fn -> nil end)
+    |> assign_new(:somevalue, fn -> nil end)
+    |> assign(:selected_fruit, Map.get(session, "selected_fruit"))
+  end
+
+  @impl Phoenix.LiveView
+  def handle_event("validate", _changes, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("select-fruit", %{"fruit" => fruit}, socket) do
+    Logger.debug("[handle_event(\"select-fruit\"...]")
+    PhoenixLiveSession.put_session(socket, "selected_fruit", fruit)
+    {:noreply, socket}
+  end
+
+  @impl Phoenix.LiveView
+  def handle_info({:live_session_updated, session}, socket) do
+    Logger.debug("[handle_info({:live_session_updated...}]")
+    {:noreply, put_session_assigns(socket, session)}
+  end
+
+  @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""
     <%!-- <.form for={:form} action={~p"/submit"} phx-change="validate">
       <button type="submit">Submit</button>
     </.form> --%>
-    <a href="/">Home</a>
+    <a href="/">Demo Live</a>
     <a href="/">
       <img src={~p"/images/logo.svg"} width="36" />
     </a>
@@ -22,9 +58,36 @@ defmodule PoffeeWeb.DemoLive do
       Tabler: <.tabler_icon name="tabler-abc" class="ml-1 w-10 h-10 animate-spin" />
     </span>
 
+    <div>
+      Fruit = <%= @selected_fruit %>
+      <p
+        phx-click="select-fruit"
+        phx-value-fruit="apple"
+        class="font-bold hover:cursor-pointer hover:text-blue-500"
+      >
+        Apple
+      </p>
+      <p
+        phx-click="select-fruit"
+        phx-value-fruit="banana"
+        class="font-bold hover:cursor-pointer hover:text-blue-500"
+      >
+        Banana
+      </p>
+      <p
+        phx-click="select-fruit"
+        phx-value-fruit="orange"
+        class="font-bold hover:cursor-pointer hover:text-blue-500"
+      >
+        Orange
+      </p>
+    </div>
     <%= if @current_user do %>
-      Welcome
+      Welcome <%= @current_user.email %>
     <% else %>
+      <div>
+        Please log in
+      </div>
       <div class="mt-4 flex items-end justify-between">
         <.tabler_icon_button
           icon="tabler-trash-x"
@@ -40,9 +103,5 @@ defmodule PoffeeWeb.DemoLive do
       </.modal>
     <% end %>
     """
-  end
-
-  def handle_event("validate", _changes, socket) do
-    {:noreply, socket}
   end
 end
