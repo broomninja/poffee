@@ -137,7 +137,6 @@ defmodule PoffeeWeb.UserAuth do
   @spec redirect_if_user_is_authenticated(Plug.Conn.t(), Keyword.t()) :: Plug.Conn.t()
   def redirect_if_user_is_authenticated(conn, _opts) do
     if conn.assigns[:current_user] do
-
       redirect_to = validate_return_to(conn.query_params["user_return_to"], signed_in_path(conn))
 
       conn

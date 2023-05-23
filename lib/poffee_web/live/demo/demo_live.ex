@@ -98,9 +98,9 @@ defmodule PoffeeWeb.DemoLive do
         />
       </div>
 
-      <.modal id="login-modal" on_cancel={hide_modal("login-modal")}>
+      <%!-- <.modal id="login-modal" on_cancel={hide_modal("login-modal")}>
         <%= live_render(@socket, PoffeeWeb.UserLoginLive, id: "login") %>
-      </.modal>
+      </.modal> --%>
     <% end %>
     """
   end
