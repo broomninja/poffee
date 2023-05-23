@@ -31,7 +31,7 @@ defmodule PoffeeWeb.UserSessionController do
       |> put_flash(:info, info)
       |> UserAuth.log_in_user(user, user_params)
     else
-      user_return_to = UserAuth.validate_return_to(user_params["user_return_to"], nil)
+      user_return_to = UserAuth.validate_return_to(user_params["user_return_to"])
 
       redirect_to =
         Router.Helpers.user_login_path(conn, :new, user_return_to: user_return_to || [])

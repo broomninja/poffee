@@ -20,8 +20,8 @@ defmodule PoffeeWeb.Router do
   scope "/", PoffeeWeb do
     pipe_through :browser
 
-    get "/", PageController, :demo
-    get "/demo", PageController, :demo
+    # get "/", PageController, :demo
+    # get "/demo", PageController, :demo
   end
 
   # Other scopes may use custom stacks.
@@ -113,6 +113,7 @@ defmodule PoffeeWeb.Router do
       ] do
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
+      live "/", DemoLive, :new
       live "/demolive", DemoLive, :new
     end
   end

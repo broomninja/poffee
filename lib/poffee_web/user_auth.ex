@@ -210,7 +210,7 @@ defmodule PoffeeWeb.UserAuth do
   # end
   # defp maybe_store_return_to(conn), do: conn
 
-  def validate_return_to(return_to, default_value) do
+  def validate_return_to(return_to, default_value \\ nil) do
     # Logger.debug(
     #   "[validate_return_to] return_to = #{return_to}, default_value = #{default_value}"
     # )
