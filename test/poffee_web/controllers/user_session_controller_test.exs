@@ -30,8 +30,8 @@ defmodule PoffeeWeb.UserSessionControllerTest do
         post(conn, ~p"/users/log_in", %{
           "user" => %{
             "email" => user.email,
-            "password" => valid_user_password(),
-            "remember_me" => "true"
+            "password" => valid_user_password()
+            # "remember_me" => "true"
           }
         })
 
@@ -42,11 +42,11 @@ defmodule PoffeeWeb.UserSessionControllerTest do
     test "logs the user in with return to", %{conn: conn, user: user} do
       conn =
         conn
-        |> init_test_session(user_return_to: "/foo/bar")
         |> post(~p"/users/log_in", %{
           "user" => %{
             "email" => user.email,
-            "password" => valid_user_password()
+            "password" => valid_user_password(),
+            "user_return_to" => "/foo/bar"
           }
         })
 

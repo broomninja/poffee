@@ -12,11 +12,11 @@
         </div>
       </div>
       <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-        <a href="/">
+        <.link href={~p"/"}>
           <%!-- Home --%>
           <img src={~p"/images/logo.svg"} width="36" />
-        </a>
-        <a href="/demolive">
+        </.link>
+        <a href={~p"/demolive"}>
           Demo <%!-- <img src={~p"/images/logo.svg"} width="36" /> --%>
         </a>
         <%= if @current_user do %>
@@ -52,6 +52,7 @@
     <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
       <div class="px-4 py-8 sm:px-0">
         <div class="border-4 border-gray-200 border-dashed rounded-lg h-96">
+          <div><a href={~p"/protected"}> Protected link </a></div>
           <div class="mt-4 flex items-end justify-between">
             <.tabler_icon_button
               icon="tabler-trash-x"

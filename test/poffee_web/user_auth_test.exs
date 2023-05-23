@@ -35,7 +35,8 @@ defmodule PoffeeWeb.UserAuthTest do
     end
 
     test "redirects to the configured path", %{conn: conn, user: user} do
-      conn = conn |> put_session(:user_return_to, "/hello") |> UserAuth.log_in_user(user)
+      params = %{"user_return_to" => "/hello"}
+      conn = UserAuth.log_in_user(conn, user, params)
       assert redirected_to(conn) == "/hello"
     end
 
@@ -58,6 +59,7 @@ defmodule PoffeeWeb.UserAuthTest do
         |> put_session(:user_token, user_token)
         |> put_req_cookie(@remember_me_cookie, user_token)
         |> fetch_cookies()
+        |> Plug.Conn.fetch_query_params()
         |> UserAuth.log_out_user()
 
       refute get_session(conn, :user_token)
@@ -73,13 +75,19 @@ defmodule PoffeeWeb.UserAuthTest do
 
       conn
       |> put_session(:live_socket_id, live_socket_id)
+      |> Plug.Conn.fetch_query_params()
       |> UserAuth.log_out_user()
 
       assert_receive %Phoenix.Socket.Broadcast{event: "disconnect", topic: ^live_socket_id}
     end
 
     test "works even if user is already logged out", %{conn: conn} do
-      conn = conn |> fetch_cookies() |> UserAuth.log_out_user()
+      conn =
+        conn
+        |> fetch_cookies()
+        |> Plug.Conn.fetch_query_params()
+        |> UserAuth.log_out_user()
+
       refute get_session(conn, :user_token)
       assert %{max_age: 0} = conn.resp_cookies[@remember_me_cookie]
       assert redirected_to(conn) == ~p"/"
@@ -217,7 +225,12 @@ defmodule PoffeeWeb.UserAuthTest do
 
   describe "redirect_if_user_is_authenticated/2" do
     test "redirects if user is authenticated", %{conn: conn, user: user} do
-      conn = conn |> assign(:current_user, user) |> UserAuth.redirect_if_user_is_authenticated([])
+      conn =
+        conn
+        |> assign(:current_user, user)
+        |> Plug.Conn.fetch_query_params()
+        |> UserAuth.redirect_if_user_is_authenticated([])
+
       assert conn.halted
       assert redirected_to(conn) == ~p"/"
     end
@@ -234,9 +247,9 @@ defmodule PoffeeWeb.UserAuthTest do
       conn = conn |> fetch_flash() |> UserAuth.require_authenticated_user([])
       assert conn.halted
 
-      assert redirected_to(conn) == ~p"/users/log_in"
+      assert redirected_to(conn) == ~p"/users/log_in?user_return_to=" <> URI.encode_www_form("/")
 
-      assert Phoenix.Flash.get(conn.assigns.flash, :error) ==
+      assert Phoenix.Flash.get(conn.assigns.flash, :warn) ==
                @require_authenticated_text
     end
 
@@ -247,7 +260,9 @@ defmodule PoffeeWeb.UserAuthTest do
         |> UserAuth.require_authenticated_user([])
 
       assert halted_conn.halted
-      assert get_session(halted_conn, :user_return_to) == "/foo"
+
+      assert redirected_to(halted_conn) ==
+               ~p"/users/log_in?user_return_to=" <> URI.encode_www_form("/foo")
 
       halted_conn =
         %{conn | path_info: ["foo"], query_string: "bar=baz"}
@@ -255,7 +270,9 @@ defmodule PoffeeWeb.UserAuthTest do
         |> UserAuth.require_authenticated_user([])
 
       assert halted_conn.halted
-      assert get_session(halted_conn, :user_return_to) == "/foo?bar=baz"
+
+      assert redirected_to(halted_conn) ==
+               ~p"/users/log_in?user_return_to=" <> URI.encode_www_form("/foo?bar=baz")
 
       halted_conn =
         %{conn | path_info: ["foo"], query_string: "bar", method: "POST"}
@@ -263,6 +280,10 @@ defmodule PoffeeWeb.UserAuthTest do
         |> UserAuth.require_authenticated_user([])
 
       assert halted_conn.halted
+
+      assert redirected_to(halted_conn) ==
+               ~p"/users/log_in?user_return_to=" <> URI.encode_www_form("/foo?bar")
+
       refute get_session(halted_conn, :user_return_to)
     end
 
@@ -278,9 +299,9 @@ defmodule PoffeeWeb.UserAuthTest do
       conn = conn |> fetch_flash() |> UserAuth.require_authenticated_admin([])
       assert conn.halted
 
-      assert redirected_to(conn) == ~p"/users/log_in"
+      assert redirected_to(conn) == ~p"/users/log_in?user_return_to=" <> URI.encode_www_form("/")
 
-      assert Phoenix.Flash.get(conn.assigns.flash, :error) == @require_authenticated_text
+      assert Phoenix.Flash.get(conn.assigns.flash, :warn) == @require_authenticated_text
     end
 
     test "show error if user is not admin", %{conn: conn, user: user} do
@@ -294,7 +315,7 @@ defmodule PoffeeWeb.UserAuthTest do
 
       assert redirected_to(conn) == ~p"/"
 
-      assert Phoenix.Flash.get(conn.assigns.flash, :error) == @require_admin_text
+      assert Phoenix.Flash.get(conn.assigns.flash, :warn) == @require_admin_text
     end
 
     test "does not redirect if user is admin", %{conn: conn, admin: admin} do

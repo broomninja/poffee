@@ -97,6 +97,7 @@ defmodule PoffeeWeb.Router do
       ] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+      live "/protected", DemoLive, :new
     end
   end
 

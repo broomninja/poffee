@@ -11,9 +11,21 @@ defmodule PoffeeWeb.Endpoint do
   @session_options [
     store: :cookie,
     key: "_poffee_key",
+    # 300 years
+    max_age: 9_999_999_999,
     signing_salt: "USFvY1wK",
+    encryption_salt: "93kjdj33-s77sd22",
+    key_length: 64,
     same_site: "Lax"
   ]
+
+  # Using PhoenixLiveSession as session store
+  # @session_options [
+  #   store: PhoenixLiveSession,
+  #   key: "_poffee_key",
+  #   signing_salt: "X3SUSFvY1wK",
+  #   pub_sub: Poffee.PubSub
+  # ]
 
   socket("/live", Phoenix.LiveView.Socket,
     websocket: [connect_info: [:user_agent, session: @session_options]]
@@ -31,12 +43,12 @@ defmodule PoffeeWeb.Endpoint do
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
-  if code_reloading? do
-    socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
-    plug Phoenix.LiveReloader
-    plug Phoenix.CodeReloader
-    plug Phoenix.Ecto.CheckRepoStatus, otp_app: :poffee
-  end
+  # if code_reloading? do
+  #   socket "/phoenix/live_reload/socket", Phoenix.LiveReloader.Socket
+  #   plug Phoenix.LiveReloader
+  #   plug Phoenix.CodeReloader
+  #   plug Phoenix.Ecto.CheckRepoStatus, otp_app: :poffee
+  # end
 
   plug Phoenix.LiveDashboard.RequestLogger,
     param_key: "request_logger",
