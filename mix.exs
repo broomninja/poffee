@@ -93,6 +93,7 @@ defmodule Poffee.MixProject do
       # debugging
       {:recon, "~> 2.5"},
       {:observer_cli, "~> 1.7"},
+      {:load_control, github: "broomninja/load_control"},
 
       # dev and test deps
       {:ecto_dev_logger, "~> 0.9"},

@@ -1,11 +1,13 @@
 <nav class="bg-gray-800">
   <div class="px-2 mx-auto max-w-7xl sm:px-6 lg:px-8">
     <div class="relative flex items-center justify-between h-16">
-      <div class="flex items-center justify-center flex-1 sm:items-stretch sm:justify-start">
+      <div class="flex flex-1 items-stretch justify-start">
         <div class="block ml-6">
           <div class="flex space-x-4">
             <div class="px-3 py-2 text-xl font-medium text-white ">
-              Brand
+              <.link navigate={~p"/"}>
+                Brand
+              </.link>
             </div>
           </div>
         </div>
@@ -15,9 +17,9 @@
           <%!-- Home --%>
           <img src={~p"/images/logo.svg"} width="36" />
         </.link>
-        <a href={~p"/demolive"}>
+        <.link navigate={~p"/demolive"}>
           Brand <%!-- <img src={~p"/images/logo.svg"} width="36" /> --%>
-        </a>
+        </.link>
         <%= if @current_user do %>
           <span class="px-3 py-2 text-sm font-medium rounded-md">
             <%= @current_user.email %>
@@ -41,7 +43,6 @@
     </div>
   </div>
 </nav>
-
 
 <main class="px-4 py-20 sm:px-6 lg:px-8">
   <div class="mx-auto max-w-2xl">

@@ -33,7 +33,7 @@ defmodule PoffeeWeb.ConnCase do
 
   setup tags do
     Poffee.DataCase.setup_sandbox(tags)
-    {:ok, conn: Phoenix.ConnTest.build_conn()}
+    {:ok, conn: Phoenix.ConnTest.build_conn() |> Plug.Conn.fetch_query_params()}
   end
 
   @doc """

@@ -59,7 +59,6 @@ defmodule PoffeeWeb.UserAuthTest do
         |> put_session(:user_token, user_token)
         |> put_req_cookie(@remember_me_cookie, user_token)
         |> fetch_cookies()
-        |> Plug.Conn.fetch_query_params()
         |> UserAuth.log_out_user()
 
       refute get_session(conn, :user_token)
@@ -75,7 +74,6 @@ defmodule PoffeeWeb.UserAuthTest do
 
       conn
       |> put_session(:live_socket_id, live_socket_id)
-      |> Plug.Conn.fetch_query_params()
       |> UserAuth.log_out_user()
 
       assert_receive %Phoenix.Socket.Broadcast{event: "disconnect", topic: ^live_socket_id}
@@ -85,7 +83,6 @@ defmodule PoffeeWeb.UserAuthTest do
       conn =
         conn
         |> fetch_cookies()
-        |> Plug.Conn.fetch_query_params()
         |> UserAuth.log_out_user()
 
       refute get_session(conn, :user_token)
@@ -228,7 +225,6 @@ defmodule PoffeeWeb.UserAuthTest do
       conn =
         conn
         |> assign(:current_user, user)
-        |> Plug.Conn.fetch_query_params()
         |> UserAuth.redirect_if_user_is_authenticated([])
 
       assert conn.halted

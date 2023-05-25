@@ -10,6 +10,8 @@ defmodule PoffeeWeb.DemoLive do
       # |> PhoenixLiveSession.maybe_subscribe(session)
       |> put_session_assigns(session)
 
+    Logger.debug("[mount] current url = #{inspect(socket.assigns)}")
+
     {:ok, socket}
   end
 
@@ -57,6 +59,17 @@ defmodule PoffeeWeb.DemoLive do
     <span class="" style="display: inline-flex; transform-style: preserve-3d">
       Tabler: <.tabler_icon name="tabler-abc" class="ml-1 w-10 h-10 animate-spin" />
     </span>
+    <div>user_return_to = <%= assigns[:user_return_to] %></div>
+    <div>current_uri = <%= assigns[:current_uri] %></div>
+    <div>socket = <%= # {inspect(@socket)} %></div>
+    <div>
+      <.link navigate={~p"/protected"}>
+        Protected Link
+      </.link>
+      <.link navigate={~p"/demolive"}>
+        Brand <%!-- <img src={~p"/images/logo.svg"} width="36" /> --%>
+      </.link>
+    </div>
 
     <div>
       Fruit = <%= @selected_fruit %>
@@ -99,7 +112,8 @@ defmodule PoffeeWeb.DemoLive do
       </div>
 
       <.modal id="login-modal" on_cancel={hide_modal("login-modal")}>
-        <%= live_render(@socket, PoffeeWeb.UserLoginLive, id: "login") %>
+        <%= live_render(@socket, PoffeeWeb.UserLoginLive, id: "login", session: %{"current_uri" => assigns[:current_uri]}) %>
+        
       </.modal>
     <% end %>
     """
