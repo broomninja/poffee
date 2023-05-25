@@ -1,4 +1,13 @@
 defmodule PoffeeWeb.SaveRequestUri do
+  @moduledoc """
+
+  url is only available in handle_params of a liveview cycle, here we use attach_hook to extract
+  the url info and put it into socket.assigns
+
+  See: https://elixirforum.com/t/get-the-url-from-a-liveview-request/47356/4
+  
+  """
+
   require Logger
 
   def on_mount(:save_request_uri, _params, _session, socket) do
