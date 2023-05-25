@@ -109,6 +109,7 @@ defmodule PoffeeWeb.Router do
     live_session :current_user,
       on_mount: [
         PoffeeWeb.Hooks.AllowEctoSandbox,
+        {PoffeeWeb.SaveRequestUri, :save_request_uri},
         {PoffeeWeb.UserAuthLive, :mount_current_user}
       ] do
       live "/users/confirm/:token", UserConfirmationLive, :edit

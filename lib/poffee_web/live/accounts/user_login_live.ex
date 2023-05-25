@@ -4,61 +4,31 @@ defmodule PoffeeWeb.UserLoginLive do
   require Logger
 
   @impl Phoenix.LiveView
-  def mount(_params, _session, socket) do
+  def mount(:not_mounted_at_router = _params, session, socket) do
+    mount(%{user_return_to: nil}, session, socket)
+  end
+
+  @doc """
+  When current_uri is set in the session, we will use that to override the user_return_to in params.
+  This is only used when we have a modal login (child liveview) but we cannot pass user_return_to 
+  to the child liveview via live_render.
+
+  Example:
+
+    <.modal id="login-modal" on_cancel={hide_modal("login-modal")}>
+      <%= live_render(@socket, PoffeeWeb.UserLoginLive, id: "login", session: %{"current_uri" => assigns[:current_uri]}) %>  
+    </.modal>
+  """
+  def mount(_params, %{"current_uri" => current_uri} = session, socket) do
+    mount(%{"user_return_to" => current_uri}, Map.delete(session, "current_uri"), socket)
+  end
+
+  def mount(params, _session, socket) do
     email = live_flash(socket.assigns.flash, :email)
     form = to_form(%{"email" => email}, as: "user")
-    {:ok, assign(socket, form: form), temporary_assigns: [form: form]}
-  end
+    user_return_to = Map.get(params, "user_return_to")
 
-  @impl Phoenix.LiveView
-  def handle_params(%{"user_return_to" => user_return_to} = _params, _uri, socket) do
-    {:noreply, assign(socket, user_return_to: user_return_to)}
-  end
-
-  def handle_params(_params, _uri, socket) do
-    {:noreply, socket}
-  end
-
-  @impl Phoenix.LiveView
-  def render(assigns) do
-    ~H"""
-    <div class="mx-auto max-w-sm">
-      <.header class="text-center">
-        Sign in to account
-        <:subtitle>
-          Don't have an account?
-          <.link
-            navigate={
-              Routes.user_registration_path(PoffeeWeb.Endpoint, :new,
-                user_return_to: assigns[:user_return_to] || []
-              )
-            }
-            class="font-semibold text-brand hover:underline"
-          >
-            Sign up
-          </.link>
-          for an account now.
-        </:subtitle>
-      </.header>
-
-      <.simple_form for={@form} id="login_form" action={~p"/users/log_in"} phx-update="ignore">
-        <.input field={@form[:email]} type="email" label="Email" required />
-        <.input field={@form[:password]} type="password" label="Password" required />
-        <.input field={@form[:user_return_to]} type="hidden" value={assigns[:user_return_to]} />
-
-        <:actions>
-          <%!-- <.input field={@form[:remember_me]} type="checkbox" label="Keep me logged in" /> --%>
-          <.link href={~p"/users/reset_password"} class="text-sm font-semibold">
-            Forgot your password?
-          </.link>
-        </:actions>
-        <:actions>
-          <.button phx-disable-with="Signing in..." class="w-full">
-            Sign in <span aria-hidden="true">→</span>
-          </.button>
-        </:actions>
-      </.simple_form>
-    </div>
-    """
+    {:ok, assign(socket, form: form, user_return_to: user_return_to),
+     temporary_assigns: [form: form]}
   end
 end

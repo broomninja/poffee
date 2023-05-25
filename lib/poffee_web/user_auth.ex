@@ -98,12 +98,10 @@ defmodule PoffeeWeb.UserAuth do
       PoffeeWeb.Endpoint.broadcast(live_socket_id, "disconnect", %{})
     end
 
-    redirect_to = validate_return_to(conn.query_params["user_return_to"], ~p"/")
-
     conn
     |> renew_session()
     |> delete_resp_cookie(@remember_me_cookie)
-    |> redirect(to: redirect_to)
+    |> redirect(to: ~p"/")
   end
 
   @doc """
