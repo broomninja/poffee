@@ -47,12 +47,13 @@ defmodule Mix.Tasks.DownloadTablerIcons do
     line
     |> String.replace(class_name, "")
     |> String.replace(size_name, "")
-    |> String.replace("stroke-width=\"2\"", "stroke-width=\"1\"")
+
+    # |> String.replace("stroke-width=\"2\"", "stroke-width=\"1\"")
   end
 
   # Downloads the icons from the Tabler Icons repository and extracts them to the `vendor` directory.
   defp download_icons do
-    # get the latest version eg "2.18.0" from github
+    # get the latest version eg "2.20.0" from github
     cmd =
       "curl -Ls -o /dev/null -w %{url_effective}  https://github.com/tabler/tabler-icons/releases/latest | sed -n 's/.*tag\\/v//p'"
 
