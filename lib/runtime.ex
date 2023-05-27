@@ -14,7 +14,9 @@ defmodule Runtime do
         end
       )
 
-    schedulers_usage = LoadControl.SchedulerMonitor.usage(wall_times) / :erlang.system_info(:schedulers_online)
+    schedulers_usage =
+      LoadControl.SchedulerMonitor.usage(wall_times) / :erlang.system_info(:schedulers_online)
+
     total_reds_delta = final_processes |> Stream.map(& &1.reds) |> Enum.sum()
 
     final_processes
@@ -24,7 +26,8 @@ defmodule Runtime do
   end
 
   defp processes() do
-    for {pid, {:reductions, reds}} <- Stream.map(Process.list(), &{&1, Process.info(&1, :reductions)}),
+    for {pid, {:reductions, reds}} <-
+          Stream.map(Process.list(), &{&1, Process.info(&1, :reductions)}),
         into: %{},
         do: {pid, reds}
   end

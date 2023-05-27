@@ -32,12 +32,17 @@
             Sign out
           </.link>
         <% else %>
-          <.link
-            navigate={~p"/users/log_in"}
-            class="rounded-lg bg-zinc-100 px-2 py-1 text-[0.8125rem] font-semibold leading-6 text-zinc-900 hover:bg-zinc-200/80 active:text-zinc-900/70"
+          <.tabler_icon_button
+            icon="tabler-user"
+            label="Login"
+            bgcolor={:primary}
+            phx-click={show_modal("live-login-modal")}
+            size={:auto}
+            iconcolor={:black}
+            textcolor={:black}
           >
             Sign In
-          </.link>
+          </.tabler_icon_button>
         <% end %>
       </div>
     </div>
@@ -47,6 +52,12 @@
 <main class="px-4 py-20 sm:px-6 lg:px-8">
   <div class="mx-auto max-w-2xl">
     <.flash_group flash={@flash} />
+    <.modal id="live-login-modal" on_cancel={hide_modal("live-login-modal")}>
+      <%= live_render(@socket, PoffeeWeb.UserLoginLive,
+        id: "live-login",
+        session: %{"current_uri" => assigns[:current_uri]}
+      ) %>
+    </.modal>
     <%= @inner_content %>
   </div>
 </main>

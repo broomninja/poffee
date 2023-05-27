@@ -5,7 +5,7 @@ defmodule PoffeeWeb.SaveRequestUri do
   the url info and put it into socket.assigns
 
   See: https://elixirforum.com/t/get-the-url-from-a-liveview-request/47356/4
-  
+
   """
 
   require Logger

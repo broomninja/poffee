@@ -53,32 +53,70 @@ defmodule PoffeeWeb.Components.TablerIcon do
   attr :label, :string, required: true, doc: "the button's label for screen readers"
   attr :rest, :global, include: ~w(disabled form name type value)
 
-  attr :color, :atom,
+  attr :textcolor, :atom,
     default: :black,
-    values: [:black, :alert, :info, :success, :warning],
+    values: [:black, :white],
+    doc: "text color"
+
+  attr :iconcolor, :atom,
+    default: :white,
+    values: [:black, :white],
+    doc: "the icon color"
+
+  attr :bgcolor, :atom,
+    default: :black,
+    values: [:black, :white, :alert, :info, :success, :warning, :primary, :secondary],
     doc: "the background color"
 
-  attr :size, :atom, default: :lg, values: [:md, :lg], doc: "the button size"
+  attr :size, :atom, default: :lg, values: [:md, :lg, :auto], doc: "the button size"
+
+  attr :class, :string,
+    default: nil,
+    doc: "the optional additional classes to add to the icon element"
+
+  slot :inner_block, required: false
 
   def tabler_icon_button(assigns) do
     ~H"""
     <button
       class={[
         "flex items-center justify-center",
-        "phx-submit-loading:opacity-75 rounded-lg py-2 px-3 focus:outline-offset-2",
-        "text-sm font-semibold leading-6 text-white active:text-white/80",
+        "phx-submit-loading:opacity-75 rounded py-2 px-2 focus:outline-offset-2",
+        "text-sm font-semibold leading-6",
         "disabled:bg-gray-light2x disabled:cursor-not-allowed disabled:text-gray-light",
-        @color == :black && "bg-gray-dark hover:bg-gray-dark2x focus:outline-gray-dark",
-        @color == :alert && "bg-alert hover:bg-alert-dark focus:outline-alert",
-        @color == :success && "bg-success hover:bg-success-dark focus:outline-success",
-        @color == :info && "bg-info hover:bg-info-dark focus:outline-info",
-        @color == :warning && "bg-warning hover:bg-warning-dark focus:outline-warning",
+        @bgcolor == :black && "bg-gray-dark hover:bg-gray-dark2x focus:outline-gray-dark",
+        @bgcolor == :white && "bg-white hover:bg-white-dark focus:outline-white-dark",
+        @bgcolor == :alert && "bg-alert hover:bg-alert-dark focus:outline-alert",
+        @bgcolor == :success && "bg-success hover:bg-success-dark focus:outline-success",
+        @bgcolor == :info && "bg-info hover:bg-info-dark focus:outline-info",
+        @bgcolor == :warning && "bg-warning hover:bg-warning-dark focus:outline-warning",
+        @bgcolor == :primary && "bg-primary hover:bg-primary-dark focus:outline-primary",
+        @bgcolor == :secondary && "bg-secondary hover:bg-secondary-dark focus:outline-secondary",
+        @size == :auto && "h-8",
         @size == :md && "h-8 w-8",
         @size == :lg && "h-10 w-10"
       ]}
       {@rest}
     >
-      <span class="sr-only"><%= @label %></span> <.tabler_icon name={@icon} />
+      <span class="sr-only"><%= @label %></span>
+      <span class={[
+        "flex items-center justify-center",
+        @iconcolor == :black && "text-black active:text-black/80",
+        @iconcolor == :white && "text-white active:text-white/80"
+      ]}>
+        <.tabler_icon name={@icon} />
+      </span>
+
+      <span
+        :if={@inner_block != []}
+        class={[
+          "whitespace-nowrap ml-2 mr-1",
+          @textcolor == :black && "text-black active:text-black/80",
+          @textcolor == :white && "text-white active:text-white/80"
+        ]}
+      >
+        <%= render_slot(@inner_block) %>
+      </span>
     </button>
     """
   end

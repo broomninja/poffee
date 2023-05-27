@@ -105,16 +105,11 @@ defmodule PoffeeWeb.DemoLive do
         <.tabler_icon_button
           icon="tabler-trash-x"
           label="Login"
-          color={:warning}
-          phx-click={show_modal("login-modal")}
+          bgcolor={:warning}
+          phx-click={show_modal("live-login-modal")}
           size={:md}
         />
       </div>
-
-      <.modal id="login-modal" on_cancel={hide_modal("login-modal")}>
-        <%= live_render(@socket, PoffeeWeb.UserLoginLive, id: "login", session: %{"current_uri" => assigns[:current_uri]}) %>
-        
-      </.modal>
     <% end %>
     """
   end
