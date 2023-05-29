@@ -42,12 +42,15 @@ defmodule PoffeeWeb.Components.TablerIcon do
   end
 
   @doc """
-  Renders a button with an icon only.
+  Renders a button with an icon and optional text.
 
   ## Examples
 
       <.tabler_icon_button icon="tabler-x" label="Remove" color={:alert} />
       <.tabler_icon_button icon="tabler-add" label="Add" phx-click="add" />
+
+      # with text slot
+      <.tabler_icon_button icon="tabler-add" label="Add" phx-click="add">Add</.tabler_icon_button>
   """
   attr :icon, :string, required: true, doc: "name of the icon to add to the button"
   attr :label, :string, required: true, doc: "the button's label for screen readers"
@@ -59,12 +62,12 @@ defmodule PoffeeWeb.Components.TablerIcon do
     doc: "text color"
 
   attr :iconcolor, :atom,
-    default: :white,
+    default: :black,
     values: [:black, :white],
     doc: "the icon color"
 
   attr :bgcolor, :atom,
-    default: :black,
+    default: :primary,
     values: [:black, :white, :alert, :info, :success, :warning, :primary, :secondary],
     doc: "the background color"
 

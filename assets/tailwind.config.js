@@ -8,23 +8,18 @@ const path = require("path");
 
 module.exports = {
   content: [
+    "../deps/petal_components/**/*.*ex",
     "./js/**/*.js",
     "../lib/*_web.ex",
     "../lib/*_web/**/*.*ex"
   ],
   theme: {
     extend: {
-      // transitionProperty: ['visibility'],
-      // transitionDuration: {
-      //     2000: '2000ms',
-      // },
-      // transitionDelay: {
-      //     2000: '2000ms',
-      //     5000: '5000ms',
-      // },
       colors: {
         transparent: 'transparent',
         current: 'currentColor',
+
+        // We need to define the 50–900 shades for Petal components 
         primary: {
           light3x: colors.emerald[50],
           light2x: colors.emerald[100],
@@ -32,6 +27,16 @@ module.exports = {
           DEFAULT: colors.emerald[400],
           dark: colors.emerald[600],
           dark2x: colors.emerald[900],
+          50: colors.emerald[50],
+          100: colors.emerald[100],
+          200: colors.emerald[200],
+          300: colors.emerald[300],
+          400: colors.emerald[400],
+          500: colors.emerald[500],
+          600: colors.emerald[600],
+          700: colors.emerald[700],
+          800: colors.emerald[800],
+          900: colors.emerald[900],
         },
         secondary: {
           light3x: colors.sky[50],
@@ -40,6 +45,16 @@ module.exports = {
           DEFAULT: colors.sky[500],
           dark: colors.sky[700],
           dark2x: colors.sky[900],
+          50: colors.sky[50],
+          100: colors.sky[100],
+          200: colors.sky[200],
+          300: colors.sky[300],
+          400: colors.sky[400],
+          500: colors.sky[500],
+          600: colors.sky[600],
+          700: colors.sky[700],
+          800: colors.sky[800],
+          900: colors.sky[900],
         },
         alert: {
           light3x: colors.pink[50],
@@ -48,6 +63,16 @@ module.exports = {
           DEFAULT: colors.pink[500],
           dark: colors.pink[700],
           dark2x: colors.pink[900],
+          50: colors.pink[50],
+          100: colors.pink[100],
+          200: colors.pink[200],
+          300: colors.pink[300],
+          400: colors.pink[400],
+          500: colors.pink[500],
+          600: colors.pink[600],
+          700: colors.pink[700],
+          800: colors.pink[800],
+          900: colors.pink[900],
         },
         info: {
           light3x: colors.cyan[50],
@@ -56,6 +81,16 @@ module.exports = {
           DEFAULT: colors.cyan[500],
           dark: colors.cyan[700],
           dark2x: colors.cyan[900],
+          50: colors.cyan[50],
+          100: colors.cyan[100],
+          200: colors.cyan[200],
+          300: colors.cyan[300],
+          400: colors.cyan[400],
+          500: colors.cyan[500],
+          600: colors.cyan[600],
+          700: colors.cyan[700],
+          800: colors.cyan[800],
+          900: colors.cyan[900],
         },
         success: {
           light3x: colors.teal[50],
@@ -64,6 +99,16 @@ module.exports = {
           DEFAULT: colors.teal[500],
           dark: colors.teal[700],
           dark2x: colors.teal[900],
+          50: colors.teal[50],
+          100: colors.teal[100],
+          200: colors.teal[200],
+          300: colors.teal[300],
+          400: colors.teal[400],
+          500: colors.teal[500],
+          600: colors.teal[600],
+          700: colors.teal[700],
+          800: colors.teal[800],
+          900: colors.teal[900],
         },
         warning: {
           light3x: colors.amber[50],
@@ -72,6 +117,34 @@ module.exports = {
           DEFAULT: colors.amber[500],
           dark: colors.amber[700],
           dark2x: colors.amber[900],
+          50: colors.amber[50],
+          100: colors.amber[100],
+          200: colors.amber[200],
+          300: colors.amber[300],
+          400: colors.amber[400],
+          500: colors.amber[500],
+          600: colors.amber[600],
+          700: colors.amber[700],
+          800: colors.amber[800],
+          900: colors.amber[900],
+        },
+        danger: {
+          light3x: colors.rose[50],
+          light2x: colors.rose[100],
+          light: colors.rose[300],
+          DEFAULT: colors.rose[500],
+          dark: colors.rose[700],
+          dark2x: colors.rose[900],
+          50: colors.rose[50],
+          100: colors.rose[100],
+          200: colors.rose[200],
+          300: colors.rose[300],
+          400: colors.rose[400],
+          500: colors.rose[500],
+          600: colors.rose[600],
+          700: colors.rose[700],
+          800: colors.rose[800],
+          900: colors.rose[900],
         },
         gray: {
           light3x: colors.slate[50],
@@ -80,6 +153,16 @@ module.exports = {
           DEFAULT: colors.slate[500],
           dark: colors.slate[700],
           dark2x: colors.slate[900],
+          50: colors.slate[50],
+          100: colors.slate[100],
+          200: colors.slate[200],
+          300: colors.slate[300],
+          400: colors.slate[400],
+          500: colors.slate[500],
+          600: colors.slate[600],
+          700: colors.slate[700],
+          800: colors.slate[800],
+          900: colors.slate[900],
         },
         white: {
           DEFAULT: colors.white,
@@ -142,7 +225,9 @@ module.exports = {
               .readFileSync(fullPath)
               .toString()
               .replace(/\r?\n|\r/g, "");
+
             console.log("hero: " + name + " fullpath: " + fullPath)
+
             return {
               [`--hero-${name}`]: `url('data:image/svg+xml;utf8,${content}')`,
               "-webkit-mask": `var(--hero-${name})`,

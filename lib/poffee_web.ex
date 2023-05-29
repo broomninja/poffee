@@ -44,7 +44,6 @@ defmodule PoffeeWeb do
 
       import Plug.Conn
       import PoffeeWeb.Gettext
-      alias PoffeeWeb.Router.Helpers, as: Routes
 
       unquote(verified_routes())
     end
@@ -97,6 +96,9 @@ defmodule PoffeeWeb do
 
       # Shortcut for generating JS commands
       alias Phoenix.LiveView.JS
+
+      # Petal UI components
+      alias PetalComponents, as: Petal
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())
