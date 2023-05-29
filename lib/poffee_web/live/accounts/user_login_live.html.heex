@@ -9,11 +9,9 @@
             user_return_to: assigns[:user_return_to] || []
           )
         }
-        class="font-semibold text-brand hover:underline"
-      >
-        Sign up
-      </.link>
-      for an account now.
+        class="font-semibold text-brand hover:underline text-blue-900"
+      >Sign up</.link>
+      now.
     </:subtitle>
   </.header>
   <.simple_form for={@form} id="login_form" action={~p"/users/log_in"} phx-update="ignore">
