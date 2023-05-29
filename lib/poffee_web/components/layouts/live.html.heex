@@ -21,43 +21,46 @@
           Brand <%!-- <img src={~p"/images/logo.svg"} width="36" /> --%>
         </.link>
 
-        <%= if @current_user do %>
-          <Petal.Dropdown.dropdown js_lib="live_view_js">
-            <:trigger_element>
-              <div class="inline-flex items-center justify-center w-full align-middle focus:outline-none">
-                <.tabler_icon name="tabler-user-cog" class="w-6 h-6" />
-              </div>
-            </:trigger_element>
-            <Petal.Dropdown.dropdown_menu_item
-              link_type="button"
-              class="hover:bg-white cursor-auto border-dotted border-b-2 border-gray-500"
+        <%!-- Skip user component when on login/register pages --%>
+        <%= if !assigns[:skip_user_display] do %>
+          <%= if @current_user do %>
+            <PetalDropdown.dropdown js_lib="live_view_js">
+              <:trigger_element>
+                <div class="inline-flex items-center justify-center w-full align-middle focus:outline-none">
+                  <.tabler_icon name="tabler-user-cog" class="w-6 h-6" />
+                </div>
+              </:trigger_element>
+              <PetalDropdown.dropdown_menu_item
+                link_type="button"
+                class="hover:bg-white cursor-auto border-dotted border-b-2 border-gray-500"
+              >
+                <.tabler_icon name="tabler-user" /> <%= @current_user.email %>
+              </PetalDropdown.dropdown_menu_item>
+              <PetalDropdown.dropdown_menu_item
+                link_type="live_redirect"
+                to={~p"/users/settings"}
+                label="Settings"
+              />
+              <PetalDropdown.dropdown_menu_item
+                link_type="a"
+                to={~p"/users/log_out"}
+                label="Sign out"
+                method={:delete}
+              />
+            </PetalDropdown.dropdown>
+          <% else %>
+            <.tabler_icon_button
+              icon="tabler-user"
+              label="Login"
+              bgcolor={:primary}
+              iconcolor={:black}
+              textcolor={:black}
+              phx-click={show_modal("live-login-modal")}
+              size={:auto}
             >
-              <.tabler_icon name="tabler-user" /> <%= @current_user.email %>
-            </Petal.Dropdown.dropdown_menu_item>
-            <Petal.Dropdown.dropdown_menu_item
-              link_type="live_redirect"
-              to={~p"/users/settings"}
-              label="Settings"
-            />
-            <Petal.Dropdown.dropdown_menu_item
-              link_type="a"
-              to={~p"/users/log_out"}
-              label="Sign out"
-              method={:delete}
-            />
-          </Petal.Dropdown.dropdown>
-        <% else %>
-          <.tabler_icon_button
-            icon="tabler-user"
-            label="Login"
-            bgcolor={:primary}
-            iconcolor={:black}
-            textcolor={:black}
-            phx-click={show_modal("live-login-modal")}
-            size={:auto}
-          >
-            Sign In
-          </.tabler_icon_button>
+              Sign in
+            </.tabler_icon_button>
+          <% end %>
         <% end %>
       </div>
     </div>
@@ -67,12 +70,17 @@
 <main class="px-4 py-20 sm:px-6 lg:px-8">
   <div class="mx-auto max-w-2xl">
     <.flash_group flash={@flash} />
-    <.modal id="live-login-modal" on_cancel={hide_modal("live-login-modal")}>
-      <%= live_render(@socket, PoffeeWeb.UserLoginLive,
-        id: "live-login",
-        session: %{"current_uri" => assigns[:current_uri]}
-      ) %>
-    </.modal>
+
+    <%!-- Skip user component when on login/register pages --%>
+    <%= if !assigns[:skip_user_display] do %>
+      <.modal id="live-login-modal" on_cancel={hide_modal("live-login-modal")}>
+        <%= live_render(@socket, PoffeeWeb.UserLoginLive,
+          id: "live-login",
+          session: %{"current_uri" => assigns[:current_uri]}
+        ) %>
+      </.modal>
+    <% end %>
+
     <%= @inner_content %>
   </div>
 </main>

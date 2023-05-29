@@ -92,6 +92,11 @@ defmodule PoffeeWeb.UserAuthLive do
     end
   end
 
+  def on_mount(:skip_user_display, _params, _session, socket) do
+    socket = Phoenix.Component.assign(socket, :skip_user_display, true)
+    {:cont, socket}
+  end
+
   @spec mount_current_user(map, Socket.t()) :: Socket.t()
   defp mount_current_user(session, socket) do
     Phoenix.Component.assign_new(socket, :current_user, fn ->

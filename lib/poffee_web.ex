@@ -98,10 +98,16 @@ defmodule PoffeeWeb do
       alias Phoenix.LiveView.JS
 
       # Petal UI components
-      alias PetalComponents, as: Petal
+      unquote(petal_components())
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())
+    end
+  end
+
+  defp petal_components do
+    quote do
+      alias PetalComponents.Dropdown, as: PetalDropdown
     end
   end
 

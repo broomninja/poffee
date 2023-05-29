@@ -13,12 +13,13 @@ defmodule PoffeeWeb.Features.HomeAuthTest do
 
       session
       |> visit("/")
-      |> click(link("Log in"))
+      |> click(button("Sign in"))
       |> click(link("Sign up"))
       |> fill_in(text_field("Email"), with: user.email)
       |> fill_in(text_field("Password"), with: user.password)
       |> click(button("Create an account"))
-      |> assert_has(css("li", text: user.email))
+      |> click(css(".tabler-user-cog"))
+      |> assert_has(css("button", text: user.email))
     end
 
     @tag :skip
