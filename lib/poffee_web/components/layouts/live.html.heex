@@ -20,26 +20,41 @@
         <.link navigate={~p"/demolive"}>
           Brand <%!-- <img src={~p"/images/logo.svg"} width="36" /> --%>
         </.link>
+
         <%= if @current_user do %>
-          <span class="px-3 py-2 text-sm font-medium rounded-md">
-            <%= @current_user.email %>
-          </span>
-          <.link
-            href={~p"/users/log_out"}
-            method="delete"
-            class="rounded-lg bg-zinc-100 px-2 py-1 text-[0.8125rem] font-semibold leading-6 text-zinc-900 hover:bg-zinc-200/80 active:text-zinc-900/70"
-          >
-            Sign out
-          </.link>
+          <Petal.Dropdown.dropdown js_lib="live_view_js">
+            <:trigger_element>
+              <div class="inline-flex items-center justify-center w-full align-middle focus:outline-none">
+                <.tabler_icon name="tabler-user-cog" class="w-6 h-6" />
+              </div>
+            </:trigger_element>
+            <Petal.Dropdown.dropdown_menu_item
+              link_type="button"
+              class="hover:bg-white cursor-auto border-dotted border-b-2 border-gray-500"
+            >
+              <.tabler_icon name="tabler-user" /> <%= @current_user.email %>
+            </Petal.Dropdown.dropdown_menu_item>
+            <Petal.Dropdown.dropdown_menu_item
+              link_type="live_redirect"
+              to={~p"/users/settings"}
+              label="Settings"
+            />
+            <Petal.Dropdown.dropdown_menu_item
+              link_type="a"
+              to={~p"/users/log_out"}
+              label="Sign out"
+              method={:delete}
+            />
+          </Petal.Dropdown.dropdown>
         <% else %>
           <.tabler_icon_button
             icon="tabler-user"
             label="Login"
             bgcolor={:primary}
-            phx-click={show_modal("live-login-modal")}
-            size={:auto}
             iconcolor={:black}
             textcolor={:black}
+            phx-click={show_modal("live-login-modal")}
+            size={:auto}
           >
             Sign In
           </.tabler_icon_button>

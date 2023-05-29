@@ -35,7 +35,7 @@ defmodule Poffee.MixProject do
     [
       mod: {Poffee.Application, []},
       included_applications: [:fun_with_flags],
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :os_mon]
     ]
   end
 
@@ -59,7 +59,8 @@ defmodule Poffee.MixProject do
       # {:phoenix_live_view, path: "../broomninja/phoenix_live_view", override: true},
       {:phoenix_live_view, github: "phoenixframework/phoenix_live_view", override: true},
       # {:phoenix_live_view, "~> 0.18.18"},
-      {:phoenix_live_dashboard, "~> 0.7.2"},
+      {:phoenix_live_dashboard, github: "phoenixframework/phoenix_live_dashboard"},
+      # {:phoenix_live_dashboard, "~> 0.7.2"},
       {:phoenix_live_session, path: "../broomninja/phoenix_live_session", override: true},
       {:phoenix_live_reload, "~> 1.4", only: :dev},
 
@@ -80,6 +81,11 @@ defmodule Poffee.MixProject do
       {:opus, "~> 0.8"},
       {:let_me, "~> 1.1"},
 
+      # UI
+      {:tailwind, "~> 0.2.0", runtime: Mix.env() == :dev},
+      {:live_svelte, "~> 0.6.0"},
+      {:petal_components, "~> 1.2.8"},
+
       # metrics
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
@@ -93,14 +99,13 @@ defmodule Poffee.MixProject do
       # debugging
       {:recon, "~> 2.5"},
       {:observer_cli, "~> 1.7"},
-      {:load_control, github: "broomninja/load_control"},
+      # {:load_control, github: "broomninja/load_control"},
 
       # dev and test deps
       {:ecto_dev_logger, "~> 0.9"},
       # {:exsync, "~> 0.2", only: :dev},
       # {:file_system, "~> 0.2"},
       {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},
-      {:tailwind, "~> 0.2.0", runtime: Mix.env() == :dev},
       {:dialyxir, "~> 1.3", only: [:dev], runtime: false},
       {:gradient, github: "esl/gradient", only: [:dev], runtime: false},
       {:typed_ecto_schema, "~> 0.4.1", runtime: false},

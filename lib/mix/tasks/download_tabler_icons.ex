@@ -48,7 +48,7 @@ defmodule Mix.Tasks.DownloadTablerIcons do
     |> String.replace(class_name, "")
     |> String.replace(size_name, "")
 
-    # |> String.replace("stroke-width=\"2\"", "stroke-width=\"1\"")
+    # |> String.replace("stroke-width=\"2\"", "stroke-width=\"1.75\"")
   end
 
   # Downloads the icons from the Tabler Icons repository and extracts them to the `vendor` directory.

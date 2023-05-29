@@ -3,3 +3,19 @@
 @import "tailwindcss/utilities";
 
 /* This file is for your main application CSS */
+
+@import "../../deps/petal_components/assets/default.css";
+
+/* Override default Petal CSS */
+/*
+.pc-button {
+  @apply inline-flex h-8 items-center justify-center font-semibold tracking-wider transition duration-150 border ease-in-out rounded focus:outline-none;
+}
+.pc-button--primary {
+  @apply text-black bg-primary-400 hover:bg-primary-700 focus:bg-primary-700 active:bg-primary-800 focus:shadow-primary-500/50;
+} 
+*/
+
+.pc-dropdown__menu-item {
+  @apply block overflow-hidden items-center self-center justify-center w-full gap-2 px-4 py-2 text-sm text-center text-gray-700 transition duration-150 ease-in-out dark:hover:bg-gray-700 dark:text-gray-300 dark:bg-gray-800 hover:bg-gray-100;
+}

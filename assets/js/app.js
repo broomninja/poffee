@@ -22,6 +22,7 @@ import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import topbar from "../vendor/topbar";
 
+
 // LiveView Hooks
 let Hooks = {};
 
@@ -42,24 +43,6 @@ Hooks.FlashAutoHide = {
     clearTimeout(this.timer);
   },
 };
-
-// Hooks.SetSession = {
-//   DEBOUNCE_MS: 200,
-
-//   mounted() {
-//     // `this.el` is the form.
-//     this.el.addEventListener("input", (e) => {
-//       clearTimeout(this.timeout)
-//       this.timeout = setTimeout(() => {
-//         // Ajax request to update session.
-//         fetch(`/api/session?${e.target.name}=${encodeURIComponent(e.target.value)}`, { method: "post" })
-
-//         // Optionally, include this so other LiveViews can be notified of changes.
-//         this.pushEventTo(".phx-hook-subscribe-to-session", "updated_session_data", [e.target.name, e.target.value])
-//       }, this.DEBOUNCE_MS)
-//     })
-//   },
-//  }
 
 let csrfToken = document
   .querySelector("meta[name='csrf-token']")
