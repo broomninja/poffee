@@ -26,8 +26,8 @@ import topbar from "../vendor/topbar";
 // LiveView Hooks
 let Hooks = {};
 
-Hooks.FlashAutoHide = {
-  HIDE_AFTER_MS: 5000,
+Hooks.FlashAutoHideHook = {
+  HIDE_AFTER_MS: 4000,
 
   mounted() {
     let hide = () =>
@@ -41,6 +41,44 @@ Hooks.FlashAutoHide = {
   },
   destroyed() {
     clearTimeout(this.timer);
+  },
+};
+
+Hooks.SearchBarHook = {
+
+  mounted() {
+    const searchBarContainer = this.el;
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') {
+        return;
+      }
+
+      const focusElemnt = document.querySelector(':focus');
+
+      if (!focusElemnt) {
+        return;
+      }
+
+      if (!searchBarContainer.contains(focusElemnt)) {
+        return;
+      }
+
+      event.preventDefault();
+
+      const tabElements = document.querySelectorAll(
+        '#search-input, #searchbox__results_list a',
+      );
+      const focusIndex = Array.from(tabElements).indexOf(focusElemnt);
+      const tabElementsCount = tabElements.length - 1;
+
+      if (event.key === 'ArrowUp') {
+        tabElements[focusIndex > 0 ? focusIndex - 1 : tabElementsCount].focus();
+      }
+
+      if (event.key === 'ArrowDown') {
+        tabElements[focusIndex < tabElementsCount ? focusIndex + 1 : 0].focus();
+      }
+    });
   },
 };
 

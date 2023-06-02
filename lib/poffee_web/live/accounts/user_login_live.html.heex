@@ -1,18 +1,6 @@
 <div class="mx-auto max-w-sm">
   <.header class="text-center">
     Sign in to account
-    <:subtitle>
-      Don't have an account?
-      <.link
-        navigate={
-          Routes.user_registration_path(PoffeeWeb.Endpoint, :new,
-            user_return_to: assigns[:user_return_to] || []
-          )
-        }
-        class="font-semibold text-brand hover:underline text-blue-900"
-      >Sign up</.link>
-      now.
-    </:subtitle>
   </.header>
   <.simple_form for={@form} id="login_form" action={~p"/users/log_in"} phx-update="ignore">
     <.input field={@form[:email]} type="email" label="Email" required />
@@ -31,4 +19,18 @@
       </.button>
     </:actions>
   </.simple_form>
+
+  <div class="text-center mt-8">
+    Don't have an account?
+    <.link
+      navigate={
+        Routes.user_registration_path(PoffeeWeb.Endpoint, :new,
+          user_return_to: assigns[:user_return_to] || []
+        )
+      }
+      class="font-semibold text-brand hover:underline text-blue-600"
+    >
+      Sign up here
+    </.link>
+  </div>
 </div>

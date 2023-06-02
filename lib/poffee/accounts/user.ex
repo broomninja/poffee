@@ -12,6 +12,9 @@ defmodule Poffee.Accounts.User do
   ])
 
   typed_schema "users" do
+    field :username, :string
+    # field :first_name, :string
+    # field :last_name, :string
     field :email, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
@@ -38,7 +41,7 @@ defmodule Poffee.Accounts.User do
       validations on a LiveView form), this option can be set to `false`.
       Defaults to `true`.
 
-    * `:validate_email` - Validates the uniqueness of the email, in case
+    * `:validate_unqiue_mail` - Validates the uniqueness of the email, in case
       you don't want to validate the uniqueness of the email (like when
       using this changeset for validations on a LiveView form before
       submitting the form), this option can be set to `false`.
@@ -46,17 +49,31 @@ defmodule Poffee.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:email, :password, :username])
     |> validate_email(opts)
     |> validate_password(opts)
+    |> validate_username(opts)
+  end
+
+  defp validate_username(changeset, opts) do
+    changeset
+    |> format_string(:username)
+    |> validate_required([:username])
+    |> validate_format(:username, ~r/^[\d\w_]+$/,
+      message: "can only contain letters, numbers and _"
+    )
+    |> validate_length(:username,
+      min: Constant.username_min_length(),
+      max: Constant.username_max_length()
+    )
+    |> validate_unique_username(opts)
   end
 
   defp validate_email(changeset, opts) do
     changeset
+    |> format_string(:email)
     |> validate_required([:email])
-    |> validate_format(:email, ~r/^[\w-\.]+@([\w-]+\.)+[\w-]{2,}$/,
-      message: "invalid email format"
-    )
+    |> EctoCommons.EmailValidator.validate_email(:email, checks: [:html_input, :burner])
     |> validate_length(:email, max: Constant.email_max_length())
     |> maybe_validate_unique_email(opts)
   end
@@ -64,7 +81,10 @@ defmodule Poffee.Accounts.User do
   defp validate_password(changeset, opts) do
     changeset
     |> validate_required([:password])
-    |> validate_length(:password, min: 8, max: 125)
+    |> validate_length(:password,
+      min: Constant.password_min_length(),
+      max: Constant.password_max_length()
+    )
     # Examples of additional password validation:
     # |> validate_format(:password, ~r/[a-z]/, message: "at least one lower case character")
     # |> validate_format(:password, ~r/[A-Z]/, message: "at least one upper case character")
@@ -90,13 +110,19 @@ defmodule Poffee.Accounts.User do
   end
 
   defp maybe_validate_unique_email(changeset, opts) do
-    if Keyword.get(opts, :validate_email, true) do
+    if Keyword.get(opts, :validate_unqiue_mail, true) do
       changeset
       |> unsafe_validate_unique(:email, Poffee.Repo)
       |> unique_constraint(:email)
     else
       changeset
     end
+  end
+
+  defp validate_unique_username(changeset, _opts) do
+    changeset
+    |> unsafe_validate_unique(:username, Poffee.Repo)
+    |> unique_constraint(:username)
   end
 
   # def roles_changeset(%__MODULE__{} = actor, %__MODULE__{} = user, attrs) do
@@ -117,6 +143,22 @@ defmodule Poffee.Accounts.User do
   defp set_admin_role(changeset) do
     changeset
     |> put_change(:role, :role_admin)
+  end
+
+  @spec format_string(t, atom) :: t
+  defp format_string(changeset, field) do
+    case Map.get(changeset.changes, field) do
+      nil ->
+        changeset
+
+      unformatted ->
+        formatted =
+          unformatted
+          |> String.downcase()
+          |> String.trim()
+
+        put_change(changeset, field, formatted)
+    end
   end
 
   @doc """

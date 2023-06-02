@@ -4,16 +4,20 @@ defmodule Poffee.AccountsFixtures do
   entities via the `Poffee.Accounts` context.
   """
 
-  def unique_user_email, do: "user#{System.unique_integer()}@example.com"
+  def unique_user_username, do: "user_username_#{:rand.uniform(99_999_999)}"
+  def unique_admin_username, do: "admin_username_#{:rand.uniform(99_999_999)}"
+
+  def unique_user_email, do: "user#{System.unique_integer()}@test.cc"
   def valid_user_password, do: "hello user!!!"
 
-  def unique_admin_email, do: "admin#{System.unique_integer()}@example.com"
+  def unique_admin_email, do: "admin#{System.unique_integer()}@test.cc"
   def valid_admin_password, do: "hello password!"
 
   def valid_user_attributes(attrs \\ %{}) do
     Enum.into(attrs, %{
       email: unique_user_email(),
-      password: valid_user_password()
+      password: valid_user_password(),
+      username: unique_user_username()
     })
   end
 
@@ -21,7 +25,7 @@ defmodule Poffee.AccountsFixtures do
     Enum.into(attrs, %{
       email: unique_admin_email(),
       password: valid_admin_password(),
-      role: :role_admin
+      username: unique_admin_username()
     })
   end
 

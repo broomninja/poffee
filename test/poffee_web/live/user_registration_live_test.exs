@@ -31,7 +31,7 @@ defmodule PoffeeWeb.UserRegistrationLiveTest do
         |> render_change(user: %{"email" => "with spaces", "password" => "short"})
 
       assert result =~ "Register"
-      assert result =~ "invalid email format"
+      assert result =~ "is not a valid email"
       assert result =~ "should be at least 8 character"
     end
   end

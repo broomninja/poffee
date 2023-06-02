@@ -47,6 +47,25 @@ defmodule Poffee.Accounts do
   end
 
   @doc """
+  Gets a user by username. Only return the id and username if found.
+
+  ## Examples
+
+      iex> get_user_by_username("username1234")
+      %User{}
+
+      iex> get_user_by_username("unknown_username")
+      nil
+
+  """
+  def get_user_by_username(username) when is_binary(username) do
+    User
+    |> where(username: ^username)
+    |> select([:id, :username])
+    |> Repo.one
+  end
+
+  @doc """
   Gets a single user.
 
   Raises `Ecto.NoResultsError` if the User does not exist.
@@ -108,7 +127,7 @@ defmodule Poffee.Accounts do
 
   """
   def change_user_registration(%User{} = user, attrs \\ %{}) do
-    User.registration_changeset(user, attrs, hash_password: false, validate_email: false)
+    User.registration_changeset(user, attrs, hash_password: false, validate_unqiue_mail: false)
   end
 
   ## Settings
@@ -123,7 +142,7 @@ defmodule Poffee.Accounts do
 
   """
   def change_user_email(user, attrs \\ %{}) do
-    User.email_changeset(user, attrs, validate_email: false)
+    User.email_changeset(user, attrs, validate_unqiue_mail: false)
   end
 
   @doc """
@@ -401,4 +420,20 @@ defmodule Poffee.Accounts do
   @spec admin?(User.t()) :: boolean()
   def admin?(%User{role: role} = _user), do: role == :role_admin
   def admin?(_user), do: false
+
+
+  @doc """
+  Returns 
+  """
+  def user_search(search_query) do
+    search_query = "%#{search_query}%"
+
+    User
+    |> order_by(asc: :username)
+    |> select([:id, :username])
+    |> where([u], ilike(u.username, ^search_query))
+    |> limit(10)
+    |> Repo.all()
+  end
+
 end

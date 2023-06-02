@@ -71,6 +71,7 @@ defmodule Poffee.MixProject do
       {:ecto_enum, "~> 1.4"},
       {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
+      {:nebulex, "~> 2.5"},
 
       # mail / smtp
       {:swoosh, "~> 1.3"},
@@ -87,6 +88,7 @@ defmodule Poffee.MixProject do
       {:petal_components, "~> 1.2.8"},
 
       # metrics
+      {:telemetry, "~> 1.2"},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
       {:ecto_psql_extras, "~> 0.7"},
@@ -95,6 +97,9 @@ defmodule Poffee.MixProject do
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
+      {:timex, "~> 3.7.11"},
+      {:ecto_commons, "~> 0.3.3"},
+      {:decorator, "~> 1.4"},
 
       # debugging
       {:recon, "~> 2.5"},
@@ -134,7 +139,7 @@ defmodule Poffee.MixProject do
       setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
-      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
+      test: ["ecto.drop --quiet", "ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "test.all": ["esbuild default", "test --include e2e"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       "assets.build": ["tailwind default", "esbuild default"],
