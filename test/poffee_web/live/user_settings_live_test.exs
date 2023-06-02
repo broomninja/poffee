@@ -62,7 +62,7 @@ defmodule PoffeeWeb.UserSettingsLiveTest do
         })
 
       assert result =~ "Change Email"
-      assert result =~ "invalid email format"
+      assert result =~ "is not a valid email"
     end
 
     test "renders errors with invalid data (phx-submit)", %{conn: conn, user: user} do

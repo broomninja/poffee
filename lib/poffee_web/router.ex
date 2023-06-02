@@ -76,6 +76,7 @@ defmodule PoffeeWeb.Router do
     live_session :redirect_if_user_is_authenticated,
       on_mount: [
         PoffeeWeb.Hooks.AllowEctoSandbox,
+        {PoffeeWeb.UserAuthLive, :skip_user_display},
         {PoffeeWeb.UserAuthLive, :redirect_if_user_is_authenticated}
       ] do
       live "/users/register", UserRegistrationLive, :new

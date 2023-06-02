@@ -107,7 +107,7 @@ defmodule PoffeeWeb.Components.TablerIcon do
         @iconcolor == :black && "text-black active:text-black/80",
         @iconcolor == :white && "text-white active:text-white/80"
       ]}>
-        <.tabler_icon name={@icon} />
+        <.tabler_icon name={@icon} class={@class} />
       </span>
 
       <span

@@ -112,7 +112,7 @@ defmodule PoffeeWeb.CoreComponents do
       :if={msg = render_slot(@inner_block) || Phoenix.Flash.get(@flash, @kind)}
       id={@id}
       phx-click={JS.push("lv:clear-flash", value: %{key: @kind}) |> hide("##{@id}")}
-      phx-hook={@auto_hide && "FlashAutoHide"}
+      phx-hook={@auto_hide && "FlashAutoHideHook"}
       role="alert"
       class={[
         "fixed top-2 inset-x-0 mx-auto w-80 sm:w-96 z-50 rounded-lg p-3 ring-1",
@@ -196,7 +196,7 @@ defmodule PoffeeWeb.CoreComponents do
   def simple_form(assigns) do
     ~H"""
     <.form :let={f} for={@for} as={@as} {@rest}>
-      <div class="mt-10 space-y-8 bg-white">
+      <div class="mt-4 space-y-7 bg-white">
         <%= render_slot(@inner_block, f) %>
         <div :for={action <- @actions} class="mt-2 flex items-center justify-between gap-6">
           <%= render_slot(action, f) %>

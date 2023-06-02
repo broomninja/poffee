@@ -2,6 +2,7 @@ defmodule Poffee.AccountsTest do
   use Poffee.DataCase
 
   alias Poffee.Accounts
+  alias Poffee.Constant
 
   import Poffee.AccountsFixtures
   alias Poffee.Accounts.{User, UserToken}
@@ -35,6 +36,31 @@ defmodule Poffee.AccountsTest do
     end
   end
 
+  describe "get_user_by_username/1" do
+    test "does not return the user if the usernamedoes not exist" do
+      refute Accounts.get_user_by_username("unknown_username")
+    end
+
+    test "returns the user if the username exists, both lower " do
+      %{id: id} = user = user_fixture()
+      assert %User{id: ^id} = Accounts.get_user_by_username(user.username)
+      assert %User{id: ^id} = Accounts.get_user_by_username(String.downcase(user.username))
+      assert %User{id: ^id} = Accounts.get_user_by_username(String.upcase(user.username))
+    end
+
+    test "returns the user when the username is in uppercase" do
+      {:ok, user} =
+        Accounts.register_user(
+          valid_user_attributes(username: String.upcase(unique_user_username()))
+        )
+
+      %{id: id} = user
+      assert %User{id: ^id} = Accounts.get_user_by_username(user.username)
+      assert %User{id: ^id} = Accounts.get_user_by_username(String.downcase(user.username))
+      assert %User{id: ^id} = Accounts.get_user_by_username(String.upcase(user.username))
+    end
+  end
+
   describe "get_user!/1" do
     test "raises if id is invalid" do
       assert_raise Ecto.NoResultsError, fn ->
@@ -49,29 +75,74 @@ defmodule Poffee.AccountsTest do
   end
 
   describe "register_user/1" do
-    test "requires email and password to be set" do
+    test "requires email, password and username to be set" do
       {:error, changeset} = Accounts.register_user(%{})
 
       assert %{
+               username: ["can't be blank"],
                password: ["can't be blank"],
                email: ["can't be blank"]
              } = errors_on(changeset)
     end
 
-    test "validates email and password when given" do
-      {:error, changeset} = Accounts.register_user(%{email: "not valid", password: "not v"})
+    test "validates email, password and username when given" do
+      {:error, changeset} =
+        Accounts.register_user(%{email: "not valid", password: "not v", username: "username"})
 
       assert %{
-               email: ["invalid email format"],
+               email: ["is not a valid email"],
                password: ["should be at least 8 character(s)"]
              } = errors_on(changeset)
     end
 
-    test "validates maximum values for email and password for security" do
-      too_long = String.duplicate("db", 200)
-      {:error, changeset} = Accounts.register_user(%{email: too_long, password: too_long})
-      assert "should be at most 250 character(s)" in errors_on(changeset).email
-      assert "should be at most 125 character(s)" in errors_on(changeset).password
+    test "validates username uniqueness" do
+      %{username: username} = user_fixture()
+      {:error, changeset} = Accounts.register_user(%{username: username})
+      assert "has already been taken" in errors_on(changeset).username
+
+      # Now try with the upper cased username too
+      {:error, changeset} = Accounts.register_user(%{username: String.upcase(username)})
+      assert "has already been taken" in errors_on(changeset).username
+    end
+
+    test "validates username format" do
+      {:error, changeset} =
+        Accounts.register_user(%{
+          email: "valid@email.com",
+          password: "12341234",
+          username: "user.name"
+        })
+
+      assert %{
+               username: ["can only contain letters, numbers and _"]
+             } = errors_on(changeset)
+    end
+
+    test "validates username length" do
+      {:error, changeset} = Accounts.register_user(valid_user_attributes(username: "abc"))
+
+      error_message = "should be at least #{Constant.username_min_length()} character(s)"
+      assert %{username: [^error_message]} = errors_on(changeset)
+
+      {:error, changeset} =
+        Accounts.register_user(valid_user_attributes(username: String.duplicate("user", 10)))
+
+      error_message = "should be at most #{Constant.username_max_length()} character(s)"
+      assert %{username: [^error_message]} = errors_on(changeset)
+    end
+
+    test "validates username case sensitivity" do
+      username_in_uppercase = String.upcase(unique_user_username())
+
+      {:ok, user} = Accounts.register_user(valid_user_attributes(username: username_in_uppercase))
+      assert user.username == String.downcase(username_in_uppercase)
+    end
+
+    test "validates email case sensitivity" do
+      email_in_uppercase = String.upcase(unique_user_email())
+
+      {:ok, user} = Accounts.register_user(valid_user_attributes(email: email_in_uppercase))
+      assert user.email == String.downcase(email_in_uppercase)
     end
 
     test "validates email uniqueness" do
@@ -84,10 +155,22 @@ defmodule Poffee.AccountsTest do
       assert "has already been taken" in errors_on(changeset).email
     end
 
+    test "validates maximum values for email and password for security" do
+      too_long = String.duplicate("db", 200)
+      {:error, changeset} = Accounts.register_user(%{email: too_long, password: too_long})
+
+      error_message = "should be at most #{Constant.email_max_length()} character(s)"
+      assert error_message in errors_on(changeset).email
+
+      error_message = "should be at most #{Constant.password_max_length()} character(s)"
+      assert error_message in errors_on(changeset).password
+    end
+
     test "registers users with a hashed password" do
       email = unique_user_email()
       {:ok, user} = Accounts.register_user(valid_user_attributes(email: email))
       assert user.email == email
+      assert is_binary(user.id)
       assert is_binary(user.hashed_password)
       assert is_nil(user.confirmed_at)
       assert is_nil(user.password)
@@ -97,7 +180,7 @@ defmodule Poffee.AccountsTest do
   describe "change_user_registration/2" do
     test "returns a changeset" do
       assert %Ecto.Changeset{} = changeset = Accounts.change_user_registration(%User{})
-      assert changeset.required == [:password, :email]
+      assert changeset.required == [:username, :password, :email]
     end
 
     test "allows fields to be set" do
@@ -138,7 +221,7 @@ defmodule Poffee.AccountsTest do
       {:error, changeset} =
         Accounts.apply_user_email(user, valid_user_password(), %{email: "not valid"})
 
-      assert %{email: ["invalid email format"]} = errors_on(changeset)
+      assert %{email: ["is not a valid email"]} = errors_on(changeset)
     end
 
     test "validates maximum value for email for security", %{user: user} do
@@ -471,7 +554,7 @@ defmodule Poffee.AccountsTest do
     test "validates password", %{user: user} do
       {:error, changeset} =
         Accounts.reset_user_password(user, %{
-          password: "not v",
+          password: "short",
           password_confirmation: "another"
         })
 
@@ -508,9 +591,9 @@ defmodule Poffee.AccountsTest do
 
   describe "register_admin/1" do
     test "registers users with a hashed password and sets role to :role_admin" do
-      email = unique_admin_email()
-      {:ok, user} = Accounts.register_admin(%{email: email, password: valid_admin_password()})
-      assert user.email == email
+      admin_attr = valid_admin_attributes()
+      {:ok, user} = Accounts.register_admin(admin_attr)
+      assert user.email == admin_attr.email
       assert is_binary(user.hashed_password)
       assert is_nil(user.confirmed_at)
       assert is_nil(user.password)
@@ -518,13 +601,15 @@ defmodule Poffee.AccountsTest do
     end
 
     test "registers non-admin users with a hashed password and sets role to :role_user" do
-      email = unique_user_email()
-      {:ok, user} = Accounts.register_user(%{email: email, password: valid_user_password()})
-      assert user.email == email
+      user_attr = valid_user_attributes()
+      {:ok, user} = Accounts.register_user(user_attr)
+      assert user.email == user_attr.email
       assert is_binary(user.hashed_password)
       assert is_nil(user.confirmed_at)
       assert is_nil(user.password)
       refute Accounts.admin?(user)
     end
   end
+
+  
 end

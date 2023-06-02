@@ -12,67 +12,51 @@
           </div>
         </div>
       </div>
-      <div class="absolute text-white inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-        <.link href={~p"/"}>
-          <%!-- Home --%>
-          <img src={~p"/images/logo.svg"} width="36" />
-        </.link>
-        <.link navigate={~p"/demolive"}>
-          Brand <%!-- <img src={~p"/images/logo.svg"} width="36" /> --%>
-        </.link>
-
-        <%= if @current_user do %>
-          <Petal.Dropdown.dropdown js_lib="live_view_js">
-            <:trigger_element>
-              <div class="inline-flex items-center justify-center w-full align-middle focus:outline-none">
-                <.tabler_icon name="tabler-user-cog" class="w-6 h-6" />
-              </div>
-            </:trigger_element>
-            <Petal.Dropdown.dropdown_menu_item
-              link_type="button"
-              class="hover:bg-white cursor-auto border-dotted border-b-2 border-gray-500"
-            >
-              <.tabler_icon name="tabler-user" /> <%= @current_user.email %>
-            </Petal.Dropdown.dropdown_menu_item>
-            <Petal.Dropdown.dropdown_menu_item
-              link_type="live_redirect"
-              to={~p"/users/settings"}
-              label="Settings"
-            />
-            <Petal.Dropdown.dropdown_menu_item
-              link_type="a"
-              to={~p"/users/log_out"}
-              label="Sign out"
-              method={:delete}
-            />
-          </Petal.Dropdown.dropdown>
-        <% else %>
-          <.tabler_icon_button
-            icon="tabler-user"
-            label="Login"
-            bgcolor={:primary}
-            iconcolor={:black}
-            textcolor={:black}
+      <div class="absolute gap-x-5 text-white inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+        <div class="block max-w-xs flex-auto">
+          <button
+            type="button"
+            class="hidden text-gray-500 bg-white hover:ring-gray-500 ring-gray-300 h-8 w-full items-center gap-2 
+           rounded-md pl-2 pr-3 text-sm ring-1 transition lg:flex focus:[&:not(:focus-visible)]:outline-none"
             phx-click={show_modal("live-login-modal")}
-            size={:auto}
           >
-            Sign In
-          </.tabler_icon_button>
+            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="h-5 w-5 stroke-current">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12.01 12a4.25 4.25 0 1 0-6.02-6 4.25 4.25 0 0 0 6.02 6Zm0 0 3.24 3.25"
+              >
+              </path>
+            </svg>
+            One
+          </button>
+        </div>
+
+        <%!-- Skip user component when on login/register pages --%>
+        <%= if !assigns[:skip_user_display] do %>
+          <PoffeeWeb.SearchBar.search_bar />
+
+          <PoffeeWeb.UserDisplay.show_user current_user={@current_user} />
         <% end %>
       </div>
     </div>
   </div>
 </nav>
 
-<main class="px-4 py-20 sm:px-6 lg:px-8">
+<main class="px-4 py-10 sm:px-6 lg:px-8">
   <div class="mx-auto max-w-2xl">
     <.flash_group flash={@flash} />
-    <.modal id="live-login-modal" on_cancel={hide_modal("live-login-modal")}>
-      <%= live_render(@socket, PoffeeWeb.UserLoginLive,
-        id: "live-login",
-        session: %{"current_uri" => assigns[:current_uri]}
-      ) %>
-    </.modal>
+
+    <%!-- Skip user component when on login/register pages --%>
+    <%= if !assigns[:skip_user_display] do %>
+      <.modal id="live-login-modal" on_cancel={hide_modal("live-login-modal")}>
+        <%= live_render(@socket, PoffeeWeb.UserLoginLive,
+          id: "live-login",
+          session: %{"current_uri" => assigns[:current_uri]}
+        ) %>
+      </.modal>
+    <% end %>
+
     <%= @inner_content %>
   </div>
 </main>
