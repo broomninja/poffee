@@ -19,7 +19,6 @@ defmodule Poffee.Repo.Migrations.CreateUsersAuthTables do
     end
 
     create unique_index(:users, [:email])
-    # create unique_index(:users, ["(lower(email))"])
 
     create table(:users_tokens, primary_key: false) do
       add :id, :uuid, primary_key: true

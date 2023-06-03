@@ -1,5 +1,5 @@
 defmodule Poffee.AccountsTest do
-  use Poffee.DataCase
+  use Poffee.DataCase, async: true
 
   alias Poffee.Accounts
   alias Poffee.Constant
@@ -611,5 +611,22 @@ defmodule Poffee.AccountsTest do
     end
   end
 
-  
+  describe "user_search/1" do
+    setup do
+      %{user: user_fixture()}
+    end
+
+    test "find users using empty string username", %{user: _user} do
+      assert {:ok, []} = Accounts.user_search(nil)
+      assert {:ok, []} = Accounts.user_search("")
+    end
+
+    test "find users using username", %{user: user} do
+      {:ok, [found_user]} = Accounts.user_search("user_")
+
+      assert user.id == found_user.id
+      assert is_nil(user.password)
+      refute Accounts.admin?(user)
+    end
+  end
 end

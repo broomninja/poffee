@@ -10,9 +10,10 @@ config :poffee, Poffee.Repo,
   database: "poffee_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
-  pool_size: 10,
-  # use ecto_dev_logger so disabling default logging
-  log: false
+  pool_size: 10
+
+# use ecto_dev_logger so disabling default logging
+# log: false
 
 config :poffee, :generators,
   migration: true,

@@ -12,6 +12,10 @@ import Config
 ####################################
 config :poffee, ecto_repos: [Poffee.Repo]
 
+query_args = ["SET pg_trgm.similarity_threshold = 0.4", []]
+# "SET random_page_cost = 1.1",
+config :poffee, Poffee.Repo, after_connect: {Postgrex, :query!, query_args}
+
 config :poffee, Poffee.Repo, migration_primary_key: [type: :uuid]
 
 ####################################

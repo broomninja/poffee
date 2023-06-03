@@ -1,8 +1,7 @@
 defmodule PoffeeWeb.SearchBarLive do
   use PoffeeWeb, :live_view
 
-  # alias Phoenix.LiveView.JS
-  alias Poffee.Users
+  alias Poffee.Accounts
 
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
@@ -17,8 +16,8 @@ defmodule PoffeeWeb.SearchBarLive do
   end
 
   def handle_event("change", %{"search" => %{"query" => search_query}}, socket) do
-    # users = Users.search(search_query)
-    socket = assign(socket, :users, nil)
+    users = Accounts.user_search(search_query)
+    socket = assign(socket, :users, users)
 
     {:noreply, socket}
   end
