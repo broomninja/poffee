@@ -32,7 +32,7 @@ defmodule Poffee.Seeds do
     end
 
     user_attr = %{
-      username: "cat_",
+      username: "cat_123",
       email: "cat@test.cc",
       password: "12341234"
     }

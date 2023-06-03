@@ -77,7 +77,7 @@ defmodule Poffee.Accounts do
     User
     |> where(username: ^username)
     |> select([:id, :username])
-    |> Repo.one
+    |> Repo.one()
   end
 
   @doc """

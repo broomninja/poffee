@@ -42,6 +42,12 @@ config :poffee, PoffeeWeb.Endpoint,
     tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
   ]
 
+####################################
+# DB Cache
+####################################
+# Uncomment the following line to disable DB caching
+# config :poffee, nebulex_adapter: Nebulex.Adapters.Nil
+
 # ## SSL Support
 #
 # In order to use HTTPS in development, a self-signed

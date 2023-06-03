@@ -45,6 +45,12 @@ config :poffee, Poffee.Mailer, adapter: Swoosh.Adapters.Test
 config :swoosh, :api_client, false
 
 ####################################
+# DB Cache
+####################################
+# Uncomment the following line to disable DB caching
+# config :poffee, nebulex_adapter: Nebulex.Adapters.Nil
+
+####################################
 # Logger
 ####################################
 # Print only warnings and errors during test
