@@ -10,9 +10,10 @@ config :poffee, Poffee.Repo,
   database: "poffee_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
-  pool_size: 10,
-  # use ecto_dev_logger so disabling default logging
-  log: false
+  pool_size: 10
+
+# use ecto_dev_logger so disabling default logging
+# log: false
 
 config :poffee, :generators,
   migration: true,
@@ -40,6 +41,12 @@ config :poffee, PoffeeWeb.Endpoint,
     esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
   ]
+
+####################################
+# DB Cache
+####################################
+# Uncomment the following line to disable DB caching
+# config :poffee, nebulex_adapter: Nebulex.Adapters.Nil
 
 # ## SSL Support
 #

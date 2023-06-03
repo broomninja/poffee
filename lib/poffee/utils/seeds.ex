@@ -30,6 +30,16 @@ defmodule Poffee.Seeds do
     with {:error, changeset} <- Accounts.register_user(user_attr) do
       Logger.info("Error running seeds: #{inspect(user_attr)} #{inspect(changeset.errors)}")
     end
+
+    user_attr = %{
+      username: "cat_123",
+      email: "cat@test.cc",
+      password: "12341234"
+    }
+
+    with {:error, changeset} <- Accounts.register_user(user_attr) do
+      Logger.info("Error running seeds: #{inspect(user_attr)} #{inspect(changeset.errors)}")
+    end
   end
 
   # prod only seeds

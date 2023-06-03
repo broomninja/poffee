@@ -19,4 +19,13 @@ defmodule Poffee.Utils do
     uri = URI.parse(url)
     is_nil(uri.scheme) && is_nil(uri.host)
   end
+
+  @doc """
+  returns true if result can be cached
+  """
+  def can_be_cached?(nil), do: false
+  def can_be_cached?({:error, _}), do: false
+  def can_be_cached?({:ok, []}), do: false
+  def can_be_cached?({:ok, _}), do: true
+  def can_be_cached?(_), do: true
 end

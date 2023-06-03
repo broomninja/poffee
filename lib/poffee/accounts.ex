@@ -2,13 +2,16 @@ defmodule Poffee.Accounts do
   @moduledoc """
   The Accounts context.
   """
+  use Nebulex.Caching
 
   import Ecto.Query, warn: false
   import Ecto.Changeset
 
-  alias Poffee.Repo
+  alias Poffee.{Repo, Utils, DBCache}
 
   alias Poffee.Accounts.{User, UserToken, UserNotifier}
+
+  @ttl :timer.minutes(10)
 
   ## Database getters
 
@@ -24,6 +27,12 @@ defmodule Poffee.Accounts do
       nil
 
   """
+  @decorate cacheable(
+              cache: DBCache,
+              key: {User, email},
+              opts: [ttl: @ttl],
+              match: &Utils.can_be_cached?/1
+            )
   def get_user_by_email(email) when is_binary(email) do
     Repo.get_by(User, email: email)
   end
@@ -58,11 +67,17 @@ defmodule Poffee.Accounts do
       nil
 
   """
+  @decorate cacheable(
+              cache: DBCache,
+              key: {User, username},
+              opts: [ttl: @ttl],
+              match: &Utils.can_be_cached?/1
+            )
   def get_user_by_username(username) when is_binary(username) do
     User
     |> where(username: ^username)
     |> select([:id, :username])
-    |> Repo.one
+    |> Repo.one()
   end
 
   @doc """
@@ -79,6 +94,12 @@ defmodule Poffee.Accounts do
       ** (Ecto.NoResultsError)
 
   """
+  @decorate cacheable(
+              cache: DBCache,
+              key: {User, id},
+              opts: [ttl: @ttl],
+              match: &Utils.can_be_cached?/1
+            )
   def get_user!(id), do: Repo.get!(User, id)
 
   ## User registration
@@ -171,6 +192,7 @@ defmodule Poffee.Accounts do
   If the token matches, the user email is updated and the token is deleted.
   The confirmed_at date is also updated to the current time.
   """
+  @decorate cache_put(cache: DBCache, key: {User, :email})
   def update_user_email(user, token) do
     context = "change:#{user.email}"
 
@@ -421,19 +443,31 @@ defmodule Poffee.Accounts do
   def admin?(%User{role: role} = _user), do: role == :role_admin
   def admin?(_user), do: false
 
-
   @doc """
-  Returns 
+  Returns a list of users matching the query
   """
-  def user_search(search_query) do
+  @decorate cacheable(
+              cache: DBCache,
+              opts: [ttl: @ttl],
+              match: &Utils.can_be_cached?/1
+            )
+  @spec user_search(String.t(), number) :: {:ok, list(User.t())}
+  def user_search(search_query, limit \\ 10)
+  def user_search(nil, _limit), do: {:ok, []}
+  def user_search("", _limit), do: {:ok, []}
+
+  def user_search(search_query, limit) do
     search_query = "%#{search_query}%"
 
-    User
-    |> order_by(asc: :username)
-    |> select([:id, :username])
-    |> where([u], ilike(u.username, ^search_query))
-    |> limit(10)
-    |> Repo.all()
-  end
+    users =
+      User
+      |> order_by(asc: :username)
+      |> select([:id, :username])
+      |> where(role: :role_user)
+      |> where([u], ilike(u.username, ^search_query))
+      |> limit(^limit)
+      |> Repo.all()
 
+    {:ok, users}
+  end
 end

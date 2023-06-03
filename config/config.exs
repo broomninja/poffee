@@ -12,6 +12,10 @@ import Config
 ####################################
 config :poffee, ecto_repos: [Poffee.Repo]
 
+query_args = ["SET pg_trgm.similarity_threshold = 0.4", []]
+# "SET random_page_cost = 1.1",
+config :poffee, Poffee.Repo, after_connect: {Postgrex, :query!, query_args}
+
 config :poffee, Poffee.Repo, migration_primary_key: [type: :uuid]
 
 ####################################
@@ -42,6 +46,23 @@ config :poffee, PoffeeWeb.Endpoint,
 # For production it's recommended to configure a different adapter
 # at the `config/runtime.exs`.
 config :poffee, Poffee.Mailer, adapter: Swoosh.Adapters.Local
+
+####################################
+# DB Cache
+####################################
+config :poffee, Poffee.DBCache,
+  # When using :shards as backend
+  # backend: :shards,
+  # GC interval for pushing new generation: 12 hrs
+  gc_interval: :timer.hours(12),
+  # Max 1 million entries in cache
+  max_size: 1_000_000,
+  # Max 1.0 GB of memory
+  allocated_memory: 1_000_000_000,
+  # GC min timeout: 10 sec
+  gc_cleanup_min_timeout: :timer.seconds(10),
+  # GC max timeout: 10 min
+  gc_cleanup_max_timeout: :timer.minutes(10)
 
 ####################################
 # FunWithFlags 

@@ -10,6 +10,8 @@ defmodule Poffee.Application do
     children = [
       # Start the Telemetry supervisor
       PoffeeWeb.Telemetry,
+      # Start the DB Cache
+      {Application.get_env(:poffee, :nebulex_db_cache, Poffee.DBCache), []},
       # Start the Ecto repository
       Poffee.Repo,
       # Start the PubSub system
@@ -30,7 +32,7 @@ defmodule Poffee.Application do
     result = Supervisor.start_link(children, opts)
 
     # Replace default Repo logging
-    Ecto.DevLogger.install(Poffee.Repo)
+    # Ecto.DevLogger.install(Poffee.Repo)
 
     result
   end
