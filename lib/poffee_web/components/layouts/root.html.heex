@@ -14,5 +14,8 @@
   </head>
   <body class="bg-white antialiased">
     <%= @inner_content %>
+    <%= if Mix.env() == :dev do %>
+      <%!-- <LiveSvelte.svelte name="DebugCSS" ssr={false} /> --%>
+    <% end %>
   </body>
 </html>

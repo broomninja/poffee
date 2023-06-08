@@ -18,6 +18,7 @@ defmodule PoffeeWeb.DemoLive do
   defp put_session_assigns(socket, session) do
     assign_new(socket, :current_user, fn -> nil end)
     |> assign_new(:somevalue, fn -> nil end)
+    |> assign_new(:number, fn -> 15 end)
     |> assign(:selected_fruit, Map.get(session, "selected_fruit"))
   end
 
@@ -32,6 +33,10 @@ defmodule PoffeeWeb.DemoLive do
     {:noreply, socket}
   end
 
+  def handle_event("set_number", %{"number" => number}, socket) do
+    {:noreply, assign(socket, :number, number)}
+  end
+
   @impl Phoenix.LiveView
   def handle_info({:live_session_updated, session}, socket) do
     Logger.debug("[handle_info({:live_session_updated...}]")
@@ -44,6 +49,8 @@ defmodule PoffeeWeb.DemoLive do
     <%!-- <.form for={:form} action={~p"/submit"} phx-change="validate">
       <button type="submit">Submit</button>
     </.form> --%>
+    <button phx-click={JS.dispatch("set_input_value", bubbles: false)}>Click me!</button>
+
     <a href="/">Demo Live</a>
     <a href="/">
       <img src={~p"/images/logo.svg"} width="36" />
@@ -66,8 +73,10 @@ defmodule PoffeeWeb.DemoLive do
       <.link navigate={~p"/protected"}>
         Protected Link
       </.link>
+    </div>
+    <div>
       <.link navigate={~p"/demolive"}>
-        Brand <%!-- <img src={~p"/images/logo.svg"} width="36" /> --%>
+        Demo Link <%!-- <img src={~p"/images/logo.svg"} width="36" /> --%>
       </.link>
     </div>
 
@@ -111,6 +120,10 @@ defmodule PoffeeWeb.DemoLive do
         />
       </div>
     <% end %>
+
+    <div>
+      <LiveSvelte.svelte name="Number" props={%{number: @number}} />
+    </div>
     """
   end
 end

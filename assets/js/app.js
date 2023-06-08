@@ -21,13 +21,15 @@ import "phoenix_html";
 import { Socket } from "phoenix";
 import { LiveSocket } from "phoenix_live_view";
 import topbar from "../vendor/topbar";
+import {getHooks} from "live_svelte"
+import * as SvelteComponents from "../svelte/**/*"
 
-
-// LiveView Hooks
-let Hooks = {};
+// LiveView Hooks, default to svelte component hooks
+// additional hooks can be added below
+let Hooks = getHooks(SvelteComponents);
 
 Hooks.FlashAutoHideHook = {
-  HIDE_AFTER_MS: 4000,
+  HIDE_AFTER_MS: 3500,
 
   mounted() {
     let hide = () =>
@@ -48,6 +50,9 @@ Hooks.SearchBarHook = {
 
   mounted() {
     const searchBarContainer = this.el;
+    document.addEventListener('js:clear_search', (event) => {
+      event.target.value = "";
+    });
     document.addEventListener('keydown', (event) => {
       if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') {
         return;

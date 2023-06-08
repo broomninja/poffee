@@ -13,30 +13,11 @@
         </div>
       </div>
       <div class="absolute gap-x-5 text-white inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
-        <div class="block max-w-xs flex-auto">
-          <button
-            type="button"
-            class="hidden text-gray-500 bg-white hover:ring-gray-500 ring-gray-300 h-8 w-full items-center gap-2 
-           rounded-md pl-2 pr-3 text-sm ring-1 transition lg:flex focus:[&:not(:focus-visible)]:outline-none"
-            phx-click={show_modal("live-login-modal")}
-          >
-            <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="h-5 w-5 stroke-current">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12.01 12a4.25 4.25 0 1 0-6.02-6 4.25 4.25 0 0 0 6.02 6Zm0 0 3.24 3.25"
-              >
-              </path>
-            </svg>
-            One
-          </button>
-        </div>
-
         <%!-- Skip user component when on login/register pages --%>
         <%= if !assigns[:skip_user_display] do %>
-          <PoffeeWeb.SearchBar.search_bar />
+          <PoffeeWeb.SearchBar.search_bar socket={@socket} />
 
-          <PoffeeWeb.UserDisplay.show_user current_user={@current_user} />
+          <PoffeeWeb.UserLoginDisplay.show_user current_user={@current_user} />
         <% end %>
       </div>
     </div>

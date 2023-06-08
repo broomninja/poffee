@@ -38,7 +38,8 @@ config :poffee, PoffeeWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "iNvUKbkYP3u1pa78Ws16v8eObw4n0eUnUF2qbP5/Psi3DsDiViWvhdiAQ69bdTlR",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
+    node: ["build.js", "--watch", cd: Path.expand("../assets", __DIR__)],
+    # esbuild: {Esbuild, :install_and_run, [:default, ~w(--sourcemap=inline --watch)]},
     tailwind: {Tailwind, :install_and_run, [:default, ~w(--watch)]}
   ]
 
@@ -46,7 +47,7 @@ config :poffee, PoffeeWeb.Endpoint,
 # DB Cache
 ####################################
 # Uncomment the following line to disable DB caching
-# config :poffee, nebulex_adapter: Nebulex.Adapters.Nil
+config :poffee, nebulex_adapter: Nebulex.Adapters.Nil
 
 # ## SSL Support
 #

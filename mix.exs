@@ -56,12 +56,11 @@ defmodule Poffee.MixProject do
       {:bandit, "~> 1.0-pre"},
 
       # liveview
-      # {:phoenix_live_view, path: "../broomninja/phoenix_live_view", override: true},
       {:phoenix_live_view, github: "phoenixframework/phoenix_live_view", override: true},
       # {:phoenix_live_view, "~> 0.18.18"},
       {:phoenix_live_dashboard, github: "phoenixframework/phoenix_live_dashboard"},
       # {:phoenix_live_dashboard, "~> 0.7.2"},
-      {:phoenix_live_session, path: "../broomninja/phoenix_live_session", override: true},
+      {:phoenix_live_session, "~> 0.1.3"},
       {:phoenix_live_reload, "~> 1.4", only: :dev},
 
       # auth
@@ -84,7 +83,7 @@ defmodule Poffee.MixProject do
 
       # UI
       {:tailwind, "~> 0.2.0", runtime: Mix.env() == :dev},
-      {:live_svelte, "~> 0.6.0"},
+      {:live_svelte, "~> 0.8.0"},
       {:petal_components, "~> 1.2.8"},
 
       # metrics
@@ -100,6 +99,7 @@ defmodule Poffee.MixProject do
       {:timex, "~> 3.7.11"},
       {:ecto_commons, "~> 0.3.3"},
       {:decorator, "~> 1.4"},
+      {:slugify, "~> 1.3"},
 
       # debugging
       {:recon, "~> 2.5"},
@@ -110,7 +110,7 @@ defmodule Poffee.MixProject do
       {:ecto_dev_logger, "~> 0.9"},
       # {:exsync, "~> 0.2", only: :dev},
       # {:file_system, "~> 0.2"},
-      {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},
+      # {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},
       {:dialyxir, "~> 1.3", only: [:dev], runtime: false},
       {:gradient, github: "esl/gradient", only: [:dev], runtime: false},
       {:typed_ecto_schema, "~> 0.4.1", runtime: false},
@@ -131,19 +131,22 @@ defmodule Poffee.MixProject do
     [
       # wallaby
       e2e: [
-        "esbuild default",
+        # "esbuild default",
         "ecto.create --quiet",
         "ecto.migrate --quiet",
         "test --only \"e2e\""
       ],
-      setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
+      # setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
+      setup: ["deps.get", "ecto.setup", "assets.setup"],
+      "assets.setup": ["cmd --cd assets npm install"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.drop --quiet", "ecto.create --quiet", "ecto.migrate --quiet", "test"],
-      "test.all": ["esbuild default", "test --include e2e"],
-      "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["tailwind default", "esbuild default"],
-      "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"]
+      "test.all": ["test --include e2e"],
+      # "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
+      # "assets.build": ["tailwind default", "esbuild default"],
+      # "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"]
+      "assets.deploy": ["cmd --cd assets node build.js --deploy", "phx.digest"]
     ]
   end
 end

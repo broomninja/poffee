@@ -1,4 +1,4 @@
-defmodule PoffeeWeb.UserDisplay do
+defmodule PoffeeWeb.UserLoginDisplay do
   use PoffeeWeb, :html
 
   def show_user(assigns) do

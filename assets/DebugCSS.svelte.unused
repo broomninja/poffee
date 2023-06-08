@@ -1,0 +1,26 @@
+<script lang="ts">
+
+    import { Toy } from '@leveluptuts/svelte-toy';
+    import { writable } from 'svelte/store';
+    
+    let debugCSS = writable({ showLayout: false });
+
+</script>
+
+{#if !!$debugCSS}
+    <Toy register={[debugCSS]} />
+
+    {#if $debugCSS.showLayout}
+    <style>
+        * { outline: 2px dotted red }
+        * * { outline: 2px dotted green }
+        * * * { outline: 2px dotted orange }
+        * * * * { outline: 2px dotted blue }
+        * * * * * { outline: 1px solid red }
+        * * * * * * { outline: 1px solid green }
+        * * * * * * * { outline: 1px solid orange }
+        * * * * * * * * { outline: 1px solid blue }
+    </style>
+    {/if}
+
+{/if}

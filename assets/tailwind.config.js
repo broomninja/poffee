@@ -9,12 +9,21 @@ const path = require("path");
 module.exports = {
   content: [
     "../deps/petal_components/**/*.*ex",
+    "./svelte/**/*.svelte",
     "./js/**/*.js",
     "../lib/*_web.ex",
     "../lib/*_web/**/*.*ex"
   ],
   theme: {
     extend: {
+      // width: {
+      //   '128': '32rem',
+      //   '160': '40rem',
+      // },
+      // height: {
+      //   '128': '32rem',
+      //   '160': '10rem',
+      // },
       colors: {
         transparent: 'transparent',
         current: 'currentColor',
