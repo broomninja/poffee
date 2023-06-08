@@ -5,12 +5,13 @@ defmodule Poffee.Seeds do
 
   def run do
     Logger.debug("[Seeds.run()] Started for #{Mix.env()} env.")
+    common()
     seed(Mix.env())
     Logger.debug("[Seeds.run()] Finished.")
   end
 
   # dev only seeds
-  def seed(env) when env in [:dev, :test] do
+  defp seed(env) when env in [:dev, :test] do
     admin_attr = %{
       username: "admin_1",
       email: "admin@test.cc",
@@ -43,10 +44,10 @@ defmodule Poffee.Seeds do
   end
 
   # prod only seeds
-  def seed(:prod) do
+  defp seed(:prod) do
   end
 
   # common seeds for all env
-  def seed(_) do
+  defp common do
   end
 end

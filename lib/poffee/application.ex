@@ -8,10 +8,12 @@ defmodule Poffee.Application do
   @impl true
   def start(_type, _args) do
     children = [
+      # LiveSevlete
+      {NodeJS.Supervisor, [path: LiveSvelte.SSR.server_path(), pool_size: 4]},
       # Start the Telemetry supervisor
       PoffeeWeb.Telemetry,
       # Start the DB Cache
-      {Application.get_env(:poffee, :nebulex_db_cache, Poffee.DBCache), []},
+      {Poffee.DBCache, []},
       # Start the Ecto repository
       Poffee.Repo,
       # Start the PubSub system

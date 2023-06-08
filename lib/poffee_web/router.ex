@@ -17,13 +17,6 @@ defmodule PoffeeWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", PoffeeWeb do
-    pipe_through :browser
-
-    # get "/", PageController, :demo
-    # get "/demo", PageController, :demo
-  end
-
   # Other scopes may use custom stacks.
   # scope "/api", PoffeeWeb do
   #   pipe_through :api
@@ -117,6 +110,7 @@ defmodule PoffeeWeb.Router do
       live "/users/confirm", UserConfirmationInstructionsLive, :new
       live "/", DemoLive, :new
       live "/demolive", DemoLive, :new
+      live "/u/:username", UserLive, :show
     end
   end
 end

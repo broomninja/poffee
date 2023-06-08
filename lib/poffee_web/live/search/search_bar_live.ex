@@ -3,49 +3,43 @@ defmodule PoffeeWeb.SearchBarLive do
 
   alias Poffee.Accounts
 
+  require Logger
+
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
-    socket = assign(socket, places: [])
+    socket =
+      socket
+      |> assign(:search_result, nil)
+      |> assign(:loading_search?, false)
+
     {:ok, socket, layout: false}
   end
 
   @impl Phoenix.LiveView
   def handle_event("change", %{"search" => %{"query" => ""}}, socket) do
-    socket = assign(socket, :places, [])
+    socket = assign(socket, :search_result, nil)
     {:noreply, socket}
   end
 
   def handle_event("change", %{"search" => %{"query" => search_query}}, socket) do
-    users = Accounts.user_search(search_query)
-    socket = assign(socket, :users, users)
-
-    {:noreply, socket}
+    send(self(), {:run_search, search_query})
+    {:noreply, assign(socket, :loading_search?, true)}
   end
 
-  defp open_search_modal(js \\ %JS{}) do
-    js
-    |> JS.show(
-      to: "#searchbox_container",
-      transition:
-        {"transition ease-out duration-200", "opacity-0 scale-95", "opacity-100 scale-100"}
-    )
-    |> JS.show(
-      to: "#searchbar-dialog",
-      transition: {"transition ease-in duration-100", "opacity-0", "opacity-100"}
-    )
-    |> JS.focus(to: "#search-input")
+  @impl Phoenix.LiveView
+  def handle_info({:run_search, search_query}, socket) do
+    socket =
+      with {:ok, users} <- Accounts.user_search(search_query) do
+        assign(socket, :search_result, %{users: users})
+      end
+
+    {:noreply, assign(socket, :loading_search?, false)}
   end
 
-  defp hide_search_modal(js \\ %JS{}) do
+  defp clear_search(js \\ %JS{}, to \\ "#search-input") do
     js
-    |> JS.hide(
-      to: "#searchbar-searchbox_container",
-      transition:
-        {"transition ease-in duration-100", "opacity-100 scale-100", "opacity-0 scale-95"}
-    )
-    |> JS.hide(
-      to: "#searchbar-dialog",
-      transition: {"transition ease-in duration-100", "opacity-100", "opacity-0"}
-    )
+    |> JS.dispatch("js:clear_search", to: to)
+    |> JS.focus(to: to)
+    |> JS.push("change", value: %{"search" => %{"query" => ""}})
   end
 end

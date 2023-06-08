@@ -38,6 +38,8 @@ defmodule PoffeeWeb.CoreComponents do
   """
   attr :id, :string, required: true
   attr :show, :boolean, default: false
+  attr :show_x_button, :boolean, default: true
+  attr :modal_width, :string, default: "w-full"
   attr :on_cancel, JS, default: %JS{}
   slot :inner_block, required: true
 
@@ -59,16 +61,16 @@ defmodule PoffeeWeb.CoreComponents do
         aria-modal="true"
         tabindex="0"
       >
-        <div class="flex min-h-full items-center justify-center">
-          <div class="w-full max-w-3xl p-4 sm:p-6 lg:py-8">
+        <div class="flex min-h-full items-start mt-6 md:mt-16 justify-center">
+          <div class={"#{@modal_width} max-w-3xl"}>
             <.focus_wrap
               id={"#{@id}-container"}
               phx-window-keydown={JS.exec("data-cancel", to: "##{@id}")}
               phx-key="escape"
               phx-click-away={JS.exec("data-cancel", to: "##{@id}")}
-              class="shadow-zinc-700/10 ring-zinc-700/10 relative hidden rounded-2xl bg-white p-14 shadow-lg ring-1 transition"
+              class="shadow-zinc-700/10 bg-white ring-zinc-700/10 relative hidden rounded-2xl shadow-lg ring-1 transition"
             >
-              <div class="absolute top-6 right-5">
+              <div :if={@show_x_button} class="absolute top-6 right-5">
                 <button
                   phx-click={JS.exec("data-cancel", to: "##{@id}")}
                   type="button"
@@ -122,14 +124,18 @@ defmodule PoffeeWeb.CoreComponents do
       ]}
       {@rest}
     >
-      <p :if={@title} class="flex items-center gap-1.5 text-sm font-semibold leading-6">
+      <p :if={@title} class="flex items-center gap-1.5 text-sm font-semibold leading-6 mb-2">
         <.icon :if={@kind == :info} name="hero-information-circle-mini" class="h-4 w-4" />
         <.icon :if={@kind == :warn} name="hero-exclamation-circle-mini" class="h-4 w-4" />
         <.icon :if={@kind == :error} name="hero-exclamation-circle-mini" class="h-4 w-4" />
         <%= @title %>
       </p>
-      <p class="mt-2 text-sm leading-5"><%= msg %></p>
-      <button type="button" class="group absolute top-1 right-1 p-2" aria-label={gettext("close")}>
+      <p class="text-sm leading-5 pl-2"><%= msg %></p>
+      <button
+        type="button"
+        class="group absolute top-1 right-1 px-2 py-1"
+        aria-label={gettext("close")}
+      >
         <.icon name="hero-x-mark-solid" class="h-5 w-5 opacity-40 group-hover:opacity-70" />
       </button>
     </div>
@@ -147,9 +153,9 @@ defmodule PoffeeWeb.CoreComponents do
 
   def flash_group(assigns) do
     ~H"""
-    <.flash kind={:info} title="Success!" flash={@flash} auto_hide={true} />
-    <.flash kind={:warn} title="Attention!" flash={@flash} auto_hide={true} />
-    <.flash kind={:error} title="Error!" flash={@flash} auto_hide={true} />
+    <.flash kind={:info} flash={@flash} auto_hide={true} />
+    <.flash kind={:warn} flash={@flash} auto_hide={true} />
+    <.flash kind={:error} flash={@flash} auto_hide={true} />
     <.flash
       id="disconnected"
       kind={:error}

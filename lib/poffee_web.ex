@@ -59,6 +59,10 @@ defmodule PoffeeWeb do
               unquote(opts)
             )
       use Phoenix.LiveView, @opts
+
+      # LiveSvelte
+      import LiveSvelte
+
       unquote(html_helpers())
     end
   end
@@ -107,7 +111,9 @@ defmodule PoffeeWeb do
 
   defp petal_components do
     quote do
+      alias PetalComponents.Card, as: PetalCard
       alias PetalComponents.Dropdown, as: PetalDropdown
+      alias PetalComponents.Loading, as: PetalLoading
     end
   end
 

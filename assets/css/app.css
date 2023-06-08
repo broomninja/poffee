@@ -6,7 +6,12 @@
 
 @import "../../deps/petal_components/assets/default.css";
 
-/* Override default Petal CSS */
+/*
+==============================================
+   Override default Petal CSS
+==============================================
+*/
+
 /*
 .pc-button {
   @apply inline-flex h-8 items-center justify-center font-semibold tracking-wider transition duration-150 border ease-in-out rounded focus:outline-none;
@@ -19,3 +24,20 @@
 .pc-dropdown__menu-item {
   @apply block overflow-hidden items-center self-center justify-center w-full gap-2 px-4 py-2 text-sm text-center text-gray-700 transition duration-150 ease-in-out dark:hover:bg-gray-700 dark:text-gray-300 dark:bg-gray-800 hover:bg-gray-100;
 }
+
+.pc-card__category--secondary {
+    @apply text-secondary-800 dark:text-secondary-300;
+}
+
+/*
+==============================================
+   Phoenix Liveview CSS
+==============================================
+*/
+
+/*
+.phx-change-loading {
+  opacity: 0.5;
+  transition: opacity 1s ease-out;
+}
+*/
