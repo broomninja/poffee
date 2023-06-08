@@ -15,15 +15,21 @@
 ARG ELIXIR_VERSION=1.14.4
 ARG OTP_VERSION=25.3.1
 ARG DEBIAN_VERSION=bullseye-20230227-slim
+ARG NODE_VERSION=20.2.0
 
 ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
 ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
 
 FROM ${BUILDER_IMAGE} as builder
+ARG NODE_VERSION
 
 # install build dependencies
-RUN apt-get update -y && apt-get install -y build-essential git \
+RUN apt-get update -y && apt-get install -y build-essential curl git \
     && apt-get clean && rm -f /var/lib/apt/lists/*_*
+
+# install nodejs
+COPY bin/install_node bin/install_node
+RUN bin/install_node ${NODE_VERSION}
 
 # prepare build dir
 WORKDIR /app
@@ -52,6 +58,8 @@ COPY priv priv
 COPY lib lib
 
 COPY assets assets
+RUN node --version
+RUN npm install --prefix assets
 
 ARG SECRET_KEY_BASE
 
@@ -77,9 +85,14 @@ RUN mix release
 # start a new build stage so that the final image will only contain
 # the compiled release and other runtime necessities
 FROM ${RUNNER_IMAGE}
+ARG NODE_VERSION
 
-RUN apt-get update -y && apt-get install -y libstdc++6 openssl libncurses5 locales \
+RUN apt-get update -y && apt-get install -y libstdc++6 openssl libncurses5 curl pgpgpg locales \
   && apt-get clean && rm -f /var/lib/apt/lists/*_*
+
+# install nodejs
+COPY bin/install_node bin/install_node
+RUN bin/install_node ${NODE_VERSION}
 
 # Set the locale
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
