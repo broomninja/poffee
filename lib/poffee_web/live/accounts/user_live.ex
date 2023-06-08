@@ -10,7 +10,7 @@ defmodule PoffeeWeb.UserLive do
     ~H"""
     <%= if is_nil(@user_found) do %>
       <div>
-      <PetalCard.card>
+        <PetalCard.card>
           <PetalCard.card_content
             category="User Display"
             category_color_class="pc-card__category--secondary"
