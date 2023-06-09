@@ -19,6 +19,8 @@ defmodule PoffeeWeb.CoreComponents do
   alias Phoenix.LiveView.JS
   import PoffeeWeb.Gettext
 
+  alias PetalComponents.Loading, as: PetalLoading
+
   @doc """
   Renders a modal.
 
@@ -156,23 +158,34 @@ defmodule PoffeeWeb.CoreComponents do
     <.flash kind={:info} flash={@flash} auto_hide={true} />
     <.flash kind={:warn} flash={@flash} auto_hide={true} />
     <.flash kind={:error} flash={@flash} auto_hide={true} />
-    <.flash
+    <.connection_status>
+      Re-establishing connection...
+    </.connection_status>
+    """
+  end
+
+  slot :inner_block
+
+  def connection_status(assigns) do
+    ~H"""
+    <div
       id="disconnected"
-      kind={:error}
-      title="Problem connecting to server"
-      phx-disconnected={show("#disconnected")}
-      phx-connected={hide("#disconnected")}
-      hidden
+      class="hidden fixed top-2 inset-x-0 mx-auto w-80 z-50 rounded-lg p-3 ring-1 bg-rose-50 text-red-800"
+      ,
+      js-show={show("#disconnected")}
+      js-hide={hide("#disconnected")}
     >
-      Attempting to reconnect
-      <%!-- 
-        FIX for firefox bug that displays black border when icon is spinning
-        see https://github.com/iconify/iconify/issues/214#issuecomment-1500860362
-       --%>
-      <span style="display: inline-flex; transform-style: preserve-3d">
-        <.icon name="hero-arrow-path" class="ml-1 h-3 w-3 animate-spin" />
-      </span>
-    </.flash>
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <PetalLoading.spinner size="sm" />
+        </div>
+        <div class="ml-3">
+          <p class="text-sm font-medium" role="alert">
+            <%= render_slot(@inner_block) %>
+          </p>
+        </div>
+      </div>
+    </div>
     """
   end
 
