@@ -24,6 +24,10 @@ import topbar from "../vendor/topbar";
 import {getHooks} from "live_svelte"
 import * as SvelteComponents from "../svelte/**/*"
 
+let execJS = (selector, attr) => {
+  document.querySelectorAll(selector).forEach(el => liveSocket.execJS(el, el.getAttribute(attr)))
+}
+
 // LiveView Hooks, default to svelte component hooks
 // additional hooks can be added below
 let Hooks = getHooks(SvelteComponents);
@@ -101,6 +105,8 @@ window.addEventListener("phx:page-loading-start", (_info) => topbar.show(180));
 window.addEventListener("phx:page-loading-stop", (_info) => topbar.hide());
 
 // connect if there are any LiveViews on the page
+liveSocket.getSocket().onOpen(() => execJS("#disconnected", "js-hide"))
+liveSocket.getSocket().onError(() => execJS("#disconnected", "js-show"))
 liveSocket.connect();
 
 // expose liveSocket on window for web console debug logs and latency simulation:
