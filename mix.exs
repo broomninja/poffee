@@ -136,9 +136,7 @@ defmodule Poffee.MixProject do
         "ecto.migrate --quiet",
         "test --only \"e2e\""
       ],
-      # setup: ["deps.get", "ecto.setup", "assets.setup", "assets.build"],
       setup: ["deps.get", "ecto.setup", "assets.setup"],
-      "assets.setup": ["cmd --cd assets npm install"],
       "ecto.setup": ["ecto.create", "ecto.migrate", "run priv/repo/seeds.exs"],
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.drop --quiet", "ecto.create --quiet", "ecto.migrate --quiet", "test"],
@@ -146,6 +144,7 @@ defmodule Poffee.MixProject do
       # "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
       # "assets.build": ["tailwind default", "esbuild default"],
       # "assets.deploy": ["tailwind default --minify", "esbuild default --minify", "phx.digest"]
+      "assets.setup": ["cmd --cd assets npm install"],
       "assets.deploy": [
         "tailwind default --minify",
         "cmd --cd assets node build.js --deploy",

@@ -23,7 +23,7 @@ defmodule PoffeeWeb.UserLoginDisplay do
         />
         <PetalDropdown.dropdown_menu_item
           link_type="a"
-          to={~p"/users/log_out"}
+          to={~p"/logout"}
           label="Sign out"
           method={:delete}
         />
