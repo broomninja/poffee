@@ -111,7 +111,7 @@ defmodule PoffeeWeb.UserAuthLive do
     socket
     |> LiveView.put_flash(:error, Constant.require_authenticated_text())
     # TODO: store_return_to?
-    |> LiveView.redirect(to: ~p"/users/log_in")
+    |> LiveView.redirect(to: ~p"/login")
   end
 
   @spec redirect_require_admin(Socket.t()) :: Socket.t()

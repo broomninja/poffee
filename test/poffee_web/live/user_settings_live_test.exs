@@ -20,7 +20,7 @@ defmodule PoffeeWeb.UserSettingsLiveTest do
       assert {:error, redirect} = live(conn, ~p"/users/settings")
 
       assert {:redirect, %{to: path, flash: flash}} = redirect
-      assert path == ~p"/users/log_in?user_return_to=" <> URI.encode_www_form("/users/settings")
+      assert path == ~p"/login?user_return_to=" <> URI.encode_www_form("/users/settings")
       assert %{"warn" => "Please login to proceed."} = flash
     end
   end
@@ -204,7 +204,7 @@ defmodule PoffeeWeb.UserSettingsLiveTest do
       assert {:redirect, %{to: path, flash: flash}} = redirect
 
       assert path ==
-               ~p"/users/log_in?user_return_to=" <>
+               ~p"/login?user_return_to=" <>
                  URI.encode_www_form(~p"/users/settings/confirm_email/#{token}")
 
       assert %{"warn" => message} = flash

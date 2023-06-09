@@ -243,7 +243,7 @@ defmodule PoffeeWeb.UserAuthTest do
       conn = conn |> fetch_flash() |> UserAuth.require_authenticated_user([])
       assert conn.halted
 
-      assert redirected_to(conn) == ~p"/users/log_in?user_return_to=" <> URI.encode_www_form("/")
+      assert redirected_to(conn) == ~p"/login?user_return_to=" <> URI.encode_www_form("/")
 
       assert Phoenix.Flash.get(conn.assigns.flash, :warn) ==
                @require_authenticated_text
@@ -258,7 +258,7 @@ defmodule PoffeeWeb.UserAuthTest do
       assert halted_conn.halted
 
       assert redirected_to(halted_conn) ==
-               ~p"/users/log_in?user_return_to=" <> URI.encode_www_form("/foo")
+               ~p"/login?user_return_to=" <> URI.encode_www_form("/foo")
 
       halted_conn =
         %{conn | path_info: ["foo"], query_string: "bar=baz"}
@@ -268,7 +268,7 @@ defmodule PoffeeWeb.UserAuthTest do
       assert halted_conn.halted
 
       assert redirected_to(halted_conn) ==
-               ~p"/users/log_in?user_return_to=" <> URI.encode_www_form("/foo?bar=baz")
+               ~p"/login?user_return_to=" <> URI.encode_www_form("/foo?bar=baz")
 
       halted_conn =
         %{conn | path_info: ["foo"], query_string: "bar", method: "POST"}
@@ -278,7 +278,7 @@ defmodule PoffeeWeb.UserAuthTest do
       assert halted_conn.halted
 
       assert redirected_to(halted_conn) ==
-               ~p"/users/log_in?user_return_to=" <> URI.encode_www_form("/foo?bar")
+               ~p"/login?user_return_to=" <> URI.encode_www_form("/foo?bar")
 
       refute get_session(halted_conn, :user_return_to)
     end
@@ -295,7 +295,7 @@ defmodule PoffeeWeb.UserAuthTest do
       conn = conn |> fetch_flash() |> UserAuth.require_authenticated_admin([])
       assert conn.halted
 
-      assert redirected_to(conn) == ~p"/users/log_in?user_return_to=" <> URI.encode_www_form("/")
+      assert redirected_to(conn) == ~p"/login?user_return_to=" <> URI.encode_www_form("/")
 
       assert Phoenix.Flash.get(conn.assigns.flash, :warn) == @require_authenticated_text
     end
