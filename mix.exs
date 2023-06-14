@@ -107,7 +107,7 @@ defmodule Poffee.MixProject do
       # {:load_control, github: "broomninja/load_control"},
 
       # dev and test deps
-      {:ecto_dev_logger, "~> 0.9"},
+      # {:ecto_dev_logger, "~> 0.9"},
       # {:exsync, "~> 0.2", only: :dev},
       # {:file_system, "~> 0.2"},
       # {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},
@@ -132,6 +132,7 @@ defmodule Poffee.MixProject do
       # wallaby
       e2e: [
         # "esbuild default",
+        "ecto.drop --quiet",
         "ecto.create --quiet",
         "ecto.migrate --quiet",
         "test --only \"e2e\""
