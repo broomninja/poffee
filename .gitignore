@@ -51,3 +51,6 @@ npm-debug.log
 # wallaby
 /screenshots/
 
+# iex script
+.iex.exs
+

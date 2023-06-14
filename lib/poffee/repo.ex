@@ -3,6 +3,8 @@ defmodule Poffee.Repo do
     otp_app: :poffee,
     adapter: Ecto.Adapters.Postgres
 
+  use ExAudit.Repo
+
   # # Installs Postgres extensions
   # def installed_extensions do
   #   ["uuid-ossp", "citext"]
