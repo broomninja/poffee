@@ -12,7 +12,7 @@ defmodule PoffeeWeb.UserLoginDisplay do
         </:trigger_element>
         <PetalDropdown.dropdown_menu_item
           link_type="button"
-          class="hover:bg-white cursor-auto border-dotted border-b-2 border-gray-500"
+          class="hover:bg-white font-semibold cursor-auto border-dotted border-b-2 border-gray-500"
         >
           <.tabler_icon name="tabler-user" /> <%= @current_user.email %>
         </PetalDropdown.dropdown_menu_item>
