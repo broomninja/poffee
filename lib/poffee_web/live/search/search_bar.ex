@@ -23,7 +23,8 @@ defmodule PoffeeWeb.SearchBar do
       <div class="hidden md:block md:max-w-xs md:flex-auto ">
         <button
           type="button"
-          class="hidden text-gray-500 bg-white hover:ring-gray-500 ring-gray-300 h-8 w-full items-center gap-2 rounded-md pl-2 pr-3 text-sm ring-1 transition md:flex justify-between focus:[&amp;:not(:focus-visible)]:outline-none"
+          class="hidden text-gray-500 bg-white hover:ring-gray-500 ring-gray-300 h-8 w-full items-center gap-2 
+                 rounded pl-2 pr-3 text-sm ring-1 transition md:flex justify-between focus:[&amp;:not(:focus-visible)]:outline-none"
           phx-click={show_modal("live-search-modal")}
           id="searchbar-open-button"
         >
