@@ -27,5 +27,6 @@ defmodule Poffee.Utils do
   def can_be_cached?({:error, _}), do: false
   def can_be_cached?({:ok, []}), do: false
   def can_be_cached?({:ok, _}), do: true
+  def can_be_cached?([]), do: false
   def can_be_cached?(_), do: true
 end

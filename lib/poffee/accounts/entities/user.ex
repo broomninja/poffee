@@ -1,9 +1,10 @@
 defmodule Poffee.Accounts.User do
   use Poffee.Schema
-  import Ecto.Changeset
   import EctoEnum
 
   alias Poffee.Constant
+  alias Poffee.Social.BrandPage
+  alias Poffee.Social.Feedback
 
   defenum(RolesEnum, :role, [
     :role_user,
@@ -20,6 +21,9 @@ defmodule Poffee.Accounts.User do
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
     field :role, RolesEnum, default: :role_user
+
+    has_one :brand_page, BrandPage, foreign_key: :owner_id
+    has_many :feedbacks, Feedback, foreign_key: :author_id
 
     timestamps(type: :utc_datetime_usec)
   end

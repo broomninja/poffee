@@ -71,6 +71,7 @@ defmodule Poffee.MixProject do
       {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
       {:nebulex, "~> 2.5"},
+      {:ex_audit, "~> 0.10"},
 
       # mail / smtp
       {:swoosh, "~> 1.3"},
@@ -80,6 +81,7 @@ defmodule Poffee.MixProject do
       {:fun_with_flags, "~> 1.10.1"},
       {:opus, "~> 0.8"},
       {:let_me, "~> 1.1"},
+      {:html_sanitize_ex, "~> 1.4"},
 
       # UI
       {:tailwind, "~> 0.2.0", runtime: Mix.env() == :dev},
@@ -107,7 +109,8 @@ defmodule Poffee.MixProject do
       # {:load_control, github: "broomninja/load_control"},
 
       # dev and test deps
-      {:ecto_dev_logger, "~> 0.9"},
+      {:benchee, "~> 1.0", only: :dev},
+      # {:ecto_dev_logger, "~> 0.9"},
       # {:exsync, "~> 0.2", only: :dev},
       # {:file_system, "~> 0.2"},
       # {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},
