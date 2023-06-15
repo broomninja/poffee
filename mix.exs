@@ -107,7 +107,7 @@ defmodule Poffee.MixProject do
       # {:load_control, github: "broomninja/load_control"},
 
       # dev and test deps
-      # {:ecto_dev_logger, "~> 0.9"},
+      {:benchee, "~> 1.0", only: :dev},
       # {:exsync, "~> 0.2", only: :dev},
       # {:file_system, "~> 0.2"},
       # {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},

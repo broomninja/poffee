@@ -13,6 +13,8 @@ defmodule Poffee.Accounts do
 
   @ttl :timer.minutes(10)
 
+  @type uuid :: <<_::128>>
+
   ## Database getters
 
   @doc """
@@ -33,6 +35,7 @@ defmodule Poffee.Accounts do
               opts: [ttl: @ttl],
               match: &Utils.can_be_cached?/1
             )
+  @spec get_user_by_email(String.t()) :: User.t()
   def get_user_by_email(email) when is_binary(email) do
     Repo.get_by(User, email: email)
   end
@@ -49,6 +52,7 @@ defmodule Poffee.Accounts do
       nil
 
   """
+  @spec get_user_by_email_and_password(String.t(), String.t()) :: User.t()
   def get_user_by_email_and_password(email, password)
       when is_binary(email) and is_binary(password) do
     user = Repo.get_by(User, email: email)
@@ -73,6 +77,7 @@ defmodule Poffee.Accounts do
               opts: [ttl: @ttl],
               match: &Utils.can_be_cached?/1
             )
+  @spec get_user_by_username(String.t()) :: User.t()
   def get_user_by_username(username) when is_binary(username) do
     User
     |> where(username: ^username)
@@ -100,6 +105,7 @@ defmodule Poffee.Accounts do
               opts: [ttl: @ttl],
               match: &Utils.can_be_cached?/1
             )
+  @spec get_user!(uuid()) :: User.t()
   def get_user!(id), do: Repo.get!(User, id)
 
   ## User registration
@@ -456,7 +462,7 @@ defmodule Poffee.Accounts do
   def user_search(nil, _limit), do: {:ok, []}
   def user_search("", _limit), do: {:ok, []}
 
-  def user_search(search_query, limit) do
+  def user_search(search_query, limit) when is_binary(search_query) do
     search_query = "%#{search_query}%"
 
     users =
