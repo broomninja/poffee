@@ -16,11 +16,19 @@ defmodule Poffee.Social do
 
   @ttl :timer.minutes(10)
 
+  @type uuid :: <<_::128>>
+
   @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
-  @spec get_user_with_brand_page_and_feedbacks(User.t()) :: User.t()
-  def get_user_with_brand_page_and_feedbacks(%User{} = user) do
-    user
-    |> Repo.preload(brand_page: :feedbacks)
+  @spec get_user_with_brand_page_and_feedbacks(uuid()) :: User.t()
+  def get_user_with_brand_page_and_feedbacks(user_id) when is_binary(user_id) do
+    User
+    |> where([u], u.id == ^user_id)
+    |> join(:left, [u], bp in BrandPage, on: bp.owner_id == u.id)
+    |> join(:left, [_, bp], fb in Feedback,
+      on: fb.brand_page_id == bp.id and fb.status == :feedback_status_active
+    )
+    |> preload([_, bp, fb], brand_page: {bp, feedbacks: fb})
+    |> Repo.one()
   end
 
   @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
@@ -28,7 +36,7 @@ defmodule Poffee.Social do
   def get_brand_page_with_feedbacks_by_user(%User{} = user) do
     BrandPage
     |> where([bp], bp.owner_id == ^user.id)
-    |> join(:inner, [bp], fb in Feedback,
+    |> join(:left, [bp], fb in Feedback,
       on: fb.brand_page_id == bp.id and fb.status == :feedback_status_active
     )
     |> preload([bp, fb], feedbacks: fb)

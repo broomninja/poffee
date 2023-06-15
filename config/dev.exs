@@ -89,7 +89,6 @@ config :poffee, PoffeeWeb.Endpoint,
 config :swoosh, :api_client, false
 
 # Do not include metadata nor timestamps in development logs
-# config :logger, level: :info
 # config :logger, :console, format: "[$level] $message\n"
 
 # Set a higher stacktrace during development. Avoid configuring such

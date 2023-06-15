@@ -27,6 +27,37 @@ defmodule Poffee.Seeds do
     create_brand_pages_and_feedbacks()
   end
 
+  defp create_users(env) do
+    admin_attr = %{
+      username: "admin_1",
+      email: "admin@test.cc",
+      password: "12341234"
+    }
+
+    if is_nil(Accounts.get_user_by_email(admin_attr.email)) do
+      with {:error, changeset} <- Accounts.register_admin(admin_attr) do
+        if env != :test do
+          Logger.error("Error running seeds: #{inspect(admin_attr)} #{inspect(changeset.errors)}")
+        end
+      end
+    end
+
+    [
+      %{username: "bob1", email: "bob@test.cc", password: "12341234"},
+      %{username: "cat_123", email: "cat@test.cc", password: "12341234"},
+      %{username: "dave33", email: "dave@test.cc", password: "12341234"}
+    ]
+    |> Enum.map(fn user_attr ->
+      if is_nil(Accounts.get_user_by_email(user_attr.email)) do
+        with {:error, changeset} <- Accounts.register_user(user_attr) do
+          if env != :test do
+            Logger.warn("Error running seeds: #{inspect(user_attr)} #{inspect(changeset.errors)}")
+          end
+        end
+      end
+    end)
+  end
+
   defp create_brand_pages_and_feedbacks do
     user_bob = Accounts.get_user_by_email("bob@test.cc")
     user_cat = Accounts.get_user_by_email("cat@test.cc")
@@ -66,36 +97,5 @@ defmodule Poffee.Seeds do
         %{content: "second feedback content from Cat", title: "Cat's second feedback "}
         |> Social.create_feedback(user_cat, brandpage_cat)
     end
-  end
-
-  defp create_users(env) do
-    admin_attr = %{
-      username: "admin_1",
-      email: "admin@test.cc",
-      password: "12341234"
-    }
-
-    if is_nil(Accounts.get_user_by_email(admin_attr.email)) do
-      with {:error, changeset} <- Accounts.register_admin(admin_attr) do
-        if env != :test do
-          Logger.error("Error running seeds: #{inspect(admin_attr)} #{inspect(changeset.errors)}")
-        end
-      end
-    end
-
-    [
-      %{username: "bob1", email: "bob@test.cc", password: "12341234"},
-      %{username: "cat_123", email: "cat@test.cc", password: "12341234"},
-      %{username: "dave33", email: "dave@test.cc", password: "12341234"}
-    ]
-    |> Enum.map(fn user_attr ->
-      if is_nil(Accounts.get_user_by_email(user_attr.email)) do
-        with {:error, changeset} <- Accounts.register_user(user_attr) do
-          if env != :test do
-            Logger.warn("Error running seeds: #{inspect(user_attr)} #{inspect(changeset.errors)}")
-          end
-        end
-      end
-    end)
   end
 end
