@@ -7,14 +7,14 @@ defmodule Poffee.SocialFixtures do
   @doc """
   Generate a feedback.
   """
-  def feedback_fixture(attrs \\ %{}) do
+  def feedback_fixture(user, brand_page, attrs \\ %{}) do
     {:ok, feedback} =
       attrs
       |> Enum.into(%{
         content: "some content",
         title: "some title"
       })
-      |> Poffee.Social.create_feedback()
+      |> Poffee.Social.create_feedback(user, brand_page)
 
     feedback
   end
@@ -22,13 +22,15 @@ defmodule Poffee.SocialFixtures do
   @doc """
   Generate a brand_page.
   """
-  def brand_page_fixture(attrs \\ %{}) do
+  def brand_page_fixture(user, attrs \\ %{}) do
+    # IO.inspect(user, label: "brand_page_fixture")
+
     {:ok, brand_page} =
       attrs
       |> Enum.into(%{
         title: "some title"
       })
-      |> Poffee.Social.create_brand_page()
+      |> Poffee.Social.create_brand_page(user)
 
     brand_page
   end

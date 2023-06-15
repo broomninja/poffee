@@ -48,7 +48,7 @@ config :swoosh, :api_client, false
 # DB Cache
 ####################################
 # Uncomment the following line to disable DB caching
-# config :poffee, nebulex_adapter: Nebulex.Adapters.Nil
+config :poffee, nebulex_adapter: Nebulex.Adapters.Nil
 
 ####################################
 # Logger

@@ -77,7 +77,7 @@ defmodule Poffee.Accounts.User do
     changeset
     |> format_string(:email)
     |> validate_required([:email])
-    |> EctoCommons.EmailValidator.validate_email(:email, checks: [:html_input, :burner])
+    |> EctoCommons.EmailValidator.validate_email(:email, checks: [:html_input])
     |> validate_length(:email, max: Constant.email_max_length())
     |> maybe_validate_unique_email(opts)
   end
