@@ -7,6 +7,22 @@ defmodule Poffee.Utils do
     if string == "", do: nil, else: string
   end
 
+  @spec sanitize_field(Ecto.Changeset.t(), atom) :: Ecto.Changeset.t()
+  def sanitize_field(changeset, field) do
+    case Map.get(changeset.changes, field) do
+      nil ->
+        changeset
+
+      unformatted ->
+        formatted =
+          unformatted
+          |> String.trim()
+          |> HtmlSanitizeEx.strip_tags()
+
+        Ecto.Changeset.put_change(changeset, field, formatted)
+    end
+  end
+
   @doc """
   returns true if the url is a valid local (not external) url
   """

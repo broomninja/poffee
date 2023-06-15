@@ -4,6 +4,7 @@ defmodule Poffee.Social.Feedback do
 
   alias Poffee.Accounts.User
   alias Poffee.Social.BrandPage
+  alias Poffee.Utils
 
   defenum(FeedbackStatusEnum, :feedback_status, [
     :feedback_status_active,
@@ -26,5 +27,7 @@ defmodule Poffee.Social.Feedback do
     feedback
     |> cast(attrs, [:title, :content, :status, :author_id, :brand_page_id])
     |> validate_required([:title, :content, :status, :author_id, :brand_page_id])
+    |> Utils.sanitize_field(:title)
+    |> Utils.sanitize_field(:content)
   end
 end

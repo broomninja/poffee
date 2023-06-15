@@ -25,11 +25,19 @@ defmodule Poffee.SocialTest do
       assert Social.get_brand_page!(brand_page.id) == brand_page
     end
 
-    test "create_brand_page/1 with valid data creates a brand_page", %{user: user} do
-      valid_attrs = %{title: "some title"}
+    test "create_brand_page/1 with valid data data and trailing whitespace creates a brand_page", %{user: user} do
+      valid_attrs = %{title: " some title "}
 
       assert {:ok, %BrandPage{} = brand_page} = Social.create_brand_page(valid_attrs, user)
       assert brand_page.title == "some title"
+    end
+
+    test "create_brand_page/1 with html tags stripped off", %{user: user} do
+      html_attrs = %{title: " <div>some <b>title</b></div> ", description: "some <script>description</script> "}
+
+      assert {:ok, %BrandPage{} = brand_page} = Social.create_brand_page(html_attrs, user)
+      assert brand_page.title == "some title"
+      assert brand_page.description == "some description"
     end
 
     test "create_brand_page/1 with invalid data returns error changeset", %{user: user} do
@@ -84,18 +92,29 @@ defmodule Poffee.SocialTest do
       assert Social.get_feedback!(feedback.id) == feedback
     end
 
-    test "create_feedback/1 with valid data creates a feedback", %{
+    test "create_feedback/1 with valid data and trailing whitespace creates a feedback", %{
       user: user,
       brand_page: brand_page
     } do
-      valid_attrs = %{content: "some content", title: "some title"}
+      valid_attrs = %{content: " some content ", title: " some title "}
 
       assert {:ok, %Feedback{} = feedback} = Social.create_feedback(valid_attrs, user, brand_page)
       assert feedback.content == "some content"
       assert feedback.title == "some title"
     end
 
-    test "create_feedback/1 with invalid data returns error changeset", %{
+    test "create_feedback/1 with html tags stripped off", %{
+      user: user,
+      brand_page: brand_page
+    } do
+      html_attrs = %{content: "<div>some <b>content</b></div>", title: "some <script>title</script>"}
+
+      assert {:ok, %Feedback{} = feedback} = Social.create_feedback(html_attrs, user, brand_page)
+      assert feedback.content == "some content"
+      assert feedback.title == "some title"
+    end
+
+    test "create_feedback/1 with sc data returns error changeset", %{
       user: user,
       brand_page: brand_page
     } do
@@ -178,5 +197,6 @@ defmodule Poffee.SocialTest do
 
       assert length(loaded_brand_page.feedbacks) == 2
     end
+
   end
 end
