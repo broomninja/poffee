@@ -4,6 +4,7 @@ defmodule Poffee.Social.BrandPage do
 
   alias Poffee.Accounts.User
   alias Poffee.Social.Feedback
+  alias Poffee.Utils
 
   defenum(BrandPageStatusEnum, :brand_page_status, [
     :brand_page_status_public,
@@ -29,6 +30,8 @@ defmodule Poffee.Social.BrandPage do
   def changeset(brand_page, attrs) do
     brand_page
     |> cast(attrs, [:title, :description, :status, :owner_id])
+    |> Utils.sanitize_field(:title)
+    |> Utils.sanitize_field(:description)
     |> validate_required([:title, :status, :owner_id])
     |> unique_constraint(:owner_id)
   end
