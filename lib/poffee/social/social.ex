@@ -54,16 +54,16 @@ defmodule Poffee.Social do
   @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
   defdelegate list_brand_pages, to: BrandPageService
   defdelegate get_brand_page!(id), to: BrandPageService
-  defdelegate create_brand_page(attrs, user), to: BrandPageService
-  defdelegate update_brand_page(brand_page, attrs), to: BrandPageService
+  defdelegate create_brand_page(attrs \\ %{}, user), to: BrandPageService
+  defdelegate update_brand_page(brand_page, attrs \\ %{}), to: BrandPageService
   defdelegate delete_brand_page(brand_page), to: BrandPageService
-  defdelegate change_brand_page(brand_page, attrs), to: BrandPageService
+  defdelegate change_brand_page(brand_page, attrs \\ %{}), to: BrandPageService
 
   @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
   defdelegate list_feedbacks, to: FeedbackService
   defdelegate get_feedback!(id), to: FeedbackService
-  defdelegate create_feedback(attrs, user, brand_page), to: FeedbackService
-  defdelegate update_feedback(feedback, attrs), to: FeedbackService
+  defdelegate create_feedback(attrs \\ %{}, user, brand_page), to: FeedbackService
+  defdelegate update_feedback(feedback, attrs \\ %{}), to: FeedbackService
   defdelegate delete_feedback(feedback), to: FeedbackService
-  defdelegate change_feedback(feedback, attrs), to: FeedbackService
+  defdelegate change_feedback(feedback, attrs \\ %{}), to: FeedbackService
 end

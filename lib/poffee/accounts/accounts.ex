@@ -456,7 +456,7 @@ defmodule Poffee.Accounts do
   def user_search(nil, _limit), do: {:ok, []}
   def user_search("", _limit), do: {:ok, []}
 
-  def user_search(search_query, limit) do
+  def user_search(search_query, limit) when is_binary(search_query) do
     search_query = "%#{search_query}%"
 
     users =

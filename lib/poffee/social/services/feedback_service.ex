@@ -50,14 +50,16 @@ defmodule Poffee.Services.FeedbackService do
       |> Map.put(:author_id, user.id)
       |> Map.put(:brand_page_id, brand_page.id)
 
-    {:ok, feedback} =
+    result =
       %Feedback{}
       |> Feedback.changeset(attrs)
       |> Repo.insert()
 
-    # :ok = Notifications.feedback_created(feedback)
+    with {:ok, _feedback} <- result do
+      # :ok = Notifications.feedback_created(feedback)
+    end
 
-    {:ok, feedback}
+    result
   end
 
   @doc """
