@@ -16,8 +16,9 @@ defmodule Poffee.Utils do
       unformatted ->
         formatted =
           unformatted
-          |> String.trim()
           |> HtmlSanitizeEx.strip_tags()
+          # trimming must be the last action since HTML stripping can turn "<b> <b>" into " "
+          |> String.trim()
 
         Ecto.Changeset.put_change(changeset, field, formatted)
     end

@@ -30,9 +30,9 @@ defmodule Poffee.Social.BrandPage do
   def changeset(brand_page, attrs) do
     brand_page
     |> cast(attrs, [:title, :description, :status, :owner_id])
-    |> validate_required([:title, :status, :owner_id])
     |> Utils.sanitize_field(:title)
     |> Utils.sanitize_field(:description)
+    |> validate_required([:title, :status, :owner_id])
     |> unique_constraint(:owner_id)
   end
 end

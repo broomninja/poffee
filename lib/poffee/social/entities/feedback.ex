@@ -26,8 +26,8 @@ defmodule Poffee.Social.Feedback do
   def changeset(feedback, attrs) do
     feedback
     |> cast(attrs, [:title, :content, :status, :author_id, :brand_page_id])
-    |> validate_required([:title, :content, :status, :author_id, :brand_page_id])
     |> Utils.sanitize_field(:title)
     |> Utils.sanitize_field(:content)
+    |> validate_required([:title, :content, :status, :author_id, :brand_page_id])
   end
 end
