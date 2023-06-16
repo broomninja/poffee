@@ -44,8 +44,15 @@ defmodule Poffee.Seeds do
 
     [
       %{username: "bob1", email: "bob@test.cc", password: "12341234"},
-      %{username: "cat_123", email: "cat@test.cc", password: "12341234"},
-      %{username: "dave33", email: "dave@test.cc", password: "12341234"}
+      %{username: "cara_123", email: "cara@test.cc", password: "12341234"},
+      %{username: "dave3371", email: "dave@test.cc", password: "12341234"},
+      %{username: "eve__11", email: "eve@test.cc", password: "12341234"},
+      %{username: "fred991", email: "fred@test.cc", password: "12341234"},
+      %{username: "greg_13", email: "greg@test.cc", password: "12341234"},
+      %{username: "henry_19190922", email: "henry@test.cc", password: "12341234"},
+      %{username: "iris_15", email: "iris@test.cc", password: "12341234"},
+      %{username: "jay_31", email: "jay@test.cc", password: "12341234"},
+      %{username: "kay7120", email: "kay@test.cc", password: "12341234"}
     ]
     |> Enum.map(fn user_attr ->
       if is_nil(Accounts.get_user_by_email(user_attr.email)) do
@@ -60,9 +67,9 @@ defmodule Poffee.Seeds do
 
   defp create_brand_pages_and_feedbacks do
     user_bob = Accounts.get_user_by_email("bob@test.cc")
-    user_cat = Accounts.get_user_by_email("cat@test.cc")
+    user_cara = Accounts.get_user_by_email("cara@test.cc")
 
-    if is_nil(Social.get_brand_page_with_feedbacks_by_user(user_bob)) do
+    if is_nil(Social.get_brand_page_by_user(user_bob)) do
       {:ok, brandpage_bob} =
         %{title: "Bob's Brand Page", description: "I love feedbacks from our fans."}
         |> Social.create_brand_page(user_bob)
@@ -80,22 +87,22 @@ defmodule Poffee.Seeds do
         |> Social.create_feedback(user_bob, brandpage_bob)
 
       {:ok, _fb3} =
-        %{content: "first feedback content from Cat", title: "Cat's first feedback "}
-        |> Social.create_feedback(user_cat, brandpage_bob)
+        %{content: "first feedback content from Cara", title: "Cara's first feedback "}
+        |> Social.create_feedback(user_cara, brandpage_bob)
     end
 
-    if is_nil(Social.get_brand_page_with_feedbacks_by_user(user_cat)) do
-      {:ok, brandpage_cat} =
+    if is_nil(Social.get_brand_page_by_user(user_cara)) do
+      {:ok, brandpage_cara} =
         %{
-          title: "Cat's Brand Page",
+          title: "Cara's Brand Page",
           description: "This should not be visible to the public.",
           status: :brand_page_status_private
         }
-        |> Social.create_brand_page(user_cat)
+        |> Social.create_brand_page(user_cara)
 
       {:ok, _fb4} =
-        %{content: "second feedback content from Cat", title: "Cat's second feedback "}
-        |> Social.create_feedback(user_cat, brandpage_cat)
+        %{content: "second feedback content from Cara", title: "Cara's second feedback "}
+        |> Social.create_feedback(user_cara, brandpage_cara)
     end
   end
 end

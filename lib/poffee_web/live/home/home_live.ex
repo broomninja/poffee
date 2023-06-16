@@ -1,4 +1,4 @@
-defmodule PoffeeWeb.DemoLive do
+defmodule PoffeeWeb.HomeLive do
   use PoffeeWeb, :live_view
 
   require Logger
@@ -10,8 +10,6 @@ defmodule PoffeeWeb.DemoLive do
       # |> PhoenixLiveSession.maybe_subscribe(session)
       |> put_session_assigns(session)
 
-    # Logger.debug("[mount] DemoLive = #{inspect(socket.assigns)}")
-
     {:ok, socket}
   end
 
@@ -21,13 +19,10 @@ defmodule PoffeeWeb.DemoLive do
     |> assign_new(:somevalue, fn -> nil end)
     |> assign_new(:number, fn -> 15 end)
     |> assign(:selected_fruit, Map.get(session, "selected_fruit"))
-    |> assign(:page_title, "Demo")
+    |> assign(:page_title, "Home")
   end
 
   @impl Phoenix.LiveView
-  def handle_event("validate", _changes, socket) do
-    {:noreply, socket}
-  end
 
   def handle_event("select-fruit", %{"fruit" => fruit}, socket) do
     Logger.debug("[handle_event(\"select-fruit\"...]")
@@ -53,7 +48,7 @@ defmodule PoffeeWeb.DemoLive do
     </.form> --%>
     <button phx-click={JS.dispatch("set_input_value", bubbles: false)}>Click me!</button>
 
-    <a href="/">Demo Live</a>
+    <a href="/">Home Live</a>
     <a href="/">
       <img src={~p"/images/logo.svg"} width="36" />
     </a>
