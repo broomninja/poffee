@@ -108,7 +108,7 @@ defmodule PoffeeWeb.Router do
       ] do
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
-      live "/", DemoLive, :new
+      live "/", HomeLive, :new
       live "/demolive", DemoLive, :new
       live "/u/:username", UserLive, :show
     end

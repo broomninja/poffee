@@ -11,6 +11,8 @@ defmodule Poffee.Services.BrandPageService do
 
   @type changeset_error :: {:error, Ecto.Changeset.t()}
 
+  @type uuid :: <<_::128>>
+
   @doc """
   Returns the list of brand_pages.
 

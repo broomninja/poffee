@@ -11,8 +11,8 @@ defmodule Poffee.SocialFixtures do
     {:ok, feedback} =
       attrs
       |> Enum.into(%{
-        content: "some content",
-        title: "some title"
+        content: "default content",
+        title: "default title"
       })
       |> Poffee.Social.create_feedback(user, brand_page)
 
@@ -28,7 +28,8 @@ defmodule Poffee.SocialFixtures do
     {:ok, brand_page} =
       attrs
       |> Enum.into(%{
-        title: "some title"
+        title: "default title",
+        description: "default description"
       })
       |> Poffee.Social.create_brand_page(user)
 

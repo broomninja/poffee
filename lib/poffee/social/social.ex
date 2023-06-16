@@ -18,12 +18,21 @@ defmodule Poffee.Social do
 
   @type uuid :: <<_::128>>
 
+  @spec get_brand_page_by_user(User.t()) :: BrandPage.t()
+  def get_brand_page_by_user(%User{} = user) do
+    user
+    |> Ecto.assoc(:brand_page)
+    |> Repo.one()
+  end
+
   @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
-  @spec get_user_with_brand_page_and_feedbacks(uuid()) :: User.t()
-  def get_user_with_brand_page_and_feedbacks(user_id) when is_binary(user_id) do
+  @spec get_user_with_brand_page_and_feedbacks_by_username(String.t()) :: User.t()
+  def get_user_with_brand_page_and_feedbacks_by_username(username) when is_binary(username) do
     User
-    |> where([u], u.id == ^user_id)
-    |> join(:left, [u], bp in BrandPage, on: bp.owner_id == u.id)
+    |> where([u], u.username == ^username)
+    |> join(:left, [u], bp in BrandPage,
+      on: bp.owner_id == u.id and bp.status == :brand_page_status_public
+    )
     |> join(:left, [_, bp], fb in Feedback,
       on: fb.brand_page_id == bp.id and fb.status == :feedback_status_active
     )
@@ -35,7 +44,7 @@ defmodule Poffee.Social do
   @spec get_brand_page_with_feedbacks_by_user(User.t()) :: BrandPage.t()
   def get_brand_page_with_feedbacks_by_user(%User{} = user) do
     BrandPage
-    |> where([bp], bp.owner_id == ^user.id)
+    |> where([bp], bp.owner_id == ^user.id and bp.status == :brand_page_status_public)
     |> join(:left, [bp], fb in Feedback,
       on: fb.brand_page_id == bp.id and fb.status == :feedback_status_active
     )

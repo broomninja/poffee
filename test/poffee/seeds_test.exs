@@ -18,6 +18,6 @@ defmodule Poffee.SeedsTest do
     Poffee.Seeds.run()
 
     user_count = Poffee.Repo.aggregate(User, :count, :id)
-    assert user_count == 4
+    assert user_count == 11
   end
 end
