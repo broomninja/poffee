@@ -24,7 +24,13 @@
   </div>
 </nav>
 
-<%= live_render(@socket, PoffeeWeb.StreamingLive, id: "streaming_list", session: %{}, sticky: true) %>
+<%= if !assigns[:skip_user_display] do %>
+  <%= live_render(@socket, PoffeeWeb.StreamingLive,
+    id: "streaming_list",
+    session: %{},
+    sticky: true
+  ) %>
+<% end %>
 
 <main class="px-4 py-10 sm:px-6 lg:px-8">
   <div class="mx-auto max-w-2xl">
