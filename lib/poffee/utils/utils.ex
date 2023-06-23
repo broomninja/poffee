@@ -1,4 +1,11 @@
 defmodule Poffee.Utils do
+  @spec blank?(String.t()) :: boolean()
+  def blank?(nil), do: true
+
+  def blank?(str) do
+    "" == str |> to_string() |> String.trim()
+  end
+
   @spec normalize_string(String.t()) :: String.t()
   def normalize_string(nil), do: nil
 

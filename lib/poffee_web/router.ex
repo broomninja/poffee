@@ -18,9 +18,13 @@ defmodule PoffeeWeb.Router do
   end
 
   # Other scopes may use custom stacks.
-  # scope "/api", PoffeeWeb do
-  #   pipe_through :api
-  # end
+  scope "/webhooks", PoffeeWeb do
+    pipe_through :api
+
+    scope "/twitch/" do
+      post "/callback", TwitchWebhookController, :handle_event
+    end
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview
   if Application.compile_env(:poffee, :admin_routes) do
@@ -87,10 +91,12 @@ defmodule PoffeeWeb.Router do
     live_session :require_authenticated_user,
       on_mount: [
         PoffeeWeb.Hooks.AllowEctoSandbox,
+        {PoffeeWeb.UserAuthLive, :skip_user_display},
         {PoffeeWeb.UserAuthLive, :ensure_authenticated}
       ] do
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+      # TODO remove
       live "/protected", DemoLive, :new
     end
   end
@@ -100,17 +106,30 @@ defmodule PoffeeWeb.Router do
 
     delete "/logout", UserSessionController, :delete
 
+    live_session :confirm_user,
+      on_mount: [
+        PoffeeWeb.Hooks.AllowEctoSandbox,
+        {PoffeeWeb.UserAuthLive, :skip_user_display},
+        {PoffeeWeb.UserAuthLive, :mount_current_user}
+      ] do
+      live "/users/confirm/:token", UserConfirmationLive, :edit
+      live "/users/confirm", UserConfirmationInstructionsLive, :new
+    end
+  end
+
+  scope "/", PoffeeWeb do
+    pipe_through [:browser]
+
     live_session :current_user,
       on_mount: [
         PoffeeWeb.Hooks.AllowEctoSandbox,
         {PoffeeWeb.SaveRequestUri, :save_request_uri},
         {PoffeeWeb.UserAuthLive, :mount_current_user}
       ] do
-      live "/users/confirm/:token", UserConfirmationLive, :edit
-      live "/users/confirm", UserConfirmationInstructionsLive, :new
       live "/", HomeLive, :new
-      live "/demolive", DemoLive, :new
       live "/u/:username", UserLive, :show
+      # TODO remove
+      live "/demolive", DemoLive, :new
     end
   end
 end

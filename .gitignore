@@ -54,3 +54,5 @@ npm-debug.log
 # iex script
 .iex.exs
 
+# dets
+phoenix_live_sessions

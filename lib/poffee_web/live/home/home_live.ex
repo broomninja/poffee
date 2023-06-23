@@ -7,26 +7,40 @@ defmodule PoffeeWeb.HomeLive do
   def mount(_params, session, socket) do
     socket =
       socket
-      # |> PhoenixLiveSession.maybe_subscribe(session)
-      |> put_session_assigns(session)
+      |> PhoenixLiveSession.maybe_subscribe(session)
+      |> maybe_put_session_assigns(session)
+      |> assign_new(:page_title, fn -> "Home" end)
+      |> assign_new(:current_user, fn -> nil end)
+      |> assign_new(:somevalue, fn -> nil end)
+      |> assign_new(:number, fn -> 15 end)
+      |> assign_new(:selected_fruit, fn -> nil end)
+      |> assign_new(:selected_time, fn -> nil end)
 
     {:ok, socket}
   end
 
-  defp put_session_assigns(socket, session) do
-    socket
-    |> assign_new(:current_user, fn -> nil end)
-    |> assign_new(:somevalue, fn -> nil end)
-    |> assign_new(:number, fn -> 15 end)
-    |> assign(:selected_fruit, Map.get(session, "selected_fruit"))
-    |> assign(:page_title, "Home")
+  defp maybe_put_session_assigns(socket, session) do
+    # always fetch from PhoenixLiveSession, the plug session can become outdated since we are 
+    # not going through the plug when using liveview navigate which bypasses the plug
+
+    if connected?(socket) do
+      sid = Map.get(session, :__sid__)
+      opts = Map.get(session, :__opts__)
+
+      {_sid, phoenix_live_session} = PhoenixLiveSession.get(nil, sid, opts)
+
+      socket
+      |> assign(:selected_fruit, Map.get(phoenix_live_session, "selected_fruit", "empty"))
+      |> assign(:selected_time, Map.get(phoenix_live_session, "selected_time", "empty"))
+    else
+      socket
+    end
   end
 
   @impl Phoenix.LiveView
-
   def handle_event("select-fruit", %{"fruit" => fruit}, socket) do
-    Logger.debug("[handle_event(\"select-fruit\"...]")
     PhoenixLiveSession.put_session(socket, "selected_fruit", fruit)
+    PhoenixLiveSession.put_session(socket, "selected_time", Timex.now())
     {:noreply, socket}
   end
 
@@ -36,8 +50,7 @@ defmodule PoffeeWeb.HomeLive do
 
   @impl Phoenix.LiveView
   def handle_info({:live_session_updated, session}, socket) do
-    Logger.debug("[handle_info({:live_session_updated...}]")
-    {:noreply, put_session_assigns(socket, session)}
+    {:noreply, maybe_put_session_assigns(socket, session)}
   end
 
   @impl Phoenix.LiveView
@@ -78,7 +91,7 @@ defmodule PoffeeWeb.HomeLive do
     </div>
 
     <div>
-      Fruit = <%= @selected_fruit %>
+      Fruit = <%= @selected_fruit %> Time = <%= @selected_time %>
       <p
         phx-click="select-fruit"
         phx-value-fruit="apple"

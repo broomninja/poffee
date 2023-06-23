@@ -1,31 +1,55 @@
 <script lang="ts">
-    import { fly } from "svelte/transition"
-    import { linear } from 'svelte/easing';
+  import { onMount, onDestroy } from 'svelte';
+  import { fly } from "svelte/transition"
+  import { quadIn } from 'svelte/easing';
 
-    export let event;
-    export let streamers;
-    export let pushEvent;
+  export let event;
+  export let streamers;
+  export let pushEvent;
 
-    function add_streamer() {
-        pushEvent("add_streamer");
-    }
+  let fly_offset;
 
-    function update_streamer_list() {
-        pushEvent("update_streamer_list");
-    }
+  const debounce = (func, delay) => {
+    let timer;
 
-    //$: console.log("streamers = " + streamers)
-    //$: console.log("event = " + event)
+    return function () {
+      const context = this;
+      const args = arguments;
+      clearTimeout(timer);
+      timer = setTimeout(() => func.apply(context, args), delay);
+    };
+  };
+
+  const setWindowWidth = () => {
+    fly_offset = window.innerWidth - 260;
+    pushEvent("window_width_change", window.innerWidth);
+  };
+
+  const debouncedSetWindowWidth = debounce(setWindowWidth, 150);
+
+  onMount(() => {
+    window.addEventListener('resize', debouncedSetWindowWidth);
+    setWindowWidth();
+    pushEvent("display_ready");
+  });
+
+  onDestroy(() => {
+    window.removeEventListener('resize', debouncedSetWindowWidth);
+  });
+
+  // $: console.log("streamers = " + streamers)
+  // $: console.log("event = " + event)
+  // $: console.log("fly_offset = " + fly_offset)
 
 </script>
 
 <main>
-  <div class="flex">
+  <div class="flex whitespace-nowrap">
     <div class="pr-3">Live streamers</div>
     <div class="flex">
       {#each streamers as streamer, i (streamer.num)}
         {#if event === "add_streamer" && i == 0}
-          <div class="px-3" in:fly={{duration: 1250, easing: linear, x: 700}}>{streamer.num}</div>
+          <div class="px-3" in:fly={{duration: 1650, easing: quadIn, x: fly_offset}}>{streamer.num}</div>
         {:else}
           <div class="px-3">{streamer.num}</div>
         {/if}
