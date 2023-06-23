@@ -17,7 +17,7 @@ defmodule PoffeeWeb.Router do
     plug :accepts, ["json"]
   end
 
-  # Other scopes may use custom stacks.
+  # see endpoint.ex :parse_body for special handling of raw_body for /webhooks path
   scope "/webhooks", PoffeeWeb do
     pipe_through :api
 

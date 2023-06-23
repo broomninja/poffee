@@ -6,26 +6,34 @@ defmodule PoffeeWeb.TwitchWebhookController do
 
   require Logger
 
+  # check if signature is within 10 mins
+  @valid_period_in_seconds 600
+
   @spec handle_event(Plug.Conn.t(), map) :: Plug.Conn.t()
   def handle_event(%Plug.Conn{} = conn, _opts) do
     twitch_headers = parse_twitch_headers(conn)
     raw_body = raw_body(conn)
 
-    if signature_valid?(twitch_headers, raw_body) do
-      Logger.debug("[TwitchWebhookController.handle_event] signature is valid")
-      event = Event.new(Enum.into(conn.req_headers, %{}), conn.params)
+    case verify_signature(twitch_headers, raw_body) do
+      {:ok, valid_message} ->
+        Logger.debug("[TwitchWebhookController.handle_event] #{valid_message}")
+        event = Event.new(Enum.into(conn.req_headers, %{}), conn.params)
 
-      case process_event(event.headers.type, event) do
-        {:ok, data} ->
-          conn |> put_resp_content_type("text/plain") |> send_resp(200, data) |> halt
+        case process_event(event.headers.type, event) do
+          {:ok, data} ->
+            conn |> put_resp_content_type("text/plain") |> send_resp(200, data) |> halt
 
-        _ ->
-          Logger.debug("[TwitchWebhookController.handle_event] process_event failed")
-          conn |> send_resp(:unauthorized, "") |> halt
-      end
-    else
-      Logger.info("[TwitchWebhookController.handle_event] Invalid signature headers")
-      conn |> send_resp(:unauthorized, "") |> halt
+          _ ->
+            Logger.warn("[TwitchWebhookController.handle_event] process_event failed")
+            conn |> send_resp(:unauthorized, "") |> halt
+        end
+
+      {:error, error_message} ->
+        Logger.info(
+          "[TwitchWebhookController.handle_event] Invalid signature headers: #{error_message}"
+        )
+
+        conn |> send_resp(:unauthorized, error_message) |> halt
     end
   end
 
@@ -57,27 +65,43 @@ defmodule PoffeeWeb.TwitchWebhookController do
     end
   end
 
-  defp signature_valid?(_headers, nil), do: false
+  defp verify_signature(_headers, nil), do: {:error, "missing raw body"}
 
-  defp signature_valid?(
+  defp verify_signature(
          %{message_id: message_id, timestamp: timestamp, signature: signature},
          raw_data
        ) do
     signature_input = "#{message_id}#{timestamp}#{raw_data}"
 
-    # Logger.debug("[signature_valid] raw_data #{raw_data}")
-    # Logger.debug("[signature_valid] signature_input #{signature_input}")
-    # Logger.debug("[signature_valid] Env.endpoint_secret #{Env.endpoint_secret()}")
+    Logger.debug("[verify_signature] message_id #{message_id}")
+    Logger.debug("[verify_signature] timestamp #{timestamp}")
+    # Logger.debug("[verify_signature] signature_input #{signature_input}")
+    # Logger.debug("[verify_signature] Env.endpoint_secret #{Env.endpoint_secret()}")
+
+    current_timestamp = System.system_time(:second)
+    # header timestamp is in the format of "2023-06-23T02:06:42.358555867Z"
+    # need to convert it to unix epoch for comparison eg 1687486002
+    {:ok, signature_datetime, _offset} = DateTime.from_iso8601(timestamp)
+    signature_timestamp_in_seconds = DateTime.to_unix(signature_datetime)
 
     hmac =
       "sha256=" <>
         (:crypto.mac(:hmac, :sha256, Env.endpoint_secret(), signature_input)
          |> Base.encode16(case: :lower))
 
-    Plug.Crypto.secure_compare(hmac, signature)
+    cond do
+      signature_timestamp_in_seconds + @valid_period_in_seconds < current_timestamp ->
+        {:error, "signature is too old"}
+
+      not Plug.Crypto.secure_compare(hmac, signature) ->
+        {:error, "signature is incorrect"}
+
+      true ->
+        {:ok, "valid signature"}
+    end
   end
 
-  defp signature_valid?(_headers, _raw_data), do: false
+  defp verify_signature(_headers, _raw_data), do: {:error, "missing header(s)"}
 
   defp process_event(:webhook_callback_verification, %Event{} = event) do
     challenge = event.body["challenge"]

@@ -1,7 +1,7 @@
 defmodule Poffee.Streaming.TwitchApiConnector do
   use GenServer
 
-  alias Poffee.{Env, PubSub}
+  alias Poffee.Env
 
   require Logger
 
@@ -120,7 +120,7 @@ defmodule Poffee.Streaming.TwitchApiConnector do
 
       {:ok, %{"error" => _error} = message} ->
         Logger.error("[TwitchApiConnector.list_event_subs] #{message}")
-        
+
       {:error, message} ->
         Logger.error("[TwitchApiConnector.list_event_subs] #{message}")
     end

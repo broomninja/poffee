@@ -94,9 +94,9 @@ defmodule PoffeeWeb.StreamingLive do
   @impl Phoenix.LiveView
   # TODO remove
   def handle_info(:simulate_new_streamer, socket) do
-    Process.send_after(self(), :simulate_new_streamer, 3_000)
-
-    handle_event("add_streamer", nil, socket)
+    # Process.send_after(self(), :simulate_new_streamer, 3_000)
+    {:noreply, socket}
+    # handle_event("add_streamer", nil, socket)
   end
 
   @impl Phoenix.LiveView
