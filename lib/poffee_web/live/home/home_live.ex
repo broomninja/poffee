@@ -56,9 +56,6 @@ defmodule PoffeeWeb.HomeLive do
   @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""
-    <%!-- <.form for={:form} action={~p"/submit"} phx-change="validate">
-      <button type="submit">Submit</button>
-    </.form> --%>
     <button phx-click={JS.dispatch("set_input_value", bubbles: false)}>Click me!</button>
 
     <a href="/">Home Live</a>

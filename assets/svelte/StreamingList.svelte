@@ -3,6 +3,8 @@
   import { fly } from "svelte/transition"
   import { quadIn } from 'svelte/easing';
 
+  import Streamer from './Streamer.svelte';
+
   export let event;
   export let streamers;
   export let pushEvent;
@@ -30,28 +32,26 @@
   onMount(() => {
     window.addEventListener('resize', debouncedSetWindowWidth);
     setWindowWidth();
-    pushEvent("display_ready");
   });
 
   onDestroy(() => {
     window.removeEventListener('resize', debouncedSetWindowWidth);
   });
 
-  // $: console.log("streamers = " + streamers)
-  // $: console.log("event = " + event)
-  // $: console.log("fly_offset = " + fly_offset)
+  // $: console.log((Date()) + " streamers = " + streamers.length)
+  // $: console.log((Date()) + " event = " + event)
 
 </script>
 
 <main>
-  <div class="flex whitespace-nowrap">
-    <div class="pr-3">Live streamers</div>
+  <div class="flex whitespace-nowrap items-center justify-stretch">
+    <div class="pr-2 sm:pr-4 font-semibold">Live streamers</div>
     <div class="flex">
-      {#each streamers as streamer, i (streamer.num)}
+      {#each streamers as streamer, i (streamer.user_id)}
         {#if event === "add_streamer" && i == 0}
-          <div class="px-3" in:fly={{duration: 1650, easing: quadIn, x: fly_offset}}>{streamer.num}</div>
+          <div class="px-1 sm:px-2 " in:fly={{duration: 1650, easing: quadIn, x: fly_offset}}><Streamer streamer={streamer} /></div>
         {:else}
-          <div class="px-3">{streamer.num}</div>
+          <div class="px-1 sm:px-2 "><Streamer streamer={streamer} /></div>
         {/if}
       {/each}
     </div>

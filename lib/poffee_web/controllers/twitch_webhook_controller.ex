@@ -2,7 +2,8 @@ defmodule PoffeeWeb.TwitchWebhookController do
   use PoffeeWeb, :controller
 
   alias Poffee.Env
-  alias Poffee.Streaming.Twitch.{Event}
+  alias Poffee.Streaming.TwitchLiveStreamers
+  alias Poffee.Streaming.Twitch.Event
 
   require Logger
 
@@ -24,7 +25,7 @@ defmodule PoffeeWeb.TwitchWebhookController do
             conn |> put_resp_content_type("text/plain") |> send_resp(200, data) |> halt
 
           _ ->
-            Logger.warn("[TwitchWebhookController.handle_event] process_event failed")
+            Logger.warning("[TwitchWebhookController.handle_event] process_event failed")
             conn |> send_resp(:unauthorized, "") |> halt
         end
 
@@ -118,24 +119,22 @@ defmodule PoffeeWeb.TwitchWebhookController do
       event.headers.subscription_type,
       event.body["subscription"]["condition"]
     } do
-      {type, %{"broadcaster_user_id" => user_id}} ->
+      {"stream.online" = type, %{"broadcaster_user_id" => user_id}} ->
         Logger.info(
           "[TwitchWebhookController.process_event] received subscription type #{type} for user_id #{user_id}"
         )
 
-      # pubsub_event = %PubSub.Event.EventsubNotification{
-      #   type: type,
-      #   event: event.body["event"],
-      #   id: event.headers.id
-      # }
+        TwitchLiveStreamers.user_online(user_id)
 
-      # PubSub.broadcast_user_event!(
-      #   user_id,
-      #   pubsub_event
-      # )
+      {"stream.offline" = type, %{"broadcaster_user_id" => user_id}} ->
+        Logger.info(
+          "[TwitchWebhookController.process_event] received subscription type #{type} for user_id #{user_id}"
+        )
+
+        TwitchLiveStreamers.user_offline(user_id)
 
       {type, _} ->
-        Logger.error(
+        Logger.warning(
           "[webhook controller] unknown subscription type #{type} #{inspect(event.body["subscription"]["condition"])}"
         )
     end
