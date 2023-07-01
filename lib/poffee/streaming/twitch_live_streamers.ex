@@ -5,6 +5,8 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
 
   use GenServer
 
+  alias Poffee.Accounts
+  alias Poffee.Services.BrandPageService
   alias Poffee.Streaming.Twitch.Streamer
   alias Poffee.Streaming.{TwitchApiConnector, TwitchSubscriptionManager}
 
@@ -154,7 +156,12 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
   defp get_streamer_info(twitch_user_id) do
     case TwitchApiConnector.get_user_info(twitch_user_id) do
       {:ok, %{"data" => [user_info]}} ->
-        Streamer.new(user_info["id"], user_info["display_name"], user_info["profile_image_url"])
+        # return Streamer struct
+        streamer =
+          Streamer.new(user_info["id"], user_info["display_name"], user_info["profile_image_url"])
+
+        # Save streamer to database
+        maybe_create_user(streamer)
 
       response ->
         Logger.error(
@@ -163,6 +170,28 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
 
         nil
     end
+  end
+
+  # TODO remove - for demo only
+  # create a dummy user account for the streamer if not in our database already 
+  defp maybe_create_user(%Streamer{} = streamer) do
+    user_attrs = %{
+      username: streamer.display_name,
+      email: "twitch_" <> streamer.user_id <> "@test.cc",
+      password: "12341234"
+    }
+
+    with nil <- Accounts.get_user_by_username(streamer.display_name),
+         {:ok, user} <- Accounts.register_user(user_attrs) do
+      brand_page_attrs = %{
+        title: "Fan Page for Twitch streamer " <> streamer.display_name,
+        description: ""
+      }
+
+      BrandPageService.create_brand_page(brand_page_attrs, user)
+    end
+
+    streamer
   end
 
   defp maybe_subscribe_to_events(nil), do: nil

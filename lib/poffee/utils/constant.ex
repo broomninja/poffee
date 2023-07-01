@@ -3,7 +3,7 @@ defmodule Poffee.Constant do
 
   # User
   const(:email_max_length, 250)
-  const(:username_min_length, 4)
+  const(:username_min_length, 2)
   const(:username_max_length, 30)
   const(:password_min_length, 8)
   const(:password_max_length, 125)

@@ -5,6 +5,7 @@ defmodule PoffeeWeb.StreamingLive do
 
   require Logger
 
+  @default_max_streamers 14
   @sm_min_width 640
   @md_min_width 768
   @lg_min_width 1024
@@ -49,7 +50,7 @@ defmodule PoffeeWeb.StreamingLive do
   defp get_display_limit(width) when is_integer(width) and width < @md_min_width, do: 7
   defp get_display_limit(width) when is_integer(width) and width < @lg_min_width, do: 9
   defp get_display_limit(width) when is_integer(width) and width < @xl_min_width, do: 12
-  defp get_display_limit(_), do: 14
+  defp get_display_limit(_), do: @default_max_streamers
 
   @impl Phoenix.LiveView
   def handle_event("window_width_change", window_width, socket) do
