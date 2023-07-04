@@ -14,6 +14,10 @@ defmodule Poffee.Utils do
     if string == "", do: nil, else: string
   end
 
+  @spec maybe_if(any, boolean(), fun()) :: any
+  def maybe_if(data, true, action) when is_function(action, 1), do: action.(data)
+  def maybe_if(data, false, _action), do: data
+
   @spec sanitize_field(Ecto.Changeset.t(), atom) :: Ecto.Changeset.t()
   def sanitize_field(changeset, field) do
     case Map.get(changeset.changes, field) do

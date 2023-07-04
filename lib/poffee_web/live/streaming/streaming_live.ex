@@ -88,7 +88,7 @@ defmodule PoffeeWeb.StreamingLive do
   @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""
-    <div class="bg-gray-200 flex items-center justify-between px-5 xl:px-8 h-16">
+    <div class="bg-gray-200 flex items-center justify-between px-5 xl:px-8 py-1">
       <LiveSvelte.svelte
         name="StreamingList"
         ssr={false}

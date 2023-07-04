@@ -44,6 +44,11 @@ config :poffee, PoffeeWeb.Endpoint,
   ]
 
 ####################################
+# Twitch API
+####################################
+config :poffee, :twitch, api_client: TwitchApi
+
+####################################
 # DB Cache
 ####################################
 # Uncomment the following line to disable DB caching

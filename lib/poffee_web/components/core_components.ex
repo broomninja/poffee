@@ -63,7 +63,7 @@ defmodule PoffeeWeb.CoreComponents do
         aria-modal="true"
         tabindex="0"
       >
-        <div class="flex min-h-full items-start mt-6 md:mt-16 justify-center">
+        <div class="flex items-start mt-6 md:mt-16 justify-center">
           <div class={"#{@modal_width} max-w-3xl"}>
             <.focus_wrap
               id={"#{@id}-container"}

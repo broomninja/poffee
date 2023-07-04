@@ -40,7 +40,7 @@ defmodule Poffee.MixProject do
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(:test), do: ["lib", "test/support", "test/poffee"]
   defp elixirc_paths(_), do: ["lib"]
 
   # Specifies your project dependencies.
@@ -119,6 +119,8 @@ defmodule Poffee.MixProject do
       {:floki, ">= 0.34.2", only: :test},
       {:excoveralls, "~> 0.16", only: :test},
       {:ex_machina, "~> 2.7", only: :test},
+      {:mox, "~> 1.0", only: :test},
+      {:rewire, "~> 0.9", only: :test},
       {:wallaby, "~> 0.30", only: :test, runtime: false}
     ]
   end

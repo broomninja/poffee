@@ -3,6 +3,7 @@ defmodule Poffee.Accounts.User do
   import EctoEnum
 
   alias Poffee.Constant
+  alias Poffee.Utils
   alias Poffee.Social.BrandPage
   alias Poffee.Social.Feedback
 
@@ -75,7 +76,7 @@ defmodule Poffee.Accounts.User do
 
   defp validate_email(changeset, opts) do
     changeset
-    |> format_string(:email)
+    |> format_string(:email, true)
     |> validate_required([:email])
     |> EctoCommons.EmailValidator.validate_email(:email, checks: [:html_input])
     |> validate_length(:email, max: Constant.email_max_length())
@@ -149,8 +150,8 @@ defmodule Poffee.Accounts.User do
     |> put_change(:role, :role_admin)
   end
 
-  @spec format_string(t, atom) :: t
-  defp format_string(changeset, field) do
+  @spec format_string(t, atom, boolean()) :: t
+  defp format_string(changeset, field, force_lowercase \\ false) do
     case Map.get(changeset.changes, field) do
       nil ->
         changeset
@@ -158,7 +159,7 @@ defmodule Poffee.Accounts.User do
       unformatted ->
         formatted =
           unformatted
-          |> String.downcase()
+          |> Utils.maybe_if(force_lowercase, &String.downcase/1)
           |> String.trim()
 
         put_change(changeset, field, formatted)

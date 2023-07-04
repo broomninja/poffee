@@ -5,6 +5,8 @@ defmodule Poffee.Streaming.TwitchSupervisor do
 
   use Supervisor
 
+  alias Poffee.Env
+
   def start_link(arg) do
     Supervisor.start_link(__MODULE__, arg, name: __MODULE__)
   end
@@ -12,8 +14,8 @@ defmodule Poffee.Streaming.TwitchSupervisor do
   @impl true
   def init(_arg) do
     children = [
-      {Task.Supervisor, name: Poffee.Streaming.TaskSupervisor},
-      Poffee.Streaming.TwitchApiConnector,
+      # {Task.Supervisor, name: Poffee.Streaming.TaskSupervisor},
+      {Poffee.Streaming.TwitchApiConnector, twitch_api_client: Env.twitch_api_client()},
       Poffee.Streaming.TwitchSubscriptionManager,
       Poffee.Streaming.TwitchLiveStreamers
     ]

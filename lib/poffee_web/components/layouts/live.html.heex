@@ -32,20 +32,22 @@
   ) %>
 <% end %>
 
-<main class="px-4 py-10 sm:px-6 lg:px-8">
-  <div class="mx-auto max-w-2xl">
-    <.flash_group flash={@flash} />
+<div class="px-2 py-4 bg-cyan-200">
+  <.flash_group flash={@flash} />
 
-    <%!-- Skip user component when on login/register pages --%>
-    <%= if !assigns[:skip_user_display] do %>
-      <.modal id="live-login-modal" on_cancel={hide_modal("live-login-modal")}>
-        <%= live_render(@socket, PoffeeWeb.UserLoginLive,
-          id: "live-login",
-          session: %{"current_uri" => assigns[:current_uri]}
-        ) %>
-      </.modal>
-    <% end %>
+  <%!-- Skip user component when on login/register pages --%>
+  <%= if !assigns[:skip_user_display] do %>
+    <.modal id="live-login-modal" on_cancel={hide_modal("live-login-modal")}>
+      <%= live_render(@socket, PoffeeWeb.UserLoginLive,
+        id: "live-login",
+        session: %{"current_uri" => assigns[:current_uri]}
+      ) %>
+    </.modal>
+  <% end %>
 
-    <%= @inner_content %>
-  </div>
-</main>
+  <%= @inner_content %>
+</div>
+
+<footer class="px-10 py-5 bg-gray-800 text-white text-sm">
+  © 2023 Brand
+</footer>

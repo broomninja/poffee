@@ -13,8 +13,8 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
   # PubSub topic
   @topic "topic_live_streamers"
 
-  # 120 secs timeout
-  @timeout :timer.minutes(2)
+  # 20 secs timeout
+  @timeout :timer.seconds(20)
 
   require Logger
 

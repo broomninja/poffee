@@ -21,19 +21,19 @@
 
   .tooltip .tooltiptext {
     visibility: hidden;
-    width: 150px;
+    width: auto;
     background-color: #F7F5B3;
     color: #222;
     text-align: center;
     border-radius: 6px;
-    padding: 5px 10px;
+    padding: 5px 15px;
     
     /* Position the tooltip */
     position: absolute;
     z-index: 10;
     top: 100%;
     left: 50%;
-    margin-left: -75px;
+    transform: translateX(-50%);
     opacity: 0;
     transition: opacity 0.3s;
 

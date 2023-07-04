@@ -8,13 +8,14 @@ defmodule Poffee.Streaming.TwitchSubscriptionManager do
 
   use GenServer
 
+  alias Poffee.Env
   alias Poffee.Streaming.TwitchApiConnector
   alias Poffee.Streaming.Twitch.Subscription
 
   require Logger
 
-  # 120 secs timeout
-  @timeout :timer.minutes(2)
+  # 20 secs timeout
+  @timeout :timer.seconds(20)
 
   ################################################
   # Client APIs
@@ -127,7 +128,10 @@ defmodule Poffee.Streaming.TwitchSubscriptionManager do
 
         # nil or other non-list type
         other ->
-          Logger.error("[TwitchSubscriptionManager.get_subscriptions] #{inspect(other)}")
+          if Env.compile_env() != :test do
+            Logger.error("[TwitchSubscriptionManager.get_subscriptions] #{inspect(other)}")
+          end
+
           []
       end
 

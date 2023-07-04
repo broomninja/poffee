@@ -43,7 +43,7 @@
 
 </script>
 
-<main>
+<div>
   <div class="flex whitespace-nowrap items-center justify-stretch">
     <div class="pr-2 sm:pr-4 font-semibold">Live streamers</div>
     <div class="flex">
@@ -56,4 +56,4 @@
       {/each}
     </div>
   </div>
-</main>
+</div>

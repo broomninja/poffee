@@ -41,42 +41,4 @@ defmodule PoffeeWeb.UserLive do
   defp assign_page_title(socket, %BrandPage{} = brand_page, _username) do
     assign(socket, :page_title, brand_page.title)
   end
-
-  @impl Phoenix.LiveView
-  def render(assigns) do
-    ~H"""
-    <%= if is_nil(@user_found) do %>
-      <div>
-        <PetalCard.card>
-          <PetalCard.card_content
-            category="User Display"
-            category_color_class="pc-card__category--secondary"
-            class="max-w-sm whitespace-nowrap"
-            heading="No user found"
-          >
-          </PetalCard.card_content>
-        </PetalCard.card>
-      </div>
-    <% else %>
-      <%= if is_nil(@user_found.brand_page) do %>
-        <div>
-          <PetalCard.card>
-            <PetalCard.card_content
-              category="User Display"
-              category_color_class="pc-card__category--secondary"
-              class="max-w-sm whitespace-nowrap"
-              heading={@user_found.username}
-            >
-              User ID: <%= @user_found.id %>
-            </PetalCard.card_content>
-          </PetalCard.card>
-        </div>
-      <% else %>
-        <div><%= @user_found.username %></div>
-        <div><%= @user_found.brand_page.title %></div>
-        <div><%= @user_found.brand_page.description %></div>
-      <% end %>
-    <% end %>
-    """
-  end
 end
