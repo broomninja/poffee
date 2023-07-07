@@ -1,0 +1,27 @@
+<div id={"brandpage-#{@id}"}>
+  <%= @streamer.username %>
+
+  <.online_status status={@streaming_status} />
+
+  <.tabler_icon_button
+    icon="tabler-plus"
+    label="Create Feedback"
+    bgcolor={:secondary}
+    phx-click={show_modal(get_modal_name(@current_user))}
+    size={:auto}
+  >
+    Create Feedback
+  </.tabler_icon_button>
+
+  <LiveSvelte.svelte
+    name="BrandPage"
+    ssr={false}
+    props={
+      %{
+        streamer: @streamer,
+        streaming_status: @streaming_status,
+        current_user: @current_user
+      }
+    }
+  />
+</div>

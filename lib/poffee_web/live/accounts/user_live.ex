@@ -47,9 +47,9 @@ defmodule PoffeeWeb.UserLive do
   # PubSub messages from TwitchLiveStreamers
   def handle_info({:online, streamer}, socket) do
     Logger.debug("[UserLive.online] #{streamer.display_name}")
-    # check if streamer is displayed
     user = socket.assigns.user_found
 
+    # check if streamer is displayed
     socket =
       if user.username == streamer.display_name do
         assign(socket, :streaming_status, "online")

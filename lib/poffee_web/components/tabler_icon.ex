@@ -94,7 +94,8 @@ defmodule PoffeeWeb.Components.TablerIcon do
         @bgcolor == :info && "bg-info hover:bg-info-dark focus:outline-info",
         @bgcolor == :warning && "bg-warning hover:bg-warning-dark focus:outline-warning",
         @bgcolor == :primary && "bg-primary hover:bg-primary-dark focus:outline-primary",
-        @bgcolor == :secondary && "bg-secondary hover:bg-secondary-dark focus:outline-secondary",
+        @bgcolor == :secondary &&
+          "bg-secondary-400 hover:bg-secondary-500 focus:outline-secondary-400",
         @size == :auto && "h-8",
         @size == :md && "h-8 w-8",
         @size == :lg && "h-10 w-10"

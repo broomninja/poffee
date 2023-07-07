@@ -1,6 +1,8 @@
 defmodule Poffee.Social.BrandPageComponent do
   use PoffeeWeb, :live_component
 
+  alias Poffee.Accounts.User
+
   require Logger
 
   @impl Phoenix.LiveComponent
@@ -10,25 +12,50 @@ defmodule Poffee.Social.BrandPageComponent do
     {:ok, socket, temporary_assigns: []}
   end
 
-  @impl Phoenix.LiveComponent
-  def render(assigns) do
+  ##########################################
+  # Helper functions for HEEX render
+  ##########################################
+
+  # show login modal when user is not logged in
+  defp get_modal_name(nil), do: "live-login-modal"
+  defp get_modal_name(%User{}), do: "live-create-feedback-modal"
+
+  # Renders a badge showing online or offline status
+  attr :status, :string,
+    default: "blank",
+    values: ~w(loading online offline blank)
+
+  defp online_status(assigns) do
     ~H"""
-    <div id={"brandpage-#{@id}"}>
-      <%= @streamer.username %>
+    <div :if={@status != "blank"}>
+      <div
+        :if={@status == "loading"}
+        class="text-alert-500"
+        style="display: inline-flex; transform-style: preserve-3d"
+      >
+        <.tabler_icon name="tabler-loader-2" class="ml-1 w-6 h-6 animate-spin" />
+      </div>
 
-      <.online_status status={@streaming_status} />
+      <Petal.Badge.badge
+        :if={@status == "online"}
+        color="success"
+        variant="outline"
+        label="lg"
+        size="lg"
+      >
+        <Petal.HeroiconsV1.Outline.status_online class="w-5 h-5 mr-1 pb-[0.025rem]" />
+        Streaming Online
+      </Petal.Badge.badge>
 
-      <LiveSvelte.svelte
-        name="BrandPage"
-        ssr={false}
-        props={
-          %{
-            streamer: @streamer,
-            streaming_status: @streaming_status,
-            current_user: @current_user
-          }
-        }
-      />
+      <Petal.Badge.badge
+        :if={@status == "offline"}
+        color="danger"
+        variant="outline"
+        label="lg"
+        size="lg"
+      >
+        <Petal.HeroiconsV1.Outline.status_offline class="w-5 h-5 mr-1 pb-[0.025rem]" /> Offline
+      </Petal.Badge.badge>
     </div>
     """
   end

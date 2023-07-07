@@ -32,8 +32,6 @@ defmodule Poffee.Streaming.TwitchApiConnector do
   # 20 secs timeout
   @timeout :timer.seconds(20)
 
-  @default_number_streamers 30
-
   ################################################
   # Client APIs
   ################################################
@@ -50,7 +48,7 @@ defmodule Poffee.Streaming.TwitchApiConnector do
     GenServer.call(pid, {:get_user_info, twitch_user_id}, @timeout)
   end
 
-  def get_live_streamers(pid \\ __MODULE__, number \\ @default_number_streamers) do
+  def get_live_streamers(pid \\ __MODULE__, number) do
     GenServer.call(pid, {:get_live_streamers, number}, @timeout)
   end
 

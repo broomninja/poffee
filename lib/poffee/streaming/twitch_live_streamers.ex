@@ -17,6 +17,8 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
   # 20 secs timeout
   @timeout :timer.seconds(20)
 
+  @default_number_streamers 30
+
   require Logger
 
   ################################################
@@ -65,7 +67,7 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
   @impl GenServer
   def handle_continue(:load, _arg) do
     streamers =
-      case TwitchApiConnector.get_live_streamers() do
+      case TwitchApiConnector.get_live_streamers(@default_number_streamers) do
         {:ok, %{"data" => results}} ->
           results
           |> Stream.map(&Map.get(&1, "user_id"))
@@ -122,7 +124,7 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
     Logger.debug("[get_live_streamers] old_streamer_user_ids = #{inspect(old_streamer_user_ids)}")
 
     new_streamers =
-      case TwitchApiConnector.get_live_streamers() do
+      case TwitchApiConnector.get_live_streamers(@default_number_streamers) do
         {:ok, %{"data" => results}} ->
           results
           |> Stream.map(&Map.get(&1, "user_id"))
