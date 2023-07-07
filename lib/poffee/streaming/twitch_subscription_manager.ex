@@ -25,17 +25,17 @@ defmodule Poffee.Streaming.TwitchSubscriptionManager do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
-  def clear_subscriptions() do
-    GenServer.call(__MODULE__, :clear_subscriptions, @timeout)
+  def clear_subscriptions(pid \\ __MODULE__) do
+    GenServer.call(pid, :clear_subscriptions, @timeout)
   end
 
-  def maybe_subscribe_stream_online(twitch_user_id) do
-    GenServer.cast(__MODULE__, {:maybe_subscribe_stream_online, twitch_user_id})
+  def maybe_subscribe_stream_online(pid \\ __MODULE__, twitch_user_id) do
+    GenServer.cast(pid, {:maybe_subscribe_stream_online, twitch_user_id})
     {:ok, twitch_user_id}
   end
 
-  def maybe_subscribe_stream_offline(twitch_user_id) do
-    GenServer.cast(__MODULE__, {:maybe_subscribe_stream_offline, twitch_user_id})
+  def maybe_subscribe_stream_offline(pid \\ __MODULE__, twitch_user_id) do
+    GenServer.cast(pid, {:maybe_subscribe_stream_offline, twitch_user_id})
     {:ok, twitch_user_id}
   end
 

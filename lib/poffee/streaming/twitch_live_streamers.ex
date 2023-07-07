@@ -11,7 +11,8 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
   alias Poffee.Streaming.{TwitchApiConnector, TwitchSubscriptionManager}
 
   # PubSub topic
-  @topic "topic_live_streamers"
+  @topic_live_streamers "topic:live_streamers"
+  @topic_twitch "topic:twitch_"
 
   # 20 secs timeout
   @timeout :timer.seconds(20)
@@ -26,23 +27,29 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
     GenServer.start_link(__MODULE__, [], name: __MODULE__)
   end
 
-  def subscribe() do
-    Phoenix.PubSub.subscribe(Poffee.PubSub, @topic)
+  def subscribe_to_streaming_list() do
+    Logger.debug("[TwitchLiveStreamers.subscribe_to_streaming_list] ")
+    Phoenix.PubSub.subscribe(Poffee.PubSub, @topic_live_streamers)
   end
 
-  def current_streamers() do
-    GenServer.call(__MODULE__, :current_streamers, @timeout)
+  def subscribe_to_streamer(twitch_user_id) do
+    Logger.debug("[TwitchLiveStreamers.subscribe_to_streamer] #{twitch_user_id}")
+    Phoenix.PubSub.subscribe(Poffee.PubSub, @topic_twitch <> twitch_user_id)
+  end
+
+  def current_streamers(pid \\ __MODULE__) do
+    GenServer.call(pid, :current_streamers, @timeout)
   end
 
   # called by PoffeeWeb.TwitchWebhookController when we receive a webhook callback
-  def user_online(twitch_user_id) do
-    GenServer.cast(__MODULE__, {:online, twitch_user_id})
+  def user_online(pid \\ __MODULE__, twitch_user_id) do
+    GenServer.cast(pid, {:online, twitch_user_id})
     {:ok, twitch_user_id}
   end
 
   # called by PoffeeWeb.TwitchWebhookController when we receive a webhook callback
-  def user_offline(twitch_user_id) do
-    GenServer.cast(__MODULE__, {:offline, twitch_user_id})
+  def user_offline(pid \\ __MODULE__, twitch_user_id) do
+    GenServer.cast(pid, {:offline, twitch_user_id})
     {:ok, twitch_user_id}
   end
 
@@ -87,6 +94,7 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
     streamers = [new_streamer | streamers]
 
     broadcast_new_streamers(streamers)
+    broadcast_online_streamer(new_streamer)
 
     {:noreply, streamers}
   end
@@ -99,6 +107,8 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
     if updated_streamers != old_streamers do
       broadcast_updated_streamers(updated_streamers)
     end
+
+    broadcast_offline_streamer(get_streamer_info(twitch_user_id))
 
     {:noreply, updated_streamers}
   end
@@ -197,6 +207,7 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
   defp maybe_subscribe_to_events(nil), do: nil
 
   defp maybe_subscribe_to_events(twitch_user_id) do
+    TwitchSubscriptionManager.maybe_subscribe_stream_online(twitch_user_id)
     TwitchSubscriptionManager.maybe_subscribe_stream_offline(twitch_user_id)
     twitch_user_id
   end
@@ -204,12 +215,33 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
   # only broadcast when new streamers are added to the list 
   defp broadcast_new_streamers(streamers) do
     Logger.debug("[broadcast_new_streamers]")
-    Phoenix.PubSub.broadcast(Poffee.PubSub, @topic, {:added_streamers, streamers})
+    Phoenix.PubSub.broadcast(Poffee.PubSub, @topic_live_streamers, {:added_streamers, streamers})
   end
 
   # only broadcast when streamers are removed from the list or other changes 
   defp broadcast_updated_streamers(streamers) do
     Logger.debug("[broadcast_updated_streamers]")
-    Phoenix.PubSub.broadcast(Poffee.PubSub, @topic, {:updated_streamers, streamers})
+
+    Phoenix.PubSub.broadcast(
+      Poffee.PubSub,
+      @topic_live_streamers,
+      {:updated_streamers, streamers}
+    )
+  end
+
+  defp broadcast_online_streamer(streamer) do
+    Phoenix.PubSub.broadcast(
+      Poffee.PubSub,
+      @topic_twitch <> streamer.user_id,
+      {:online, streamer}
+    )
+  end
+
+  defp broadcast_offline_streamer(streamer) do
+    Phoenix.PubSub.broadcast(
+      Poffee.PubSub,
+      @topic_twitch <> streamer.user_id,
+      {:offline, streamer}
+    )
   end
 end

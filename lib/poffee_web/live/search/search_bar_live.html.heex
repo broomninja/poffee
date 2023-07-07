@@ -15,7 +15,7 @@
         <div class="group relative flex h-12 items-center">
           <%= if @loading_search? do %>
             <div class="pointer-events-none absolute left-2 top-4">
-              <PetalLoading.spinner size="sm" class="text-secondary-700" />
+              <Petal.Loading.spinner size="sm" class="text-secondary-700" />
             </div>
           <% else %>
             <.tabler_icon

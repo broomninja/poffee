@@ -4,30 +4,30 @@ defmodule PoffeeWeb.UserLoginDisplay do
   def show_user(assigns) do
     ~H"""
     <%= if @current_user do %>
-      <PetalDropdown.dropdown js_lib="live_view_js">
+      <Petal.Dropdown.dropdown js_lib="live_view_js">
         <:trigger_element>
           <div class="inline-flex items-center justify-center w-full align-middle focus:outline-none">
             <.tabler_icon name="tabler-user-cog" class="w-6 h-6" />
           </div>
         </:trigger_element>
-        <PetalDropdown.dropdown_menu_item
+        <Petal.Dropdown.dropdown_menu_item
           link_type="button"
           class="hover:bg-white font-semibold cursor-auto border-dotted border-b-2 border-gray-500"
         >
           <.tabler_icon name="tabler-user" /> <%= @current_user.email %>
-        </PetalDropdown.dropdown_menu_item>
-        <PetalDropdown.dropdown_menu_item
+        </Petal.Dropdown.dropdown_menu_item>
+        <Petal.Dropdown.dropdown_menu_item
           link_type="live_redirect"
           to={~p"/users/settings"}
           label="Settings"
         />
-        <PetalDropdown.dropdown_menu_item
+        <Petal.Dropdown.dropdown_menu_item
           link_type="a"
           to={~p"/logout"}
           label="Sign out"
           method={:delete}
         />
-      </PetalDropdown.dropdown>
+      </Petal.Dropdown.dropdown>
     <% else %>
       <.tabler_icon_button
         icon="tabler-user"

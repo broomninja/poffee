@@ -22,7 +22,7 @@
   .tooltip .tooltiptext {
     visibility: hidden;
     width: auto;
-    background-color: #F7F5B3;
+    background-color: #FFC;
     color: #222;
     text-align: center;
     border-radius: 6px;
@@ -47,7 +47,7 @@
     margin-left: -5px;
     border-width: 5px;
     border-style: solid;
-    border-color: transparent transparent #F7F5B3 transparent;
+    border-color: transparent transparent #FFC transparent;
   }
 
   .tooltip:hover .tooltiptext {

@@ -18,23 +18,6 @@ defmodule Poffee.Utils do
   def maybe_if(data, true, action) when is_function(action, 1), do: action.(data)
   def maybe_if(data, false, _action), do: data
 
-  @spec sanitize_field(Ecto.Changeset.t(), atom) :: Ecto.Changeset.t()
-  def sanitize_field(changeset, field) do
-    case Map.get(changeset.changes, field) do
-      nil ->
-        changeset
-
-      unformatted ->
-        formatted =
-          unformatted
-          |> HtmlSanitizeEx.strip_tags()
-          # trimming must be the last action since HTML stripping can turn "<b> <b>" into " "
-          |> String.trim()
-
-        Ecto.Changeset.put_change(changeset, field, formatted)
-    end
-  end
-
   @doc """
   returns true if the url is a valid local (not external) url
   """

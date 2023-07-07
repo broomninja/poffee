@@ -2,6 +2,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { fly } from "svelte/transition"
   import { quadIn } from 'svelte/easing';
+  import { Stretch } from 'svelte-loading-spinners';
 
   import Streamer from './Streamer.svelte';
 
@@ -45,7 +46,9 @@
 
 <div>
   <div class="flex whitespace-nowrap items-center justify-stretch">
-    <div class="pr-2 sm:pr-4 font-semibold">Live streamers</div>
+    <div class="flex items-center pr-2 md:pr-3 justify-stretch">
+      <Stretch size="40" color="#6bc655" unit="px" duration="1.7s" />
+    </div>
     <div class="flex">
       {#each streamers as streamer, i (streamer.user_id)}
         {#if event === "add_streamer" && i == 0}

@@ -19,7 +19,7 @@ defmodule PoffeeWeb.StreamingLive do
       |> put_session_assigns(session)
 
     if connected?(socket) do
-      TwitchLiveStreamers.subscribe()
+      TwitchLiveStreamers.subscribe_to_streaming_list()
     end
 
     {:ok, socket, layout: false, temporary_assigns: []}
@@ -88,7 +88,7 @@ defmodule PoffeeWeb.StreamingLive do
   @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""
-    <div class="bg-gray-200 flex items-center justify-between px-5 xl:px-8 py-1">
+    <div class="bg-gray-200 flex items-center justify-between px-4 md:px-6 py-1">
       <LiveSvelte.svelte
         name="StreamingList"
         ssr={false}

@@ -1,5 +1,5 @@
-<div class="flex flex-col md:flex-row bg-yellow-200">
-  <aside class="flex p-2 md:flex-none md:w-1/4 lg:w-1/5 overflow-hidden bg-green-200">
+<div class="flex flex-col md:flex-row">
+  <aside class="flex p-2 md:flex-row md:w-1/4 lg:w-1/5 overflow-hidden bg-green-200">
     <%= live_render(@socket, PoffeeWeb.ActiveStreamersLive,
       id: "active_streamers",
       session: %{},
@@ -9,34 +9,38 @@
   <main class="min-h-screen px-4 py-2">
     <%= if is_nil(@user_found) do %>
       <div>
-        <PetalCard.card>
-          <PetalCard.card_content
+        <Petal.Card.card>
+          <Petal.Card.card_content
             category="User Display"
             category_color_class="pc-card__category--secondary"
             class="max-w-sm whitespace-nowrap"
             heading="No user found"
           >
-          </PetalCard.card_content>
-        </PetalCard.card>
+          </Petal.Card.card_content>
+        </Petal.Card.card>
       </div>
     <% else %>
       <%= if is_nil(@user_found.brand_page) do %>
         <div>
-          <PetalCard.card>
-            <PetalCard.card_content
+          <Petal.Card.card>
+            <Petal.Card.card_content
               category="User Display"
               category_color_class="pc-card__category--secondary"
               class="max-w-sm whitespace-nowrap"
               heading={@user_found.username}
             >
               User ID: <%= @user_found.id %>
-            </PetalCard.card_content>
-          </PetalCard.card>
+            </Petal.Card.card_content>
+          </Petal.Card.card>
         </div>
       <% else %>
-        <div><%= @user_found.username %></div>
-        <div><%= @user_found.brand_page.title %></div>
-        <div><%= @user_found.brand_page.description %></div>
+        <.live_component
+          module={Poffee.Social.BrandPageComponent}
+          id={@user_found.id}
+          streamer={@user_found}
+          streaming_status={@streaming_status}
+          current_user={@current_user}
+        />
       <% end %>
     <% end %>
   </main>

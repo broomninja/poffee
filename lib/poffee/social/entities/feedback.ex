@@ -4,7 +4,6 @@ defmodule Poffee.Social.Feedback do
 
   alias Poffee.Accounts.User
   alias Poffee.Social.BrandPage
-  alias Poffee.Utils
 
   defenum(FeedbackStatusEnum, :feedback_status, [
     :feedback_status_active,
@@ -26,8 +25,13 @@ defmodule Poffee.Social.Feedback do
   def changeset(feedback, attrs) do
     feedback
     |> cast(attrs, [:title, :content, :status, :author_id, :brand_page_id])
-    |> Utils.sanitize_field(:title)
-    |> Utils.sanitize_field(:content)
+    |> sanitize_field(:title)
+    |> sanitize_field(:content)
     |> validate_required([:title, :content, :status, :author_id, :brand_page_id])
+  end
+
+  defimpl Jason.Encoder, for: __MODULE__ do
+    @fields ~w(id title content status user brand_page inserted_at updated_at)a
+    def encode(value, opts), do: jason_encode(value, @fields, opts)
   end
 end

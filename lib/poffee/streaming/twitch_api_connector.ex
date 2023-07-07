@@ -32,6 +32,8 @@ defmodule Poffee.Streaming.TwitchApiConnector do
   # 20 secs timeout
   @timeout :timer.seconds(20)
 
+  @default_number_streamers 30
+
   ################################################
   # Client APIs
   ################################################
@@ -40,36 +42,36 @@ defmodule Poffee.Streaming.TwitchApiConnector do
     GenServer.start_link(__MODULE__, opts, name: __MODULE__)
   end
 
-  def is_user_online?(twitch_user_id) do
-    GenServer.call(__MODULE__, {:is_user_online, twitch_user_id}, @timeout)
+  def is_user_online?(pid \\ __MODULE__, twitch_user_id) do
+    GenServer.call(pid, {:is_user_online, twitch_user_id}, @timeout)
   end
 
-  def get_user_info(twitch_user_id) do
-    GenServer.call(__MODULE__, {:get_user_info, twitch_user_id}, @timeout)
+  def get_user_info(pid \\ __MODULE__, twitch_user_id) do
+    GenServer.call(pid, {:get_user_info, twitch_user_id}, @timeout)
   end
 
-  def get_live_streamers() do
-    GenServer.call(__MODULE__, :get_live_streamers, @timeout)
+  def get_live_streamers(pid \\ __MODULE__, number \\ @default_number_streamers) do
+    GenServer.call(pid, {:get_live_streamers, number}, @timeout)
   end
 
-  def get_event_subscriptions() do
-    GenServer.call(__MODULE__, :get_event_subscriptions, @timeout)
+  def get_event_subscriptions(pid \\ __MODULE__) do
+    GenServer.call(pid, :get_event_subscriptions, @timeout)
   end
 
-  def remove_subscription(subscription_id) do
-    GenServer.call(__MODULE__, {:remove_subscription, subscription_id}, @timeout)
+  def remove_subscription(pid \\ __MODULE__, subscription_id) do
+    GenServer.call(pid, {:remove_subscription, subscription_id}, @timeout)
   end
 
   @doc """
   Get nofication when a given user is online
   """
-  def subscribe_stream_online(twitch_user_id) do
-    GenServer.cast(__MODULE__, {:stream_online, twitch_user_id})
+  def subscribe_stream_online(pid \\ __MODULE__, twitch_user_id) do
+    GenServer.cast(pid, {:stream_online, twitch_user_id})
     {:ok, twitch_user_id}
   end
 
-  def subscribe_stream_offline(twitch_user_id) do
-    GenServer.cast(__MODULE__, {:stream_offline, twitch_user_id})
+  def subscribe_stream_offline(pid \\ __MODULE__, twitch_user_id) do
+    GenServer.cast(pid, {:stream_offline, twitch_user_id})
     {:ok, twitch_user_id}
   end
 
@@ -123,9 +125,13 @@ defmodule Poffee.Streaming.TwitchApiConnector do
     {:reply, user_info, state}
   end
 
-  def handle_call(:get_live_streamers, _from, state) do
+  def handle_call({:get_live_streamers, number}, _from, state) do
     streamers =
-      twitch_api_client(state, Helix).list_streamers(state.client_id, state.app_access_token, 20)
+      twitch_api_client(state, Helix).list_streamers(
+        state.client_id,
+        state.app_access_token,
+        number
+      )
 
     {:reply, streamers, state}
   end

@@ -16,10 +16,11 @@ defmodule PoffeeWeb.CoreComponents do
   """
   use Phoenix.Component
 
+  alias PetalComponents, as: Petal
   alias Phoenix.LiveView.JS
-  import PoffeeWeb.Gettext
 
-  alias PetalComponents.Loading, as: PetalLoading
+  import PoffeeWeb.Gettext
+  import PoffeeWeb.Components.TablerIcon
 
   @doc """
   Renders a modal.
@@ -177,7 +178,7 @@ defmodule PoffeeWeb.CoreComponents do
     >
       <div class="flex">
         <div class="flex-shrink-0">
-          <PetalLoading.spinner size="sm" />
+          <Petal.Loading.spinner size="sm" />
         </div>
         <div class="ml-3">
           <p class="text-sm font-medium" role="alert">
@@ -591,6 +592,47 @@ defmodule PoffeeWeb.CoreComponents do
   def icon(%{name: "hero-" <> _} = assigns) do
     ~H"""
     <span class={[@name, @class]} />
+    """
+  end
+
+  @doc """
+  Renders a badge showing online or offline status
+  """
+  attr :status, :string,
+    default: "blank",
+    values: ~w(loading online offline blank)
+
+  def online_status(assigns) do
+    ~H"""
+    <div :if={@status != "blank"}>
+      <div
+        :if={@status == "loading"}
+        class="text-alert-500"
+        style="display: inline-flex; transform-style: preserve-3d"
+      >
+        <.tabler_icon name="tabler-loader-2" class="ml-1 w-6 h-6 animate-spin" />
+      </div>
+
+      <Petal.Badge.badge
+        :if={@status == "online"}
+        color="success"
+        variant="outline"
+        label="lg"
+        size="lg"
+      >
+        <Petal.HeroiconsV1.Outline.status_online class="w-5 h-5 mr-1 pb-[0.025rem]" /> Online
+      </Petal.Badge.badge>
+
+      <Petal.Badge.badge
+        :if={@status == "offline"}
+        color="danger"
+        variant="outline"
+        label="lg"
+        size="lg"
+      >
+        <Petal.HeroiconsV1.Outline.status_offline class="w-5 h-5 mr-1 pb-[0.025rem]" /> Offline
+      </Petal.Badge.badge>
+    </div>
     """
   end
 

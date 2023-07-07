@@ -64,7 +64,8 @@ defmodule Poffee.Accounts.User do
     changeset
     |> format_string(:username)
     |> validate_required([:username])
-    |> validate_format(:username, ~r/^[\d\w_]+$/,
+    # /u is unicode modifier which will allow unicode characters from other languages like CJK
+    |> validate_format(:username, ~r/^[[:alnum:]_]+$/u,
       message: "can only contain letters, numbers and _"
     )
     |> validate_length(:username,
@@ -233,5 +234,10 @@ defmodule Poffee.Accounts.User do
     else
       add_error(changeset, :current_password, "is not valid")
     end
+  end
+
+  defimpl Jason.Encoder, for: __MODULE__ do
+    @fields ~w(id username email role brand_page feedbacks inserted_at updated_at)a
+    def encode(value, opts), do: jason_encode(value, @fields, opts)
   end
 end

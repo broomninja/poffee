@@ -29,8 +29,9 @@ defmodule PoffeeWeb.SearchBarLive do
   @impl Phoenix.LiveView
   def handle_info({:run_search, search_query}, socket) do
     socket =
-      with {:ok, users} <- Accounts.user_search(search_query) do
-        assign(socket, :search_result, %{users: users})
+      case Accounts.user_search(search_query) do
+        {:ok, users} -> assign(socket, :search_result, %{users: users})
+        _ -> socket
       end
 
     {:noreply, assign(socket, :loading_search?, false)}
