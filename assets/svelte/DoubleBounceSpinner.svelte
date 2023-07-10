@@ -9,5 +9,5 @@
 </script>
 
 <div>
-<DoubleBounce size={size} color={color} unit="px" duration={duration} />
+  <DoubleBounce size={size} color={color} unit="px" duration={duration} />
 </div>

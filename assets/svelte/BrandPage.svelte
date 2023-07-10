@@ -27,6 +27,9 @@ Create Feedback
 aaaa
 {/if}
 
+  <DoubleBounce size="40" color="#6bc655" unit="px" duration="1.5s" />
+  <Moon size="30" color="#FF3E00" unit="px" duration="1.5s" />
+
 <div class="columns-3">
     <!-- fixed-width -->
     <div class="w-fixed w-full  px-4 border border-black">
