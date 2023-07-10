@@ -1,18 +1,23 @@
 <div id={"brandpage-#{@id}"}>
   <%= if !is_nil(@twitch_user) do %>
-    <div class="max-w-screen-lg min-w-min flex flex-col space-y-1 w-full border border-red-300 
-                h-full  mx-auto">
+    <div class="max-w-screen-lg min-w-min flex flex-col space-y-1 w-full border border-red-300 h-full mx-auto">
       <div class="flex items-center justify-start">
-        <div class="pr-3 rounded-lg">
-          <a href={"https://www.twitch.tv/#{@twitch_user.login}"} target="_blank">
-            <img
-              class="rounded-full inline-block"
-              width="55"
-              height="55"
-              src={@twitch_user.profile_image_url}
-              alt={@twitch_user.display_name}
-            />
-          </a>
+        <div class="pr-3">
+          <LiveSvelte.svelte
+            name="TooltipDiv"
+            ssr={true}
+            props={%{text: "Visit Twitch channel", background_color: "#FFF"}}
+          >
+            <a href={"https://www.twitch.tv/#{@twitch_user.login}"} target="_blank">
+              <img
+                class="rounded-full inline-block"
+                width="55"
+                height="55"
+                src={@twitch_user.profile_image_url}
+                alt={@twitch_user.display_name}
+              />
+            </a>
+          </LiveSvelte.svelte>
         </div>
 
         <div class="pr-3 font-semibold whitespace-nowrap">
@@ -20,9 +25,15 @@
         </div>
 
         <div class="whitespace-nowrap">
-          <a href={"https://www.twitch.tv/#{@twitch_user.login}"} target="_blank">
-            <.online_status status={@streaming_status} />
-          </a>
+          <LiveSvelte.svelte
+            name="TooltipDiv"
+            ssr={true}
+            props={%{text: "Visit Twitch channel", background_color: "#FFF"}}
+          >
+            <a href={"https://www.twitch.tv/#{@twitch_user.login}"} target="_blank">
+              <.online_status status={@streaming_status} />
+            </a>
+          </LiveSvelte.svelte>
         </div>
         <div class="pl-10">
           <.tabler_icon_button
@@ -36,13 +47,16 @@
           </.tabler_icon_button>
         </div>
       </div>
-      <div class="flex w-full h-full p-2 bg-gray-100 rounded-md">
+      <div
+        :if={!Utils.blank?(@twitch_user.description)}
+        class="flex w-full h-full p-2 text-secondary-900 text-sm bg-gray-100 rounded-md"
+      >
         <%= @twitch_user.description %>
       </div>
 
       <div class="flex space-x-5 w-full h-full">
-        <div class="flex h-full w-full bg-gray-300 rounded-md"></div>
-        <div class="flex h-full w-full bg-gray-300 rounded-md"></div>
+        <div class="flex h-full w-full bg-gray-300 rounded-md">ABC</div>
+        <div class="flex h-full w-full bg-gray-300 rounded-md">DEF</div>
       </div>
     </div>
   <% end %>
@@ -54,7 +68,6 @@
       %{
         streamer: @streamer,
         twitch_user: @twitch_user,
-        streaming_status: @streaming_status,
         current_user: @current_user
       }
     }

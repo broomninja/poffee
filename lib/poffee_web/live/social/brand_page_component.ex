@@ -2,6 +2,7 @@ defmodule Poffee.Social.BrandPageComponent do
   use PoffeeWeb, :live_component
 
   alias Poffee.Accounts.User
+  alias Poffee.Utils
 
   require Logger
 

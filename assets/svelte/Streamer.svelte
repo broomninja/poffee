@@ -1,57 +1,10 @@
 <script lang="ts">
+  import TooltipDiv from './TooltipDiv.svelte';
   export let streamer;
 </script>
 
-<a href="/u/{streamer.display_name}" data-phx-link="redirect" data-phx-link-state="push">
-  <div class="tooltip bg-secondary-700 rounded-lg p-1">
+<TooltipDiv text={streamer.display_name} classes="bg-secondary-700 rounded-lg p-1">
+   <a href="/u/{streamer.display_name}" data-phx-link="redirect" data-phx-link-state="push">
     <img class="rounded-md inline-block" width=55 height=55 src="{streamer.profile_image_url}" alt="{streamer.display_name}"/>
-    <!-- Tooltip -->
-    <span class="tooltiptext">
-        {streamer.display_name}
-    </span>
-    <!-- End Tooltip -->
-  </div>
-</a>
-
-<style>
-  .tooltip {
-    position: relative;
-    display: inline-block;
-  }
-
-  .tooltip .tooltiptext {
-    visibility: hidden;
-    width: auto;
-    background-color: #FFC;
-    color: #222;
-    text-align: center;
-    border-radius: 6px;
-    padding: 5px 15px;
-    
-    /* Position the tooltip */
-    position: absolute;
-    z-index: 10;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity 0.3s;
-
-  }
-
-  .tooltip .tooltiptext::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    bottom: 100%;
-    margin-left: -5px;
-    border-width: 5px;
-    border-style: solid;
-    border-color: transparent transparent #FFC transparent;
-  }
-
-  .tooltip:hover .tooltiptext {
-    visibility: visible;
-    opacity: 1;
-  }
-</style>
+  </a>
+</TooltipDiv>

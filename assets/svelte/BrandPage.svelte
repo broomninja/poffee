@@ -3,7 +3,6 @@
 
   export let streamer;
   export let twitch_user;
-  export let streaming_status;
   export let current_user;
 
   let brand_page = streamer?.brand_page;
