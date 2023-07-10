@@ -43,8 +43,9 @@ defmodule Poffee.Social.BrandPageComponent do
         label="lg"
         size="lg"
       >
-        <Petal.HeroiconsV1.Outline.status_online class="w-5 h-5 mr-1 pb-[0.025rem]" />
-        Streaming Online
+        <%!-- <Petal.HeroiconsV1.Outline.status_online class="w-5 h-5 mr-1 pb-[0.025rem]" /> --%>
+        <LiveSvelte.svelte name="DoubleBounceSpinner" ssr={false} props={%{size: 16, duration: "2s"}} />
+        <span class="pl-1">Streaming Online</span>
       </Petal.Badge.badge>
 
       <Petal.Badge.badge

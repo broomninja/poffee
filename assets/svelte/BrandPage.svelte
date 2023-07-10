@@ -2,6 +2,7 @@
   import { DoubleBounce, Moon } from 'svelte-loading-spinners';
 
   export let streamer;
+  export let twitch_user;
   export let streaming_status;
   export let current_user;
 
@@ -12,9 +13,12 @@
 
 </script>
 
-<a href="/u/{streamer.username}" data-phx-link="redirect" data-phx-link-state="push">
-  {streamer.username}
+{#if !!twitch_user}
+<a href="https://www.twitch.tv/{twitch_user.login}" target="_blank">
+  {twitch_user.display_name}
 </a>
+{/if}
+
 
 {#if !!current_user}
 <a href="/">
@@ -22,14 +26,6 @@ Create Feedback
 </a>
 {:else}
 aaaa
-{/if}
-
-{#if streaming_status === "online" }
-  <DoubleBounce size="40" color="#6bc655" unit="px" duration="1.5s" />
-{:else if streaming_status === "offline" }
-  Offline
-{:else}
-  <Moon size="30" color="#FF3E00" unit="px" duration="1.5s" />
 {/if}
 
 <div class="columns-3">

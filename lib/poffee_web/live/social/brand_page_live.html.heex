@@ -1,13 +1,13 @@
 <div class="flex flex-col md:flex-row">
-  <aside class="flex p-2 md:flex-row md:w-1/4 lg:w-1/5 overflow-hidden bg-green-200">
+  <aside class="flex p-2 md:flex-row w-full md:w-1/4 min-w-min lg:w-1/5 overflow-hidden bg-green-200">
     <%= live_render(@socket, PoffeeWeb.ActiveStreamersLive,
       id: "active_streamers",
       session: %{},
       sticky: true
     ) %>
   </aside>
-  <main class="min-h-screen px-4 py-2">
-    <%= if is_nil(@user_found) do %>
+  <main class="min-h-screen p-2 bg-yellow-100">
+    <%= if is_nil(@streamer) do %>
       <div>
         <Petal.Card.card>
           <Petal.Card.card_content
@@ -20,24 +20,25 @@
         </Petal.Card.card>
       </div>
     <% else %>
-      <%= if is_nil(@user_found.brand_page) do %>
+      <%= if is_nil(@streamer.brand_page) do %>
         <div>
           <Petal.Card.card>
             <Petal.Card.card_content
               category="User Display"
               category_color_class="pc-card__category--secondary"
               class="max-w-sm whitespace-nowrap"
-              heading={@user_found.username}
+              heading={@streamer.username}
             >
-              User ID: <%= @user_found.id %>
+              User ID: <%= @streamer.id %>
             </Petal.Card.card_content>
           </Petal.Card.card>
         </div>
       <% else %>
         <.live_component
           module={Poffee.Social.BrandPageComponent}
-          id={@user_found.id}
-          streamer={@user_found}
+          id={@streamer.id}
+          streamer={@streamer}
+          twitch_user={@twitch_user}
           streaming_status={@streaming_status}
           current_user={@current_user}
         />

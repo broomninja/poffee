@@ -4,7 +4,7 @@
 
 <a href="/u/{streamer.display_name}" data-phx-link="redirect" data-phx-link-state="push">
   <div class="tooltip bg-secondary-700 rounded-lg p-1">
-    <img class="rounded-md inline-block" width=55 height=55 src="{streamer.profile_url}" alt="{streamer.display_name}"/>
+    <img class="rounded-md inline-block" width=55 height=55 src="{streamer.profile_image_url}" alt="{streamer.display_name}"/>
     <!-- Tooltip -->
     <span class="tooltiptext">
         {streamer.display_name}

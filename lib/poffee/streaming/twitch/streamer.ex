@@ -1,13 +1,15 @@
 defmodule Poffee.Streaming.Twitch.Streamer do
   @derive Jason.Encoder
-  @enforce_keys [:user_id, :display_name]
-  defstruct @enforce_keys ++ [:profile_url]
+  @enforce_keys [:twitch_user_id, :display_name, :login]
+  defstruct @enforce_keys ++ [:profile_image_url, :description]
 
-  def new(user_id, display_name, profile_url) do
+  def new(twitch_user_id, display_name, login, description, profile_image_url) do
     %__MODULE__{
-      user_id: user_id,
+      twitch_user_id: twitch_user_id,
       display_name: display_name,
-      profile_url: profile_url
+      login: login,
+      description: description,
+      profile_image_url: profile_image_url
     }
   end
 end

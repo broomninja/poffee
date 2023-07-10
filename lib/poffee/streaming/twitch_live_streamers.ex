@@ -7,12 +7,16 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
 
   alias Poffee.Accounts
   alias Poffee.Services.BrandPageService
+  alias Poffee.Streaming
   alias Poffee.Streaming.Twitch.Streamer
   alias Poffee.Streaming.{TwitchApiConnector, TwitchSubscriptionManager}
 
   # PubSub topic
   @topic_live_streamers "topic:live_streamers"
   @topic_twitch "topic:twitch_"
+
+  @dummy_email_domain "test.cc"
+  @dummy_password "12341234"
 
   # 20 secs timeout
   @timeout :timer.seconds(20)
@@ -104,7 +108,7 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
   def handle_cast({:offline, twitch_user_id}, old_streamers) do
     updated_streamers =
       old_streamers
-      |> Enum.reject(fn x -> x.user_id == twitch_user_id end)
+      |> Enum.reject(fn x -> x.twitch_user_id == twitch_user_id end)
 
     if updated_streamers != old_streamers do
       broadcast_updated_streamers(updated_streamers)
@@ -119,7 +123,7 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
   # Retreive a fresh list of streamers, ignore any existing online streamers.
   @impl GenServer
   def handle_info(:get_live_streamers, old_streamers) do
-    old_streamer_user_ids = old_streamers |> Enum.map(&Map.get(&1, :user_id))
+    old_streamer_user_ids = old_streamers |> Enum.map(&Map.get(&1, :twitch_user_id))
 
     Logger.debug("[get_live_streamers] old_streamer_user_ids = #{inspect(old_streamer_user_ids)}")
 
@@ -141,9 +145,7 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
     streamers =
       case new_streamers do
         [head | _tail] ->
-          Logger.debug(
-            "[get_live_streamers] New online streamers found: #{inspect(new_streamers)}"
-          )
+          Logger.debug("[get_live_streamers] New online streamers found.}")
 
           # we are only interested in the first new streamer, for demo only 
           list = [head | old_streamers]
@@ -170,9 +172,15 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
       {:ok, %{"data" => [user_info]}} ->
         # return Streamer struct
         streamer =
-          Streamer.new(user_info["id"], user_info["display_name"], user_info["profile_image_url"])
+          Streamer.new(
+            user_info["id"],
+            user_info["display_name"],
+            user_info["login"],
+            user_info["description"],
+            user_info["profile_image_url"]
+          )
 
-        # Save streamer to database
+        # TODO remove this - Save streamer to database for demo purposes
         maybe_create_user(streamer)
 
       response ->
@@ -189,15 +197,24 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
   defp maybe_create_user(%Streamer{} = streamer) do
     user_attrs = %{
       username: streamer.display_name,
-      email: "twitch_" <> streamer.user_id <> "@test.cc",
-      password: "12341234"
+      email: "twitch_#{streamer.twitch_user_id}_#{streamer.login}@#{@dummy_email_domain}",
+      password: @dummy_password
+    }
+
+    twitch_user_attrs = %{
+      twitch_user_id: streamer.twitch_user_id,
+      description: streamer.description,
+      display_name: streamer.display_name,
+      login: streamer.login,
+      profile_image_url: streamer.profile_image_url
     }
 
     with nil <- Accounts.get_user_by_username(streamer.display_name),
-         {:ok, user} <- Accounts.register_user(user_attrs) do
+         {:ok, user} <- Accounts.register_user(user_attrs),
+         {:ok, twitch_user} <- Streaming.create_twitch_user(twitch_user_attrs, user) do
       brand_page_attrs = %{
-        title: "Fan Page for Twitch streamer " <> streamer.display_name,
-        description: ""
+        title: "#{twitch_user.display_name} - Twitch",
+        description: streamer.description
       }
 
       BrandPageService.create_brand_page(brand_page_attrs, user)
@@ -234,7 +251,7 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
   defp broadcast_online_streamer(streamer) do
     Phoenix.PubSub.broadcast(
       Poffee.PubSub,
-      @topic_twitch <> streamer.user_id,
+      @topic_twitch <> streamer.twitch_user_id,
       {:online, streamer}
     )
   end
@@ -242,7 +259,7 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
   defp broadcast_offline_streamer(streamer) do
     Phoenix.PubSub.broadcast(
       Poffee.PubSub,
-      @topic_twitch <> streamer.user_id,
+      @topic_twitch <> streamer.twitch_user_id,
       {:offline, streamer}
     )
   end

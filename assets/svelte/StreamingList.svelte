@@ -50,7 +50,7 @@
       <Stretch size="40" color="#6bc655" unit="px" duration="1.7s" />
     </div>
     <div class="flex">
-      {#each streamers as streamer, i (streamer.user_id)}
+      {#each streamers as streamer, i (streamer.twitch_user_id)}
         {#if event === "add_streamer" && i == 0}
           <div class="px-1 sm:px-2 " in:fly={{duration: 1650, easing: quadIn, x: fly_offset}}><Streamer streamer={streamer} /></div>
         {:else}
