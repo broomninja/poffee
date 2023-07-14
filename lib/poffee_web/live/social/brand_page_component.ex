@@ -8,18 +8,20 @@ defmodule Poffee.Social.BrandPageComponent do
 
   @impl Phoenix.LiveComponent
   def mount(socket) do
-    Logger.debug("[BrandPageComponent.mount] LC pid = #{inspect(self())}")
+    Logger.debug(
+      "[BrandPageComponent.mount] LC pid = #{inspect(self())} socket connected? #{connected?(socket)}"
+    )
 
     {:ok, socket, temporary_assigns: []}
   end
 
   ##########################################
-  # Helper functions for HEEX render
+  # Helper functions for HEEX rendering
   ##########################################
 
   # show login modal when user is not logged in
-  defp get_modal_name(nil), do: "live-login-modal"
-  defp get_modal_name(%User{}), do: "live-create-feedback-modal"
+  defp get_modal_name(nil, _), do: "live-login-modal"
+  defp get_modal_name(%User{}, modal_name), do: modal_name
 
   # Renders a badge showing online or offline status
   attr :status, :string,
@@ -57,7 +59,7 @@ defmodule Poffee.Social.BrandPageComponent do
         size="lg"
       >
         <Petal.HeroiconsV1.Outline.status_offline class="w-5 h-5 mr-1 pb-[0.025rem]" />
-        <span class="pl-2">Offline</span>
+        <span class="pl-1">Offline</span>
       </Petal.Badge.badge>
     </div>
     """

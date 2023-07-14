@@ -1,13 +1,9 @@
 <div id={"brandpage-#{@id}"}>
   <%= if !is_nil(@twitch_user) do %>
-    <div class="max-w-screen-lg min-w-min flex flex-col w-full border border-red-300 h-full mx-auto">
+    <div class="max-w-screen-lg min-w-min pr-2 md:pr-8 flex flex-col w-full h-full mx-auto">
       <div class="flex items-center justify-start">
         <div class="pr-3">
-          <LiveSvelte.svelte
-            name="TooltipDiv"
-            ssr={true}
-            props={%{text: "Visit Twitch channel"}}
-          >
+          <LiveSvelte.svelte name="TooltipDiv" ssr={true} props={%{text: "Visit Twitch channel"}}>
             <a href={"https://www.twitch.tv/#{@twitch_user.login}"} target="_blank">
               <img
                 class="rounded-full inline-block"
@@ -25,16 +21,18 @@
         </div>
 
         <div class="whitespace-nowrap">
-            <a href={"https://www.twitch.tv/#{@twitch_user.login}"} target="_blank">
-              <.online_status status={@streaming_status} />
-            </a>
+          <a href={"https://www.twitch.tv/#{@twitch_user.login}"} target="_blank">
+            <.online_status status={@streaming_status} />
+          </a>
         </div>
-        <div class="pl-10">
+        <div class="pl-4 md:pl-10">
           <.tabler_icon_button
             icon="tabler-plus"
             label="Create Feedback"
-            bgcolor={:secondary}
-            phx-click={show_modal(get_modal_name(@current_user))}
+            bgcolor={:blue}
+            iconcolor={:inherit}
+            textcolor={:inherit}
+            phx-click={show_modal(get_modal_name(@current_user, "live-create-feedback-modal"))}
             size={:auto}
           >
             Create Feedback
@@ -43,27 +41,22 @@
       </div>
       <div
         :if={!Utils.blank?(@twitch_user.description)}
-        class="flex w-full h-full pr-2 pt-3 text-gray-900 text-sm"
+        class="flex w-full h-full pl-1 pr-2 pt-3 text-gray-900 text-sm"
       >
         <%= @twitch_user.description %>
       </div>
 
-      <div class="flex space-x-5 pt-5 w-full h-full">
+      <%!-- <div class="flex space-x-5 pt-5 w-full h-full">
         <div class="flex h-full w-full bg-gray-300 rounded-md">ABC</div>
         <div class="flex h-full w-full bg-gray-300 rounded-md">DEF</div>
-      </div>
+      </div> --%>
+      <.live_component
+        :for={feedback <- @streamer.brand_page.feedbacks}
+        module={Poffee.Social.FeedbackComponent}
+        id={feedback.id}
+        feedback={feedback}
+        current_user={@current_user}
+      />
     </div>
   <% end %>
-
-  <LiveSvelte.svelte
-    name="BrandPage"
-    ssr={false}
-    props={
-      %{
-        streamer: @streamer,
-        twitch_user: @twitch_user,
-        current_user: @current_user
-      }
-    }
-  />
 </div>

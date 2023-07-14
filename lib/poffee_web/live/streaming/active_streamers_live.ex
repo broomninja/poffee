@@ -30,9 +30,7 @@ defmodule PoffeeWeb.ActiveStreamersLive do
     ~H"""
     <div class="bg-gray-200 flex items-center justify-between px-5 xl:px-8 py-1">
       Most Active Streamers
-      <div>
-        <LiveSvelte.svelte name="Number" props={%{number: @number}} />
-      </div>
+      <div></div>
     </div>
     """
   end

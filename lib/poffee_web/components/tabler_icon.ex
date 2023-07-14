@@ -58,17 +58,17 @@ defmodule PoffeeWeb.Components.TablerIcon do
 
   attr :textcolor, :atom,
     default: :black,
-    values: [:black, :white],
+    values: [:black, :white, :inherit],
     doc: "text color"
 
   attr :iconcolor, :atom,
     default: :black,
-    values: [:black, :white],
+    values: [:black, :white, :inherit],
     doc: "the icon color"
 
   attr :bgcolor, :atom,
     default: :primary,
-    values: [:black, :white, :alert, :info, :success, :warning, :primary, :secondary],
+    values: [:black, :white, :blue, :alert, :info, :success, :warning, :primary, :secondary],
     doc: "the background color"
 
   attr :size, :atom, default: :lg, values: [:md, :lg, :auto], doc: "the button size"
@@ -96,6 +96,8 @@ defmodule PoffeeWeb.Components.TablerIcon do
         @bgcolor == :primary && "bg-primary hover:bg-primary-dark focus:outline-primary",
         @bgcolor == :secondary &&
           "bg-secondary-400 hover:bg-secondary-500 focus:outline-secondary-400",
+        @bgcolor == :blue &&
+          "bg-blue-100 hover:bg-blue-500 text-blue-500 hover:text-white focus:outline-blue-100",
         @size == :auto && "h-8",
         @size == :md && "h-8 w-8",
         @size == :lg && "h-10 w-10"

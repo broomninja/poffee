@@ -45,6 +45,12 @@ defmodule PoffeeWeb.BrandPageLive do
     {:noreply, socket}
   end
 
+  # @impl Phoenix.LiveView
+  # def handle_event(event, params, socket) do
+  #   Logger.error("[BrandPageLive.handle_event] #{event}, #{inspect(params)}")
+  #   {:noreply, socket}
+  # end
+
   @impl Phoenix.LiveView
   # PubSub notifications from TwitchLiveStreamers
   def handle_info({:online, %Streamer{} = streamer}, socket) do

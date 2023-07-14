@@ -6,6 +6,7 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
   use GenServer
 
   alias Poffee.Accounts
+  alias Poffee.Social
   alias Poffee.Services.BrandPageService
   alias Poffee.Streaming
   alias Poffee.Streaming.Twitch.Streamer
@@ -209,15 +210,22 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
       profile_image_url: streamer.profile_image_url
     }
 
+    # create user in db if not exists
     with nil <- Accounts.get_user_by_username(streamer.display_name),
          {:ok, user} <- Accounts.register_user(user_attrs),
-         {:ok, twitch_user} <- Streaming.create_twitch_user(twitch_user_attrs, user) do
-      brand_page_attrs = %{
-        title: "#{twitch_user.display_name} - Twitch",
-        description: streamer.description
+         {:ok, twitch_user} <- Streaming.create_twitch_user(twitch_user_attrs, user),
+         {:ok, brand_page} =
+           %{
+             title: "#{twitch_user.display_name} - Twitch",
+             description: streamer.description
+           }
+           |> BrandPageService.create_brand_page(user) do
+      %{
+        title: "Demo feedback for #{twitch_user.display_name}",
+        content:
+          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Senectus et netus et malesuada fames. Massa massa ultricies mi quis hendrerit. "
       }
-
-      BrandPageService.create_brand_page(brand_page_attrs, user)
+      |> Social.create_feedback(user, brand_page)
     end
 
     streamer
