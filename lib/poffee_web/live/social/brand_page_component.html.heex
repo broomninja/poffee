@@ -11,6 +11,7 @@
                 height="55"
                 src={@twitch_user.profile_image_url}
                 alt={@twitch_user.display_name}
+                onerror="this.src='/images/profile_image_not_found.jpg';this.onerror='';"
               />
             </a>
           </LiveSvelte.svelte>
