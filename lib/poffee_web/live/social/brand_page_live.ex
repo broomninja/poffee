@@ -9,17 +9,16 @@ defmodule PoffeeWeb.BrandPageLive do
 
   require Logger
 
+  @default_assigns %{
+    # current_user: nil,
+    # streamer: nil,
+    twitch_user: nil,
+    streaming_status: "blank"
+  }
+
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
-    socket =
-      socket
-      #   |> PhoenixLiveSession.maybe_subscribe(session)
-      |> assign_new(:current_user, fn -> nil end)
-      |> assign_new(:streamer, fn -> nil end)
-      |> assign_new(:twitch_user, fn -> nil end)
-      |> assign_new(:streaming_status, fn -> "blank" end)
-
-    {:ok, socket}
+    {:ok, assign(socket, @default_assigns), temporary_assigns: []}
   end
 
   @impl Phoenix.LiveView

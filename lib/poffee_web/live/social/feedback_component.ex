@@ -46,9 +46,9 @@ defmodule Poffee.Social.FeedbackComponent do
   @impl Phoenix.LiveComponent
   def render(assigns) do
     ~H"""
-    <div id={get_container_id(@id)} class="pt-5" data-show-login={show_modal("live-login-modal")}>
+    <div id={get_container_id(@id)} class="pt-5">
       <!-- Feedback -->
-      <div class="grid grid-cols-9 gap-1 pt-4 pb-4 pl-2 bg-gray-100 rounded-md">
+      <div class="grid grid-cols-9 gap-1 pt-4 pb-4 pl-2 bg-slate-100 rounded-md">
         <!-- Feedback title -->
         <div class="col-span-7 ml-1 mb-1 text-lg font-bold text-gray-800 lg:leading-tight dark:text-white">
           <%= @feedback.title %>
@@ -76,12 +76,12 @@ defmodule Poffee.Social.FeedbackComponent do
         </div>
         <!-- End Author -->
         <!-- Feedback content -->
-        <div class="col-span-9 mt-3 ml-1 pr-5 text-sm text-gray-800">
+        <div class="col-span-9 mt-3 ml-1 mr-5 md:mr-16 text-sm text-gray-800">
           <%= @feedback.content %>
         </div>
         <!-- End Feedback content -->
         <!-- Created time -->
-        <div class="col-span-7 mt-3 flex whitespace-nowrap text-gray-700 text-sm">
+        <div class="col-span-9 mt-3 flex whitespace-nowrap text-gray-700 text-sm">
           <Petal.HeroiconsV1.Solid.clock class="w-6 h-6 pb-[0.025rem]" />
           <span class="pl-1">created <%= format_time(@feedback.inserted_at) %></span>
         </div>

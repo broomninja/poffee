@@ -1,7 +1,7 @@
 <script lang="ts">
   export let text;
-  export let background_color = "#FFE";
-  export let text_color = "#222";
+  export let background_color = "#4b5563";
+  export let text_color = "#FFF";
   export let classes = "";
 </script>
 

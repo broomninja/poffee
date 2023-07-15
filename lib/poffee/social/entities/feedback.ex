@@ -31,7 +31,7 @@ defmodule Poffee.Social.Feedback do
   end
 
   defimpl Jason.Encoder, for: __MODULE__ do
-    @fields ~w(id title content status user brand_page inserted_at updated_at)a
+    @fields ~w(id title content status author_id brand_page inserted_at updated_at)a
     def encode(value, opts), do: jason_encode(value, @fields, opts)
   end
 end

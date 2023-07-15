@@ -1,5 +1,6 @@
 <div id={"brandpage-#{@id}"}>
-  <%= if !is_nil(@twitch_user) do %>
+  LIVE ACTION <%= @live_action %>
+  <%= if @twitch_user do %>
     <div class="max-w-screen-lg min-w-min pr-2 md:pr-8 flex flex-col w-full h-full mx-auto">
       <div class="flex items-center justify-start">
         <div class="pr-3">
@@ -17,11 +18,11 @@
           </LiveSvelte.svelte>
         </div>
 
-        <div class="pr-3 font-semibold whitespace-nowrap">
+        <div class="font-semibold whitespace-nowrap">
           <%= @twitch_user.display_name %>
         </div>
 
-        <div class="whitespace-nowrap">
+        <div class="pl-2 md:pl-5 whitespace-nowrap">
           <a href={"https://www.twitch.tv/#{@twitch_user.login}"} target="_blank">
             <.online_status status={@streaming_status} />
           </a>
@@ -42,7 +43,7 @@
       </div>
       <div
         :if={!Utils.blank?(@twitch_user.description)}
-        class="flex w-full h-full pl-1 pr-2 pt-3 text-gray-900 text-sm"
+        class="flex w-full h-full pl-1 pr-2 pt-3 text-gray-900 text-sm font-semibold"
       >
         <%= @twitch_user.description %>
       </div>
@@ -58,6 +59,14 @@
         feedback={feedback}
         current_user={@current_user}
       />
+
+      <%= for feedback <- @streamer.brand_page.feedbacks do %>
+        <LiveSvelte.svelte
+          name="Feedback"
+          ssr={true}
+          props={%{feedback: feedback, current_user: @current_user, user_vote: nil}}
+        />
+      <% end %>
     </div>
   <% end %>
 </div>

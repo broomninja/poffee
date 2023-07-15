@@ -32,7 +32,8 @@
   ) %>
 <% end %>
 
-<div class="px-2 py-4">
+<%!-- id and data-show-login attr will allow show_modal() to be called from LiveSvelte --%>
+<div id="header-live" class="px-2 py-4" data-show-login={show_modal("live-login-modal")}>
   <.flash_group flash={@flash} />
 
   <%!-- Skip user component when on login/register pages --%>
