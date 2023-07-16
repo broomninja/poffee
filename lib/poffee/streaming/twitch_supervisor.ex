@@ -14,7 +14,7 @@ defmodule Poffee.Streaming.TwitchSupervisor do
   @impl true
   def init(_arg) do
     children = [
-      # {Task.Supervisor, name: Poffee.Streaming.TaskSupervisor},
+      {Task.Supervisor, name: Poffee.Streaming.TaskSupervisor},
       {Poffee.Streaming.TwitchApiConnector, twitch_api_client: Env.twitch_api_client()},
       Poffee.Streaming.TwitchSubscriptionManager,
       Poffee.Streaming.TwitchLiveStreamers

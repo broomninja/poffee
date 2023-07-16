@@ -67,7 +67,7 @@ defmodule PoffeeWeb.StreamingLive do
 
   # we subscribe to PubSub topic for new streamer events
   @impl Phoenix.LiveView
-  def handle_info({:added_streamers, streamers}, socket) do
+  def handle_info({TwitchLiveStreamers, :added_streamers, streamers}, socket) do
     socket =
       socket
       |> assign(:streamers, maybe_apply_limit(streamers, Map.get(socket.assigns, :display_limit)))
@@ -76,7 +76,7 @@ defmodule PoffeeWeb.StreamingLive do
     {:noreply, socket}
   end
 
-  def handle_info({:updated_streamers, streamers}, socket) do
+  def handle_info({TwitchLiveStreamers, :updated_streamers, streamers}, socket) do
     socket =
       socket
       |> assign(:streamers, maybe_apply_limit(streamers, Map.get(socket.assigns, :display_limit)))

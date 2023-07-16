@@ -5,14 +5,14 @@ defmodule PoffeeWeb.SearchBarLive do
 
   require Logger
 
+  @default_assigns %{
+    search_result: nil,
+    loading_search?: false
+  }
+
   @impl Phoenix.LiveView
   def mount(_params, _session, socket) do
-    socket =
-      socket
-      |> assign(:search_result, nil)
-      |> assign(:loading_search?, false)
-
-    {:ok, socket, layout: false}
+    {:ok, assign(socket, @default_assigns), temporary_assigns: []}
   end
 
   @impl Phoenix.LiveView
@@ -22,12 +22,12 @@ defmodule PoffeeWeb.SearchBarLive do
   end
 
   def handle_event("change", %{"search" => %{"query" => search_query}}, socket) do
-    send(self(), {:run_search, search_query})
+    send(self(), {__MODULE__, :run_search, search_query})
     {:noreply, assign(socket, :loading_search?, true)}
   end
 
   @impl Phoenix.LiveView
-  def handle_info({:run_search, search_query}, socket) do
+  def handle_info({__MODULE__, :run_search, search_query}, socket) do
     socket =
       case Accounts.user_search(search_query) do
         {:ok, users} -> assign(socket, :search_result, %{users: users})

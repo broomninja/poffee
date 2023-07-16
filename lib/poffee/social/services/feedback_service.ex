@@ -41,6 +41,11 @@ defmodule Poffee.Services.FeedbackService do
   def get_feedback!(id), do: Repo.get!(Feedback, id)
 
   @doc """
+  Gets a single feedback. Returns nil if does not exist.
+  """
+  def get_feedback(id), do: Repo.get(Feedback, id)
+
+  @doc """
   Creates a feedback.
   """
   @spec create_feedback(map, User.t(), BrandPage.t()) :: {:ok, Feedback.t()} | changeset_error

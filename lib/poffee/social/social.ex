@@ -78,6 +78,7 @@ defmodule Poffee.Social do
 
   @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
   defdelegate list_feedbacks, to: FeedbackService
+  defdelegate get_feedback(id), to: FeedbackService
   defdelegate get_feedback!(id), to: FeedbackService
   defdelegate create_feedback(attrs \\ %{}, user, brand_page), to: FeedbackService
   defdelegate update_feedback(feedback, attrs \\ %{}), to: FeedbackService

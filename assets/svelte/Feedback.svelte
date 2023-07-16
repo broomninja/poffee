@@ -5,9 +5,10 @@
 	import DateTimeDisplay from './DateTimeDisplay.svelte';
 
   export let current_user;
-  //export let brand_page;
+  export let brandpage_username;
   export let feedback;
   export let user_vote;
+  export let live_action;
   //export let pushEvent;
 
   let test_voter_count = 3;
@@ -31,9 +32,17 @@
   <!-- Feedback -->
   <div class="grid grid-cols-9 gap-1 pt-4 pb-4 pl-2 bg-slate-100 rounded-md">
     <!-- Feedback title -->
-    <div class="col-span-7 ml-1 mb-1 text-lg font-bold text-gray-800 lg:leading-tight dark:text-white">
-      {feedback.title}
-    </div>
+    {#if live_action === "show_brand_page"}
+      <div class="col-span-7 ml-1 mb-1 text-lg font-bold text-gray-800 hover:text-blue-700 lg:leading-tight dark:text-white">
+        <a href={`/u/${brandpage_username}/${feedback.id}`} data-phx-link="redirect" data-phx-link-state="push">
+          {feedback.title}
+        </a>
+      </div>
+    {:else if live_action === "show_feedback"}
+      <div class="col-span-7 ml-1 mb-1 text-lg font-bold text-gray-800 lg:leading-tight dark:text-white">
+        {feedback.title}
+      </div>
+    {/if}
     <!-- End Feedback title -->
     <!-- Vote Counter -->
     <div class="col-span-2 row-span-2 text-right">
@@ -46,7 +55,7 @@
     </div>
     <!-- End Author -->
     <!-- Feedback content -->
-    <div class="col-span-9 mt-3 ml-1 mr-5 md:mr-16 text-sm text-gray-800">
+    <div class="col-span-9 mt-3 ml-1 mr-5 md:mr-16 text-sm text-gray-800 lg:leading-relaxed">
       {@html feedback.content}
     </div>
     <!-- End Feedback content -->
@@ -58,6 +67,15 @@
       </span>
     </div>
     <!-- End Created time -->
+    <!-- Comment Link -->
+    {#if live_action === "show_brand_page"}
+      <div class="col-span-9 flex whitespace-nowrap text-gray-800 hover:text-blue-700 font-semibold justify-center">
+        <a href={`/u/${brandpage_username}/${feedback.id}`} data-phx-link="redirect" data-phx-link-state="push">
+          View comments ...
+        </a>
+      </div>
+    {/if}
+    <!-- End Comment Link -->
   </div>
   <!-- End Feedback -->
 </div>

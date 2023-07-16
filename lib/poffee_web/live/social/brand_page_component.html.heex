@@ -52,21 +52,64 @@
         <div class="flex h-full w-full bg-gray-300 rounded-md">ABC</div>
         <div class="flex h-full w-full bg-gray-300 rounded-md">DEF</div>
       </div> --%>
-      <.live_component
-        :for={feedback <- @streamer.brand_page.feedbacks}
-        module={Poffee.Social.FeedbackComponent}
-        id={feedback.id}
-        feedback={feedback}
-        current_user={@current_user}
-      />
 
-      <%= for feedback <- @streamer.brand_page.feedbacks do %>
+      <%!-- div :show_brand_page --%>
+      <div :if={@live_action == :show_brand_page}>
+        <.live_component
+          :for={feedback <- @streamer.brand_page.feedbacks}
+          module={Poffee.Social.FeedbackComponent}
+          id={feedback.id}
+          feedback={feedback}
+          brandpage_username={@streamer.username}
+          current_user={@current_user}
+          user_vote={nil}
+          live_action={@live_action}
+        />
+
+        <%= for feedback <- @streamer.brand_page.feedbacks do %>
+          <LiveSvelte.svelte
+            name="Feedback"
+            ssr={true}
+            props={
+              %{
+                feedback: feedback,
+                brandpage_username: @streamer.username,
+                current_user: @current_user,
+                user_vote: nil,
+                live_action: @live_action
+              }
+            }
+          />
+        <% end %>
+      </div>
+      <%!-- end div :show_brand_page --%>
+      <%!-- div :show_feedback --%>
+      <div :if={@live_action == :show_feedback}>
+        <.live_component
+          module={Poffee.Social.FeedbackComponent}
+          id={@feedback.id}
+          feedback={@feedback}
+          brandpage_username={@streamer.username}
+          current_user={@current_user}
+          user_vote={nil}
+          live_action={@live_action}
+        />
         <LiveSvelte.svelte
           name="Feedback"
           ssr={true}
-          props={%{feedback: feedback, current_user: @current_user, user_vote: nil}}
+          props={
+            %{
+              feedback: @feedback,
+              brandpage_username: @streamer.username,
+              current_user: @current_user,
+              user_vote: nil,
+              live_action: @live_action
+            }
+          }
         />
-      <% end %>
+      </div>
+      <%!-- end div :show_feedback --%>
     </div>
   <% end %>
+  <%!-- end if @twitch_user --%>
 </div>

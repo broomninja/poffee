@@ -53,8 +53,6 @@ defmodule PoffeeWeb.UserAuthLive do
     {:cont, mount_current_user(session, socket)}
   end
 
-  # def on_mount(:ensure_admin, _params, _session, %{assigns: %{current_user: user}} = socket) do
-
   def on_mount(:ensure_admin, _params, session, socket) do
     socket = mount_current_user(session, socket)
     current_user = socket.assigns.current_user

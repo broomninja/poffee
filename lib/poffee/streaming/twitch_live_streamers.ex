@@ -18,6 +18,7 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
 
   @dummy_email_domain "test.cc"
   @dummy_password "12341234"
+  @dummy_content "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Senectus et netus et malesuada fames. Massa massa ultricies mi quis hendrerit. "
 
   # 20 secs timeout
   @timeout :timer.seconds(20)
@@ -182,7 +183,11 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
           )
 
         # TODO remove this - Save streamer to database for demo purposes
-        maybe_create_user(streamer)
+        Task.Supervisor.start_child(Poffee.Streaming.TaskSupervisor, fn ->
+          maybe_create_user(streamer)
+        end)
+
+        streamer
 
       response ->
         Logger.error(
@@ -194,7 +199,7 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
   end
 
   # TODO remove - for demo only
-  # create a dummy user account for the streamer if not in our database already 
+  # create a dummy user account for the streamer if not already exists in our db 
   defp maybe_create_user(%Streamer{} = streamer) do
     user_attrs = %{
       username: streamer.display_name,
@@ -213,22 +218,33 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
     # create user in db if not exists
     with nil <- Accounts.get_user_by_username(streamer.display_name),
          {:ok, user} <- Accounts.register_user(user_attrs),
-         {:ok, twitch_user} <- Streaming.create_twitch_user(twitch_user_attrs, user),
-         {:ok, brand_page} =
-           %{
-             title: "#{twitch_user.display_name} - Twitch",
-             description: streamer.description
-           }
-           |> BrandPageService.create_brand_page(user) do
+         {:ok, _twitch_user} <- Streaming.create_twitch_user(twitch_user_attrs, user),
+         {:ok, brand_page} <- create_demo_brandpage(user, streamer.description) do
+      create_demo_feedbacks(user, brand_page)
+    end
+  end
+
+  # TODO remove - for demo only
+  defp create_demo_brandpage(user, description) do
+    %{
+      title: "#{user.username} - Twitch",
+      description: description
+    }
+    |> BrandPageService.create_brand_page(user)
+  end
+
+  # TODO remove - for demo only
+  defp create_demo_feedbacks(user, brand_page) do
+    1..2
+    |> Enum.each(fn n ->
       %{
-        title: "Demo feedback for #{twitch_user.display_name}",
-        content:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Senectus et netus et malesuada fames. Massa massa ultricies mi quis hendrerit. "
+        title: "Demo feedback #{n} for #{user.username}",
+        content: @dummy_content
       }
       |> Social.create_feedback(user, brand_page)
-    end
 
-    streamer
+      Process.sleep(2000)
+    end)
   end
 
   defp maybe_subscribe_to_events(nil), do: nil
@@ -242,7 +258,12 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
   # only broadcast when new streamers are added to the list 
   defp broadcast_new_streamers(streamers) do
     Logger.debug("[broadcast_new_streamers]")
-    Phoenix.PubSub.broadcast(Poffee.PubSub, @topic_live_streamers, {:added_streamers, streamers})
+
+    Phoenix.PubSub.broadcast(
+      Poffee.PubSub,
+      @topic_live_streamers,
+      {__MODULE__, :added_streamers, streamers}
+    )
   end
 
   # only broadcast when streamers are removed from the list or other changes 
@@ -252,7 +273,7 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
     Phoenix.PubSub.broadcast(
       Poffee.PubSub,
       @topic_live_streamers,
-      {:updated_streamers, streamers}
+      {__MODULE__, :updated_streamers, streamers}
     )
   end
 
@@ -260,7 +281,7 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
     Phoenix.PubSub.broadcast(
       Poffee.PubSub,
       @topic_twitch <> streamer.twitch_user_id,
-      {:online, streamer}
+      {__MODULE__, :online, streamer}
     )
   end
 
@@ -268,7 +289,7 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
     Phoenix.PubSub.broadcast(
       Poffee.PubSub,
       @topic_twitch <> streamer.twitch_user_id,
-      {:offline, streamer}
+      {__MODULE__, :offline, streamer}
     )
   end
 end

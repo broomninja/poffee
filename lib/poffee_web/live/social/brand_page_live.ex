@@ -10,8 +10,7 @@ defmodule PoffeeWeb.BrandPageLive do
   require Logger
 
   @default_assigns %{
-    # current_user: nil,
-    # streamer: nil,
+    feedback: nil,
     twitch_user: nil,
     streaming_status: "blank"
   }
@@ -22,25 +21,24 @@ defmodule PoffeeWeb.BrandPageLive do
   end
 
   @impl Phoenix.LiveView
-  def handle_params(%{"username" => username}, _url, socket) do
+
+  # Loads a specific feedback and its comments from db using the feedback_id
+  # @live_action == :show_feedback
+  def handle_params(%{"username" => username, "feedback_id" => feedback_id}, _url, socket) do
+    feedback = Social.get_feedback(feedback_id)
+
     socket =
-      case Social.get_user_with_brand_page_and_feedbacks_by_username(username) do
-        nil ->
-          socket
-          |> assign(:streamer, nil)
-          |> assign_page_title(nil, username)
+      socket
+      |> assign(:feedback, feedback)
+      |> assign_streamer(username)
 
-        %User{} = user ->
-          # fetch online status from API in the background, see handle_info below
-          if connected?(socket), do: send(self(), {:get_streaming_status, user})
+    {:noreply, socket}
+  end
 
-          socket
-          |> assign(:streamer, user)
-          |> assign(:streaming_status, "loading")
-          |> assign_page_title(user.brand_page, username)
-          |> maybe_load_twitch_streamer(user)
-      end
-
+  # Loads a specific streamer based on the given username
+  # @live_action == :show_brand_page
+  def handle_params(%{"username" => username}, _url, socket) do
+    socket = assign_streamer(socket, username)
     {:noreply, socket}
   end
 
@@ -52,7 +50,7 @@ defmodule PoffeeWeb.BrandPageLive do
 
   @impl Phoenix.LiveView
   # PubSub notifications from TwitchLiveStreamers
-  def handle_info({:online, %Streamer{} = streamer}, socket) do
+  def handle_info({TwitchLiveStreamers, :online, %Streamer{} = streamer}, socket) do
     Logger.debug("[UserLive.online] #{streamer.display_name}")
     user = socket.assigns.streamer
 
@@ -72,7 +70,7 @@ defmodule PoffeeWeb.BrandPageLive do
   end
 
   # PubSub notifications from TwitchLiveStreamers
-  def handle_info({:offline, %Streamer{} = streamer}, socket) do
+  def handle_info({TwitchLiveStreamers, :offline, %Streamer{} = streamer}, socket) do
     Logger.debug("[UserLive.offline] #{streamer.display_name}")
 
     # check if streamer is displayed
@@ -93,7 +91,7 @@ defmodule PoffeeWeb.BrandPageLive do
   end
 
   # message sent by self only
-  def handle_info({:get_streaming_status, user}, socket) do
+  def handle_info({__MODULE__, :get_streaming_status, user}, socket) do
     Logger.debug("[UserLive.get_streaming_status] #{user.username}")
 
     socket =
@@ -110,6 +108,25 @@ defmodule PoffeeWeb.BrandPageLive do
     {:noreply, socket}
   end
 
+  defp assign_streamer(socket, username) do
+    case Social.get_user_with_brand_page_and_feedbacks_by_username(username) do
+      nil ->
+        socket
+        |> assign(:streamer, nil)
+        |> assign_page_title(nil, username)
+
+      %User{} = user ->
+        # fetch online status from API in the background, see handle_info below
+        if connected?(socket), do: send(self(), {__MODULE__, :get_streaming_status, user})
+
+        socket
+        |> assign(:streamer, user)
+        |> assign(:streaming_status, "loading")
+        |> assign_page_title(user.brand_page, username)
+        |> maybe_load_twitch_streamer(user)
+    end
+  end
+
   defp assign_page_title(socket, nil, username) do
     assign(socket, :page_title, username)
   end
@@ -121,8 +138,7 @@ defmodule PoffeeWeb.BrandPageLive do
   # check if user is a twitch user, then subscribe to online events and
   # set socket.assigns
   defp maybe_load_twitch_streamer(socket, %User{id: user_id}) do
-    with true <- connected?(socket),
-         %TwitchUser{} = twitch_user <- get_twitch_user_from_db(user_id) do
+    with %TwitchUser{} = twitch_user <- get_twitch_user_from_db(user_id) do
       TwitchLiveStreamers.subscribe_to_streamer(twitch_user.twitch_user_id)
       assign(socket, :twitch_user, twitch_user)
     else
