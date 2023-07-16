@@ -1,10 +1,10 @@
 <div id={get_container_id(@feedback.id)} class="pt-5">
   <%!-- Feedback --%>
-  <div class="grid grid-cols-9 gap-1 pt-4 pb-4 pl-2 bg-slate-100 rounded-md">
+  <div class="grid grid-cols-9 pt-4 pb-2 pl-2 mb-2 bg-slate-100 rounded-md">
     <!-- Feedback title -->
     <div
       :if={@live_action == :show_brand_page}
-      class="col-span-7 ml-1 mb-1 text-lg font-bold text-gray-800 hover:text-blue-700 lg:leading-tight dark:text-white"
+      class="col-span-7 ml-1 mb-2 text-lg font-bold text-gray-800 hover:text-blue-700 lg:leading-tight dark:text-white"
     >
       <.link navigate={~p"/u/#{@brandpage_username}/#{@feedback.id}"}>
         <%= @feedback.title %>
@@ -12,7 +12,7 @@
     </div>
     <div
       :if={@live_action == :show_feedback}
-      class="col-span-7 ml-1 mb-1 text-lg font-bold text-gray-800 lg:leading-tight dark:text-white"
+      class="col-span-7 ml-1 mb-2 text-lg font-bold text-gray-800 lg:leading-tight dark:text-white"
     >
       <%= @feedback.title %>
     </div>
@@ -34,12 +34,12 @@
     </div>
     <!-- End Vote Counter -->
     <!-- Author -->
-    <div class="col-span-7 ml-1">
+    <div class="col-span-7 ml-1 mb-1">
       <%= @feedback.author_id %>
     </div>
     <!-- End Author -->
     <!-- Feedback content -->
-    <div class="col-span-9 mt-3 ml-1 mr-5 md:mr-16 text-sm text-gray-800 lg:leading-relaxed">
+    <div class="col-span-9 mt-3 ml-1 mr-5 md:mr-16 mb-1 text-sm text-gray-800 lg:leading-relaxed">
       <%= @feedback.content %>
     </div>
     <!-- End Feedback content -->
@@ -55,7 +55,9 @@
       class="col-span-9 flex whitespace-nowrap text-gray-800 hover:text-blue-700 font-semibold justify-center"
     >
       <.link navigate={~p"/u/#{@brandpage_username}/#{@feedback.id}"}>
-        View comments ...
+        <LiveSvelte.svelte name="Button">
+          View comments
+        </LiveSvelte.svelte>
       </.link>
     </div>
     <!-- End Comment Link -->

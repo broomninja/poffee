@@ -3,6 +3,7 @@
   import ClockIcon from './icons/ClockIcon.svelte';
   import VoteCounter from './VoteCounter.svelte';
 	import DateTimeDisplay from './DateTimeDisplay.svelte';
+	import Button from './Button.svelte';
 
   export let current_user;
   export let brandpage_username;
@@ -30,16 +31,16 @@
 
 <div id={`feedback-${feedback.id}`} class="pt-5">
   <!-- Feedback -->
-  <div class="grid grid-cols-9 gap-1 pt-4 pb-4 pl-2 bg-slate-100 rounded-md">
+  <div class="grid grid-cols-9 pt-4 pb-2 pl-2 mb-2 bg-slate-100 rounded-md">
     <!-- Feedback title -->
     {#if live_action === "show_brand_page"}
-      <div class="col-span-7 ml-1 mb-1 text-lg font-bold text-gray-800 hover:text-blue-700 lg:leading-tight dark:text-white">
+      <div class="col-span-7 ml-1 mb-2 text-lg font-bold text-gray-800 hover:text-blue-700 lg:leading-tight dark:text-white">
         <a href={`/u/${brandpage_username}/${feedback.id}`} data-phx-link="redirect" data-phx-link-state="push">
           {feedback.title}
         </a>
       </div>
     {:else if live_action === "show_feedback"}
-      <div class="col-span-7 ml-1 mb-1 text-lg font-bold text-gray-800 lg:leading-tight dark:text-white">
+      <div class="col-span-7 ml-1 mb-2 text-lg font-bold text-gray-800 lg:leading-tight dark:text-white">
         {feedback.title}
       </div>
     {/if}
@@ -50,12 +51,12 @@
     </div>
     <!-- End Vote Counter -->
     <!-- Author -->
-    <div class="col-span-7 ml-1">
+    <div class="col-span-7 ml-1 mb-1">
       {feedback.author_id}
     </div>
     <!-- End Author -->
     <!-- Feedback content -->
-    <div class="col-span-9 mt-3 ml-1 mr-5 md:mr-16 text-sm text-gray-800 lg:leading-relaxed">
+    <div class="col-span-9 mt-3 ml-1 mr-5 md:mr-16 mb-1 text-sm text-gray-800 lg:leading-relaxed">
       {@html feedback.content}
     </div>
     <!-- End Feedback content -->
@@ -71,7 +72,9 @@
     {#if live_action === "show_brand_page"}
       <div class="col-span-9 flex whitespace-nowrap text-gray-800 hover:text-blue-700 font-semibold justify-center">
         <a href={`/u/${brandpage_username}/${feedback.id}`} data-phx-link="redirect" data-phx-link-state="push">
-          View comments ...
+          <Button>
+            View comments
+          </Button>
         </a>
       </div>
     {/if}
