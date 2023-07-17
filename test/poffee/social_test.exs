@@ -234,4 +234,89 @@ defmodule Poffee.SocialTest do
       assert length(loaded_brand_page.feedbacks) == 2
     end
   end
+
+  describe "comments" do
+    alias Poffee.Social.Comment
+
+    import Poffee.SocialFixtures
+
+    @invalid_attrs %{content: nil}
+
+    setup do
+      user = user_fixture()
+      brand_page = brand_page_fixture(user)
+
+      %{user: user, feedback: feedback_fixture(user, brand_page)}
+    end
+
+    test "list_comments/0 returns all comments", %{
+      user: user,
+      feedback: feedback
+    } do
+      comment = comment_fixture(user, feedback)
+      assert Social.list_comments() == [comment]
+    end
+
+    test "get_comment!/1 returns the comment with given id", %{
+      user: user,
+      feedback: feedback
+    } do
+      comment = comment_fixture(user, feedback)
+      assert Social.get_comment!(comment.id) == comment
+    end
+
+    test "create_comment/1 with valid data creates a comment", %{
+      user: user,
+      feedback: feedback
+    } do
+      valid_attrs = %{content: "some content"}
+
+      assert {:ok, %Comment{} = comment} = Social.create_comment(valid_attrs, user, feedback)
+      assert comment.content == "some content"
+    end
+
+    test "create_comment/1 with invalid data returns error changeset", %{
+      user: user,
+      feedback: feedback
+    } do
+      assert {:error, %Ecto.Changeset{}} = Social.create_comment(@invalid_attrs, user, feedback)
+    end
+
+    test "update_comment/2 with valid data updates the comment", %{
+      user: user,
+      feedback: feedback
+    } do
+      comment = comment_fixture(user, feedback)
+      update_attrs = %{content: "some updated content"}
+
+      assert {:ok, %Comment{} = comment} = Social.update_comment(comment, update_attrs)
+      assert comment.content == "some updated content"
+    end
+
+    test "update_comment/2 with invalid data returns error changeset", %{
+      user: user,
+      feedback: feedback
+    } do
+      comment = comment_fixture(user, feedback)
+      assert {:error, %Ecto.Changeset{}} = Social.update_comment(comment, @invalid_attrs)
+      assert comment == Social.get_comment!(comment.id)
+    end
+
+    test "delete_comment/1 deletes the comment", %{
+      user: user,
+      feedback: feedback
+    } do
+      comment = comment_fixture(user, feedback)
+      assert {:ok, %Comment{}} = Social.delete_comment(comment)
+      assert_raise Ecto.NoResultsError, fn -> Social.get_comment!(comment.id) end
+    end
+
+    test "change_comment/1 returns a comment changeset", %{
+      user: user,
+      feedback: feedback
+    } do
+      comment = comment_fixture(user, feedback)
+      assert %Ecto.Changeset{} = Social.change_comment(comment)
+    end
+  end
 end

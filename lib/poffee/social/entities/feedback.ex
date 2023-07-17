@@ -4,6 +4,7 @@ defmodule Poffee.Social.Feedback do
 
   alias Poffee.Accounts.User
   alias Poffee.Social.BrandPage
+  alias Poffee.Social.Comment
 
   defenum(FeedbackStatusEnum, :feedback_status, [
     :feedback_status_active,
@@ -18,6 +19,8 @@ defmodule Poffee.Social.Feedback do
     belongs_to :user, User, foreign_key: :author_id
     belongs_to :brand_page, BrandPage
 
+    has_many :comments, Comment
+
     timestamps(type: :utc_datetime_usec)
   end
 
@@ -31,7 +34,7 @@ defmodule Poffee.Social.Feedback do
   end
 
   defimpl Jason.Encoder, for: __MODULE__ do
-    @fields ~w(id title content status author_id brand_page inserted_at updated_at)a
+    @fields ~w(id title content status author_id brand_page comments inserted_at updated_at)a
     def encode(value, opts), do: jason_encode(value, @fields, opts)
   end
 end

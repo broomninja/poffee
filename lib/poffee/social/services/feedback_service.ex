@@ -1,5 +1,6 @@
 defmodule Poffee.Services.FeedbackService do
   @moduledoc """
+  CRUD service module for Feedback
   """
 
   import Ecto.Query, warn: false
@@ -49,11 +50,11 @@ defmodule Poffee.Services.FeedbackService do
   Creates a feedback.
   """
   @spec create_feedback(map, User.t(), BrandPage.t()) :: {:ok, Feedback.t()} | changeset_error
-  def create_feedback(attrs \\ %{}, user, brand_page) do
+  def create_feedback(attrs \\ %{}, %User{id: user_id}, %BrandPage{id: brand_page_id}) do
     attrs =
       attrs
-      |> Map.put(:author_id, user.id)
-      |> Map.put(:brand_page_id, brand_page.id)
+      |> Map.put(:author_id, user_id)
+      |> Map.put(:brand_page_id, brand_page_id)
 
     result =
       %Feedback{}

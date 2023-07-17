@@ -11,8 +11,10 @@ defmodule Poffee.Social do
   alias Poffee.Accounts.User
   alias Poffee.Social.BrandPage
   alias Poffee.Social.Feedback
+  alias Poffee.Social.Comment
   alias Poffee.Services.BrandPageService
   alias Poffee.Services.FeedbackService
+  alias Poffee.Services.CommentService
 
   @ttl :timer.minutes(10)
 
@@ -68,7 +70,10 @@ defmodule Poffee.Social do
     |> Repo.all()
   end
 
-  @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
+  ###########################
+  # BrandPage
+  ###########################
+  # @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
   defdelegate list_brand_pages, to: BrandPageService
   defdelegate get_brand_page!(id), to: BrandPageService
   defdelegate create_brand_page(attrs \\ %{}, user), to: BrandPageService
@@ -76,7 +81,10 @@ defmodule Poffee.Social do
   defdelegate delete_brand_page(brand_page), to: BrandPageService
   defdelegate change_brand_page(brand_page, attrs \\ %{}), to: BrandPageService
 
-  @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
+  ###########################
+  # Feedback
+  ###########################
+  # @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
   defdelegate list_feedbacks, to: FeedbackService
   defdelegate get_feedback(id), to: FeedbackService
   defdelegate get_feedback!(id), to: FeedbackService
@@ -84,4 +92,14 @@ defmodule Poffee.Social do
   defdelegate update_feedback(feedback, attrs \\ %{}), to: FeedbackService
   defdelegate delete_feedback(feedback), to: FeedbackService
   defdelegate change_feedback(feedback, attrs \\ %{}), to: FeedbackService
+
+  ###########################
+  # Comment
+  ###########################
+  defdelegate list_comments, to: CommentService
+  defdelegate get_comment!(id), to: CommentService
+  defdelegate create_comment(attrs \\ %{}, user, feedback), to: CommentService
+  defdelegate update_comment(feedback, attrs \\ %{}), to: CommentService
+  defdelegate delete_comment(feedback), to: CommentService
+  defdelegate change_comment(feedback, attrs \\ %{}), to: CommentService
 end

@@ -84,7 +84,7 @@
       </div>
       <%!-- end div :show_brand_page --%>
       <%!-- div :show_feedback --%>
-      <div :if={@live_action == :show_feedback}>
+      <div :if={@live_action == :show_feedback and !is_nil(@feedback)}>
         <.live_component
           module={Poffee.Social.FeedbackComponent}
           id={@feedback.id}
