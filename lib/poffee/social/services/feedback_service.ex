@@ -1,6 +1,6 @@
 defmodule Poffee.Services.FeedbackService do
   @moduledoc """
-  CRUD service module for Feedback
+  Context module for Feedback
   """
 
   import Ecto.Query, warn: false
@@ -8,6 +8,7 @@ defmodule Poffee.Services.FeedbackService do
 
   alias Poffee.Accounts.User
   alias Poffee.Social.Feedback
+  alias Poffee.Social.FeedbackVote
   alias Poffee.Social.BrandPage
 
   @type changeset_error :: {:error, Ecto.Changeset.t()}
@@ -95,5 +96,24 @@ defmodule Poffee.Services.FeedbackService do
   """
   def change_feedback(%Feedback{} = feedback, attrs \\ %{}) do
     Feedback.changeset(feedback, attrs)
+  end
+
+  ##########################
+  # FeedbackVote
+  ##########################
+
+  def vote_feedback(%User{id: user_id}, %Feedback{id: feedback_id}) do
+    attrs = %{feedback_id: feedback_id, user_id: user_id}
+
+    %FeedbackVote{}
+    |> FeedbackVote.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  def unvote_feedback(%User{id: user_id}, %Feedback{id: feedback_id}) do
+    FeedbackVote
+    |> where(feedback_id: ^feedback_id)
+    |> where(user_id: ^user_id)
+    |> Repo.delete_all()
   end
 end

@@ -1,6 +1,6 @@
 defmodule Poffee.Services.CommentService do
   @moduledoc """
-  CRUD service module for Comment
+  Context module for Comment
   """
 
   import Ecto.Query, warn: false

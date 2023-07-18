@@ -10,8 +10,9 @@ defmodule Poffee.Social do
 
   alias Poffee.Accounts.User
   alias Poffee.Social.BrandPage
-  alias Poffee.Social.Feedback
   alias Poffee.Social.Comment
+  alias Poffee.Social.Feedback
+  alias Poffee.Social.FeedbackVote
   alias Poffee.Services.BrandPageService
   alias Poffee.Services.FeedbackService
   alias Poffee.Services.CommentService
@@ -71,6 +72,23 @@ defmodule Poffee.Social do
   end
 
   ###########################
+  # FeedbackVote
+  ###########################
+  @spec get_feedback_votes_by_user(%User{}) :: list(%FeedbackVote{})
+  def get_feedback_votes_by_user(%User{} = user) do
+    user
+    |> Repo.preload(:feedback_votes)
+    |> Map.get(:feedback_votes)
+  end
+
+  @spec get_feedback_votes_by_feedback(%Feedback{}) :: list(%FeedbackVote{})
+  def get_feedback_votes_by_feedback(%Feedback{} = feedback) do
+    feedback
+    |> Repo.preload(:voters)
+    |> Map.get(:voters)
+  end
+
+  ###########################
   # BrandPage
   ###########################
   # @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
@@ -92,6 +110,8 @@ defmodule Poffee.Social do
   defdelegate update_feedback(feedback, attrs \\ %{}), to: FeedbackService
   defdelegate delete_feedback(feedback), to: FeedbackService
   defdelegate change_feedback(feedback, attrs \\ %{}), to: FeedbackService
+  defdelegate vote_feedback(user, feedback), to: FeedbackService
+  defdelegate unvote_feedback(user, feedback), to: FeedbackService
 
   ###########################
   # Comment

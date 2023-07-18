@@ -5,6 +5,7 @@ defmodule Poffee.Social.Feedback do
   alias Poffee.Accounts.User
   alias Poffee.Social.BrandPage
   alias Poffee.Social.Comment
+  alias Poffee.Social.FeedbackVote
 
   defenum(FeedbackStatusEnum, :feedback_status, [
     :feedback_status_active,
@@ -20,6 +21,11 @@ defmodule Poffee.Social.Feedback do
     belongs_to :brand_page, BrandPage
 
     has_many :comments, Comment
+
+    many_to_many :voters, User,
+      join_through: FeedbackVote,
+      on_replace: :delete,
+      on_delete: :delete_all
 
     timestamps(type: :utc_datetime_usec)
   end

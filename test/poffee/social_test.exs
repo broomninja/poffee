@@ -319,4 +319,46 @@ defmodule Poffee.SocialTest do
       assert %Ecto.Changeset{} = Social.change_comment(comment)
     end
   end
+
+  describe "feedback_votes" do
+    alias Poffee.Social.FeedbackVote
+
+    import Poffee.SocialFixtures
+
+    @invalid_attrs %{}
+
+    setup do
+      user = user_fixture()
+      brand_page = brand_page_fixture(user)
+
+      %{user: user, feedback: feedback_fixture(user, brand_page)}
+    end
+
+    test "get_feedback_votes_by_user/1 returns all feedback_votes", %{
+      user: user,
+      feedback: feedback
+    } do
+      {:ok, feedback_vote} = Social.vote_feedback(user, feedback)
+      assert Social.get_feedback_votes_by_user(user) == [feedback_vote]
+      assert Social.get_feedback_votes_by_feedback(feedback) == [feedback_vote]
+    end
+
+    test "vote_feedback/2 with duplicate data returns error changeset", %{
+      user: user,
+      feedback: feedback
+    } do
+      {:ok, feedback_vote} = Social.vote_feedback(user, feedback)
+      assert {:error, %Ecto.Changeset{}} = Social.vote_feedback(user, feedback)
+    end
+
+    test "unvote_feedback/2 deletes the vote", %{
+      user: user,
+      feedback: feedback
+    } do
+      {:ok, _feedback_vote} = Social.vote_feedback(user, feedback)
+      assert {1, _} = Social.unvote_feedback(user, feedback)
+      assert {0, _} = Social.unvote_feedback(user, feedback)
+      assert Social.get_feedback_votes_by_user(user) == []
+    end
+  end
 end

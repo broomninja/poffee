@@ -1,5 +1,6 @@
 defmodule Poffee.Services.BrandPageService do
   @moduledoc """
+  Context module for BrandPage
   """
 
   import Ecto.Query, warn: false
