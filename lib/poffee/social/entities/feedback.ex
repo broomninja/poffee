@@ -16,8 +16,10 @@ defmodule Poffee.Social.Feedback do
     field :title, :string
     field :content, :string
     field :status, FeedbackStatusEnum, default: :feedback_status_active
+    field :votes_count, :integer, default: 0, virtual: true
+    field :comments_count, :integer, default: 0, virtual: true
 
-    belongs_to :user, User, foreign_key: :author_id
+    belongs_to :author, User, foreign_key: :author_id
     belongs_to :brand_page, BrandPage
 
     has_many :comments, Comment
@@ -40,7 +42,7 @@ defmodule Poffee.Social.Feedback do
   end
 
   defimpl Jason.Encoder, for: __MODULE__ do
-    @fields ~w(id title content status author_id brand_page comments inserted_at updated_at)a
+    @fields ~w(id title content status votes_count comments_count author brand_page comments voters inserted_at updated_at)a
     def encode(value, opts), do: jason_encode(value, @fields, opts)
   end
 end

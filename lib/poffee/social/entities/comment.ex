@@ -14,7 +14,7 @@ defmodule Poffee.Social.Comment do
     field :content, :string
     field :status, CommentStatusEnum, default: :comment_status_active
 
-    belongs_to :user, User, foreign_key: :author_id
+    belongs_to :author, User, foreign_key: :author_id
     belongs_to :feedback, Feedback, foreign_key: :feedback_id
 
     timestamps(type: :utc_datetime_usec)
@@ -29,7 +29,7 @@ defmodule Poffee.Social.Comment do
   end
 
   defimpl Jason.Encoder, for: __MODULE__ do
-    @fields ~w(id content status author_id feedback_id inserted_at updated_at)a
+    @fields ~w(id content status author feedback inserted_at updated_at)a
     def encode(value, opts), do: jason_encode(value, @fields, opts)
   end
 end

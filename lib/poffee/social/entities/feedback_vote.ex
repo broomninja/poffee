@@ -23,6 +23,5 @@ defmodule Poffee.Social.FeedbackVote do
       message: "already voted by user",
       name: :feedback_votes_pkey
     )
-    |> IO.inspect(label: "changeset")
   end
 end

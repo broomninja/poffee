@@ -2,15 +2,17 @@ defmodule PoffeeWeb.BrandPageLive do
   use PoffeeWeb, :live_view
 
   alias Poffee.Accounts.User
+  alias Poffee.Notifications
   alias Poffee.Social
   alias Poffee.Social.BrandPage
+  alias Poffee.Social.BrandPageComponent
   alias Poffee.Streaming.{TwitchUser, TwitchApiConnector, TwitchLiveStreamers}
   alias Poffee.Streaming.Twitch.Streamer
 
   require Logger
 
   @default_assigns %{
-    feedback: nil,
+    feedback_id: nil,
     twitch_user: nil,
     streaming_status: "blank"
   }
@@ -23,20 +25,20 @@ defmodule PoffeeWeb.BrandPageLive do
   @impl Phoenix.LiveView
 
   # Loads a specific feedback and its comments from db using the feedback_id
-  # @live_action == :show_feedback
+  # @live_action == :show_single_feedback
   def handle_params(%{"username" => username, "feedback_id" => feedback_id}, _url, socket) do
-    feedback = Social.get_feedback(feedback_id)
+    # feedback = Social.get_feedback(feedback_id)
 
     socket =
       socket
-      |> assign(:feedback, feedback)
+      |> assign(:feedback_id, feedback_id)
       |> assign_streamer(username)
 
     {:noreply, socket}
   end
 
   # Loads a specific streamer based on the given username
-  # @live_action == :show_brand_page
+  # @live_action == :show_feedbacks
   def handle_params(%{"username" => username}, _url, socket) do
     socket = assign_streamer(socket, username)
     {:noreply, socket}
@@ -92,7 +94,7 @@ defmodule PoffeeWeb.BrandPageLive do
 
   # message sent by self only
   def handle_info({__MODULE__, :get_streaming_status, user}, socket) do
-    Logger.debug("[UserLive.get_streaming_status] #{user.username}")
+    Logger.debug("[BrandPageLive.get_streaming_status] #{user.username}")
 
     socket =
       with %TwitchUser{twitch_user_id: twitch_user_id} <- get_twitch_user_from_db(user.id) do
@@ -108,9 +110,28 @@ defmodule PoffeeWeb.BrandPageLive do
     {:noreply, socket}
   end
 
+  # message sent by Notifications PubSub
+  def handle_info({Notifications, :update, feedback}, socket) do
+    Logger.debug("[BrandPageLive.handle_info.Notifications.update] #{feedback.id}")
+
+    # forward to LiveComponent
+    send_update(self(), BrandPageComponent,
+      id: socket.assigns.streamer.brand_page.id,
+      updated_feedback: feedback
+    )
+
+    {:noreply, socket}
+  end
+
+  ##########################################
+  # Helper functions for data loading
+  ##########################################
+
   defp assign_streamer(socket, username) do
-    case Social.get_user_with_brand_page_and_feedbacks_by_username(username) do
+    case Social.get_user_with_brand_page_by_username(username) do
       nil ->
+        Logger.warning("[BrandPageLive.assign_streamer] no user found for #{username}")
+
         socket
         |> assign(:streamer, nil)
         |> assign_page_title(nil, username)
@@ -118,6 +139,8 @@ defmodule PoffeeWeb.BrandPageLive do
       %User{} = user ->
         # fetch online status from API in the background, see handle_info below
         if connected?(socket), do: send(self(), {__MODULE__, :get_streaming_status, user})
+
+        Logger.debug("[BrandPageLive.assign_streamer] found user = #{username}")
 
         socket
         |> assign(:streamer, user)
@@ -159,4 +182,8 @@ defmodule PoffeeWeb.BrandPageLive do
   defp get_twitch_user_from_db(user_id) do
     Poffee.Streaming.get_twitch_user_by_user_id(user_id)
   end
+
+  ##########################################
+  # Helper functions for HEEX rendering
+  ##########################################
 end

@@ -11,6 +11,7 @@ defmodule Poffee.Services.CommentService do
   alias Poffee.Social.Feedback
 
   @type changeset_error :: {:error, Ecto.Changeset.t()}
+  @type uuid :: <<_::128>>
 
   @doc """
   Returns the list of comments.
@@ -23,6 +24,20 @@ defmodule Poffee.Services.CommentService do
   """
   def list_comments do
     Repo.all(Comment)
+  end
+
+  @doc """
+  Gets a list of comment for a given feedback_id
+  """
+  @spec get_comments_by_feedback_id(uuid) :: list(Comment.t())
+  def get_comments_by_feedback_id(nil), do: []
+
+  def get_comments_by_feedback_id(feedback_id) do
+    Comment
+    |> where([c], c.feedback_id == ^feedback_id and c.status == :comment_status_active)
+    |> preload(:author)
+    |> order_by([c], asc: c.inserted_at)
+    |> Repo.all()
   end
 
   @doc """

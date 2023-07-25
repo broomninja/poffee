@@ -340,7 +340,7 @@ defmodule Poffee.SocialTest do
     } do
       {:ok, feedback_vote} = Social.vote_feedback(user, feedback)
       assert Social.get_feedback_votes_by_user(user) == [feedback_vote]
-      assert Social.get_feedback_votes_by_feedback(feedback) == [feedback_vote]
+      assert Social.get_feedback_voters_by_feedback_id(feedback.id) == [feedback_vote]
     end
 
     test "vote_feedback/2 with duplicate data returns error changeset", %{

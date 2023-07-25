@@ -11,7 +11,6 @@ defmodule Poffee.Services.BrandPageService do
   alias Poffee.Social.BrandPage
 
   @type changeset_error :: {:error, Ecto.Changeset.t()}
-
   @type uuid :: <<_::128>>
 
   @doc """

@@ -16,7 +16,7 @@ defmodule Poffee.Social.BrandPage do
     field :description, :string
     field :status, BrandPageStatusEnum, default: :brand_page_status_public
 
-    belongs_to :user, User, foreign_key: :owner_id
+    belongs_to :owner, User, foreign_key: :owner_id
     # has_many :feedbacks, Feedback, where: [status: :feedback_status_active]
     # we will perform filtering on context level instead
     has_many :feedbacks, Feedback

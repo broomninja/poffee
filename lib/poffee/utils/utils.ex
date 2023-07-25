@@ -14,6 +14,10 @@ defmodule Poffee.Utils do
     if string == "", do: nil, else: string
   end
 
+  @spec is_non_empty_list?(any()) :: boolean()
+  def is_non_empty_list?([_ | _]), do: true
+  def is_non_empty_list?(_), do: false
+
   @spec maybe_if(any, boolean(), fun()) :: any
   def maybe_if(data, true, action) when is_function(action, 1), do: action.(data)
   def maybe_if(data, false, _action), do: data
@@ -41,4 +45,16 @@ defmodule Poffee.Utils do
   def can_be_cached?({:ok, _}), do: true
   def can_be_cached?([]), do: false
   def can_be_cached?(_), do: true
+
+  # Get the relative time from now, nil if datetime is not in the correct format
+  @spec format_time(String.t()) :: String.t() | nil
+  def format_time(datetime) do
+    with {:ok, relative_str} <- Timex.format(datetime, "{relative}", :relative) do
+      relative_str
+    end
+  end
+
+  # show login modal when user is not logged in
+  def get_modal_name(nil, _), do: "live-login-modal"
+  def get_modal_name(%Poffee.Accounts.User{id: _}, modal_name), do: modal_name
 end

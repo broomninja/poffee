@@ -6,11 +6,11 @@ defmodule Poffee.Social do
 
   import Ecto.Query, warn: false
 
+  # alias EctoJuno.Query.Sorting
   alias Poffee.{Repo, Utils, DBCache}
-
   alias Poffee.Accounts.User
   alias Poffee.Social.BrandPage
-  alias Poffee.Social.Comment
+  # alias Poffee.Social.Comment
   alias Poffee.Social.Feedback
   alias Poffee.Social.FeedbackVote
   alias Poffee.Services.BrandPageService
@@ -25,6 +25,18 @@ defmodule Poffee.Social do
   def get_brand_page_by_user(%User{} = user) do
     user
     |> Ecto.assoc(:brand_page)
+    |> Repo.one()
+  end
+
+  @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
+  @spec get_user_with_brand_page_by_username(String.t()) :: User.t()
+  def get_user_with_brand_page_by_username(username) when is_binary(username) do
+    User
+    |> where([u], u.username == ^username)
+    |> join(:left, [u], bp in BrandPage,
+      on: bp.owner_id == u.id and bp.status == :brand_page_status_public
+    )
+    |> preload([_, bp], brand_page: bp)
     |> Repo.one()
   end
 
@@ -55,38 +67,25 @@ defmodule Poffee.Social do
     |> Repo.one()
   end
 
-  @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
-  @spec get_feedbacks_by_user(User.t()) :: [Feedback.t()]
-  def get_feedbacks_by_user(%User{} = user) do
-    user
-    |> Ecto.assoc(:feedbacks)
-    |> Repo.all()
-  end
+  # @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
+  # @spec get_feedbacks_by_user(User.t()) :: [Feedback.t()]
+  # def get_feedbacks_by_user(%User{} = user) do
+  #   user
+  #   |> Ecto.assoc(:feedbacks)
+  #   |> Repo.all()
+  # end
 
-  @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
-  @spec get_feedbacks_by_brand_page(BrandPage.t()) :: [Feedback.t()]
-  def get_feedbacks_by_brand_page(%BrandPage{} = brand_page) do
-    brand_page
-    |> Ecto.assoc(:feedbacks)
-    |> Repo.all()
-  end
+  # @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
+  # @spec get_feedbacks_by_brand_page(BrandPage.t()) :: [Feedback.t()]
+  # def get_feedbacks_by_brand_page(%BrandPage{} = brand_page) do
+  #   brand_page
+  #   |> Ecto.assoc(:feedbacks)
+  #   |> Repo.all()
+  # end
 
   ###########################
   # FeedbackVote
   ###########################
-  @spec get_feedback_votes_by_user(%User{}) :: list(%FeedbackVote{})
-  def get_feedback_votes_by_user(%User{} = user) do
-    user
-    |> Repo.preload(:feedback_votes)
-    |> Map.get(:feedback_votes)
-  end
-
-  @spec get_feedback_votes_by_feedback(%Feedback{}) :: list(%FeedbackVote{})
-  def get_feedback_votes_by_feedback(%Feedback{} = feedback) do
-    feedback
-    |> Repo.preload(:voters)
-    |> Map.get(:voters)
-  end
 
   ###########################
   # BrandPage
@@ -106,18 +105,27 @@ defmodule Poffee.Social do
   defdelegate list_feedbacks, to: FeedbackService
   defdelegate get_feedback(id), to: FeedbackService
   defdelegate get_feedback!(id), to: FeedbackService
+
+  defdelegate get_feedback_with_comments_count_and_voters_count_by_id(feedback_id),
+    to: FeedbackService
+
+  defdelegate get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id(brand_page_id),
+    to: FeedbackService
+
+  defdelegate get_feedback_voters_by_feedback_id(feedback_id), to: FeedbackService
   defdelegate create_feedback(attrs \\ %{}, user, brand_page), to: FeedbackService
   defdelegate update_feedback(feedback, attrs \\ %{}), to: FeedbackService
   defdelegate delete_feedback(feedback), to: FeedbackService
   defdelegate change_feedback(feedback, attrs \\ %{}), to: FeedbackService
-  defdelegate vote_feedback(user, feedback), to: FeedbackService
-  defdelegate unvote_feedback(user, feedback), to: FeedbackService
+  defdelegate vote_feedback(user_id, feedback_id), to: FeedbackService
+  defdelegate unvote_feedback(user_id, feedback_id), to: FeedbackService
 
   ###########################
   # Comment
   ###########################
   defdelegate list_comments, to: CommentService
   defdelegate get_comment!(id), to: CommentService
+  defdelegate get_comments_by_feedback_id(feedback_id), to: CommentService
   defdelegate create_comment(attrs \\ %{}, user, feedback), to: CommentService
   defdelegate update_comment(feedback, attrs \\ %{}), to: CommentService
   defdelegate delete_comment(feedback), to: CommentService

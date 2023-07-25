@@ -127,8 +127,8 @@ defmodule PoffeeWeb.Router do
         {PoffeeWeb.UserAuthLive, :mount_current_user}
       ] do
       live "/", HomeLive, :new
-      live "/u/:username", BrandPageLive, :show_brand_page
-      live "/u/:username/:feedback_id", BrandPageLive, :show_feedback
+      live "/u/:username", BrandPageLive, :show_feedbacks
+      live "/u/:username/:feedback_id", BrandPageLive, :show_single_feedback
       # TODO remove
       live "/demolive", DemoLive, :new
     end

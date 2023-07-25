@@ -36,12 +36,12 @@
       <% else %>
         <.live_component
           module={Poffee.Social.BrandPageComponent}
-          id={@streamer.id}
+          id={@streamer.brand_page.id}
           streamer={@streamer}
           twitch_user={@twitch_user}
           streaming_status={@streaming_status}
           current_user={@current_user}
-          feedback={@feedback}
+          feedback_id={@feedback_id}
           live_action={@live_action}
         />
       <% end %>

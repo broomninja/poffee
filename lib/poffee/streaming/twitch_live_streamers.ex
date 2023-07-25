@@ -1,6 +1,8 @@
 defmodule Poffee.Streaming.TwitchLiveStreamers do
   @moduledoc """
-  This holds the state to represent a list of the current live streamers
+  This holds the state to represent a list of the current live streamers.
+
+  It also acts as a PubSub broadcaster for events related to s
   """
 
   use GenServer
@@ -220,7 +222,7 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
          {:ok, user} <- Accounts.register_user(user_attrs),
          {:ok, _twitch_user} <- Streaming.create_twitch_user(twitch_user_attrs, user),
          {:ok, brand_page} <- create_demo_brandpage(user, streamer.description) do
-      create_demo_feedbacks(user, brand_page)
+      create_demo_feedbacks_and_comments(user, brand_page)
     end
   end
 
@@ -234,17 +236,28 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
   end
 
   # TODO remove - for demo only
-  defp create_demo_feedbacks(user, brand_page) do
-    1..2
-    |> Enum.each(fn n ->
-      %{
-        title: "Demo feedback #{n} for #{user.username}",
-        content: @dummy_content
-      }
-      |> Social.create_feedback(user, brand_page)
+  defp create_demo_feedbacks_and_comments(user, brand_page) do
+    1..5
+    |> Enum.each(fn ix ->
+      with {:ok, feedback} <-
+             %{title: "Demo feedback #{ix} for #{user.username}", content: @dummy_content}
+             |> Social.create_feedback(get_random_test_user(), brand_page) do
+        1..5
+        |> Enum.each(fn iy ->
+          %{content: "Demo comment #{iy} for feedback id #{feedback.id}"}
+          |> Social.create_comment(get_random_test_user(), feedback)
 
-      Process.sleep(2000)
+          Process.sleep(1000)
+        end)
+      end
     end)
+  end
+
+  # TODO remove - for demo only
+  defp get_random_test_user() do
+    ~w(bob1 cara_123 dave3371 eve__11 fred991 greg_13 henry_19190922 iris_15 jay_31)
+    |> Enum.random()
+    |> Accounts.get_user_by_username()
   end
 
   defp maybe_subscribe_to_events(nil), do: nil

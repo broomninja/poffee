@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { onMount, onDestroy } from 'svelte';
   import ClockIcon from './icons/ClockIcon.svelte';
   import VoteCounter from './VoteCounter.svelte';
 	import DateTimeDisplay from './DateTimeDisplay.svelte';
@@ -7,39 +6,29 @@
 
   export let current_user;
   export let brandpage_username;
+  export let brandpage_id;
   export let feedback;
   export let user_vote;
   export let live_action;
-  //export let pushEvent;
-
-  let test_voter_count = 3;
-
-  onMount(async () => create_subscription());
-
-  onDestroy(async() => delete_subscription());
+  export let pushEventTo;
 
   console.log(`feedback = ${JSON.stringify(feedback, null, 2)}`);
+  //console.log(`[Feedback] brandpage_id = ${JSON.stringify(brandpage_id, null, 2)}`);
 
-  const create_subscription = async () => {
-
-  }
-
-  const delete_subscription = async () => {
-  }
-
+  $: comments_text = feedback?.comments_count > 0 ? "View comments" : "Create a comment";
 </script>
 
 <div id={`feedback-${feedback.id}`} class="pt-5">
   <!-- Feedback -->
   <div class="grid grid-cols-9 pt-4 pb-2 pl-2 mb-2 bg-slate-100 rounded-md">
     <!-- Feedback title -->
-    {#if live_action === "show_brand_page"}
+    {#if live_action === "show_feedbacks"}
       <div class="col-span-7 ml-1 mb-2 text-lg font-bold text-gray-800 hover:text-blue-700 lg:leading-tight dark:text-white">
         <a href={`/u/${brandpage_username}/${feedback.id}`} data-phx-link="redirect" data-phx-link-state="push">
           {feedback.title}
         </a>
       </div>
-    {:else if live_action === "show_feedback"}
+    {:else if live_action === "show_single_feedback"}
       <div class="col-span-7 ml-1 mb-2 text-lg font-bold text-gray-800 lg:leading-tight dark:text-white">
         {feedback.title}
       </div>
@@ -47,12 +36,12 @@
     <!-- End Feedback title -->
     <!-- Vote Counter -->
     <div class="col-span-2 row-span-2 text-right">
-      <VoteCounter {current_user} {feedback} {test_voter_count} {user_vote} />
+      <VoteCounter {current_user} {feedback} {brandpage_id} {user_vote} {pushEventTo} />
     </div>
     <!-- End Vote Counter -->
     <!-- Author -->
     <div class="col-span-7 ml-1 mb-1">
-      {feedback.author_id}
+      {feedback.author?.username}
     </div>
     <!-- End Author -->
     <!-- Feedback content -->
@@ -69,11 +58,11 @@
     </div>
     <!-- End Created time -->
     <!-- Comment Link -->
-    {#if live_action === "show_brand_page"}
+    {#if live_action === "show_feedbacks"}
       <div class="col-span-9 flex whitespace-nowrap text-gray-800 hover:text-blue-700 font-semibold justify-center">
         <a href={`/u/${brandpage_username}/${feedback.id}`} data-phx-link="redirect" data-phx-link-state="push">
           <Button>
-            View comments
+            {comments_text}
           </Button>
         </a>
       </div>

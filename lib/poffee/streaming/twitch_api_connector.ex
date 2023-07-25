@@ -2,7 +2,7 @@ defmodule Poffee.Streaming.TwitchApiConnector do
   @moduledoc """
   GenServer process that connects to the Twitch APi.
 
-  We only need one instance of TwitchApiConnector
+  We only need a single instance of TwitchApiConnector
   """
 
   use GenServer
@@ -11,23 +11,25 @@ defmodule Poffee.Streaming.TwitchApiConnector do
 
   require Logger
 
-  defstruct [
-    :twitch_api_client,
-    :client_id,
-    :client_secret,
-    :callback_webhook_uri,
-    :endpoint_secret,
-    :app_access_token
-  ]
+  defmodule State do
+    @type t :: %State{
+            twitch_api_client: module(),
+            client_id: String.t(),
+            client_secret: String.t(),
+            callback_webhook_uri: String.t(),
+            endpoint_secret: String.t(),
+            app_access_token: String.t()
+          }
 
-  @type state :: %__MODULE__{
-          twitch_api_client: module(),
-          client_id: String.t(),
-          client_secret: String.t(),
-          callback_webhook_uri: String.t(),
-          endpoint_secret: String.t(),
-          app_access_token: String.t()
-        }
+    defstruct ~w(
+      twitch_api_client
+      client_id
+      client_secret
+      callback_webhook_uri
+      endpoint_secret
+      app_access_token
+      )a
+  end
 
   # 20 secs timeout
   @timeout :timer.seconds(20)
@@ -84,7 +86,7 @@ defmodule Poffee.Streaming.TwitchApiConnector do
     twitch_api_client = Keyword.fetch!(opts, :twitch_api_client)
 
     state =
-      %__MODULE__{twitch_api_client: twitch_api_client}
+      %State{twitch_api_client: twitch_api_client}
       |> get_webhook_env
       |> refresh_access_token
 
