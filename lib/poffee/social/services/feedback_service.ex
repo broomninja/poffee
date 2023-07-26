@@ -227,9 +227,16 @@ defmodule Poffee.Services.FeedbackService do
 
     Logger.debug("[FeedbackService.unvote_feedback] result = #{inspect(result)}")
 
-    #  case result do
-    #   {1, _} -> feedback = get_feedback_with_comments_count_and_votes_count_by_id(feedback_vote.feedback_id)
-    #             :ok = Notifications.broadcast_feedback(feedback)
-    #   {0, _} -> nil
+    case result do
+      {1, _} ->
+        feedback = get_feedback_with_comments_count_and_voters_count_by_id(feedback_id)
+        feedback_votes = get_feedback_votes_by_feedback_id(feedback_id)
+        :ok = Notifications.broadcast_feedback(feedback, feedback_votes)
+
+      {_, _} ->
+        nil
+    end
+
+    result
   end
 end

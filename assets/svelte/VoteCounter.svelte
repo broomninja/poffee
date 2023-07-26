@@ -6,10 +6,11 @@
   export let feedback;
   export let brandpage_id;
   export let user_vote;
+  export let pushEvent;
   export let pushEventTo;
 
   // console.log(`feedback = ${JSON.stringify(feedback, null, 2)}`);
-  console.log(`[VoteCounter] brandpage_id = ${JSON.stringify(brandpage_id, null, 2)}`);
+  // console.log(`[VoteCounter] brandpage_id = ${JSON.stringify(brandpage_id, null, 2)}`);
 
   const clickVote = (user, feedback) => {
     if (!user?.id) {
@@ -18,7 +19,7 @@
     }
     // do not allow vote on self feedbacks
     if (feedback?.author?.id == user.id) {
-      // TODO show flash message
+      pushEvent("flash", {level: "warn", message: "Voting own feedback is not permitted"});
       return;
     }
     // send event to BrandPageComponent
@@ -31,7 +32,7 @@
       return;
     }
     if (feedback?.author?.id == user.id) {
-      // TODO show flash message
+      pushEvent("flash", {level: "warn", message: "Unvoting own feedback is not permitted"});
       return;
     }
     // send event to BrandPageComponent

@@ -44,7 +44,12 @@ defmodule PoffeeWeb.BrandPageLive do
     {:noreply, socket}
   end
 
-  # @impl Phoenix.LiveView
+  @impl Phoenix.LiveView
+  def handle_event("flash", %{"level" => level, "message" => message}, socket) do
+    Logger.debug("[BrandPageLive.handle_event.flash] message = #{message}")
+    {:noreply, put_flash(socket, String.to_existing_atom(level), message)}
+  end
+
   # def handle_event(event, params, socket) do
   #   Logger.error("[BrandPageLive.handle_event] #{event}, #{inspect(params)}")
   #   {:noreply, socket}

@@ -134,7 +134,7 @@ defmodule Poffee.Social.BrandPageComponent do
   end
 
   def handle_event("subscribe_feedback", %{"feedback_id" => feedback_id}, socket) do
-    Logger.error(
+    Logger.debug(
       "[BrandPageComponent.handle_event.subscribe_feedback] feedback_id = #{feedback_id}"
     )
 
@@ -143,7 +143,7 @@ defmodule Poffee.Social.BrandPageComponent do
   end
 
   def handle_event("unsubscribe_feedback", %{"feedback_id" => feedback_id}, socket) do
-    Logger.error(
+    Logger.debug(
       "[BrandPageComponent.handle_event.unsubscribe_feedback] feedback_id = #{feedback_id}"
     )
 
