@@ -35,4 +35,18 @@ defmodule Poffee.SocialFixtures do
 
     brand_page
   end
+
+  @doc """
+  Generate a comment.
+  """
+  def comment_fixture(user, feedback, attrs \\ %{}) do
+    {:ok, comment} =
+      attrs
+      |> Enum.into(%{
+        content: "default content"
+      })
+      |> Poffee.Social.create_comment(user, feedback)
+
+    comment
+  end
 end

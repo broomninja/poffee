@@ -15,7 +15,7 @@ defmodule PoffeeWeb.UserLoginLive do
 
   Example:
 
-    <.modal id="login-modal" on_cancel={hide_modal("login-modal")}>
+    <.modal id="live-login-modal" on_cancel={hide_modal("live-login-modal")}>
       <%= live_render(@socket, PoffeeWeb.UserLoginLive, id: "login", session: %{"current_uri" => assigns[:current_uri]}) %>  
     </.modal>
   """

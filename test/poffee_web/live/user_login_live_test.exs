@@ -63,7 +63,7 @@ defmodule PoffeeWeb.UserLoginLiveTest do
 
       {:ok, _login_live, login_html} =
         lv
-        |> element(~s|main a:fl-contains("Sign up")|)
+        |> element(~s|div a:fl-contains("Sign up")|)
         |> render_click()
         |> follow_redirect(conn, ~p"/register")
 
@@ -77,7 +77,7 @@ defmodule PoffeeWeb.UserLoginLiveTest do
 
       {:ok, conn} =
         lv
-        |> element(~s|main a:fl-contains("Forgot your password?")|)
+        |> element(~s|div a:fl-contains("Forgot your password?")|)
         |> render_click()
         |> follow_redirect(conn, ~p"/users/reset_password")
 

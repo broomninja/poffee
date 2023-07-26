@@ -1,0 +1,122 @@
+<div id={"brandpage-#{@id}"}>
+  <%= if @twitch_user do %>
+    <div class="max-w-screen-lg min-w-min pr-2 md:pr-8 pt-2 md:pt-0 flex flex-col w-full h-full mx-auto">
+      <div class="flex items-center justify-start">
+        <div class="pr-3">
+          <LiveSvelte.svelte name="TooltipDiv" ssr={true} props={%{text: "Visit Twitch channel"}}>
+            <a href={"https://www.twitch.tv/#{@twitch_user.login}"} target="_blank">
+              <img
+                class="rounded-full inline-block"
+                width="55"
+                height="55"
+                src={@twitch_user.profile_image_url}
+                alt={@twitch_user.display_name}
+                onerror="this.src='/images/profile_image_not_found.jpg';this.onerror='';"
+              />
+            </a>
+          </LiveSvelte.svelte>
+        </div>
+
+        <div class="font-semibold whitespace-nowrap">
+          <.link navigate={~p"/u/#{@twitch_user.display_name}"}>
+            <%= @twitch_user.display_name %>
+          </.link>
+        </div>
+
+        <div class="pl-2 md:pl-5 whitespace-nowrap">
+          <a href={"https://www.twitch.tv/#{@twitch_user.login}"} target="_blank">
+            <.online_status status={@streaming_status} />
+          </a>
+        </div>
+        <div class="pl-4 md:pl-10">
+          <.tabler_icon_button
+            icon="tabler-plus"
+            label="Create Feedback"
+            bgcolor={:blue}
+            iconcolor={:inherit}
+            textcolor={:inherit}
+            phx-click={
+              show_modal(Utils.get_modal_name(@current_user, "live-create-feedback-modal"))
+            }
+            size={:auto}
+          >
+            Create Feedback
+          </.tabler_icon_button>
+        </div>
+      </div>
+      <div
+        :if={!Utils.blank?(@twitch_user.description)}
+        class="flex w-full h-full pl-1 pr-2 pt-3 text-gray-900 text-sm font-semibold"
+      >
+        <%= @twitch_user.description %>
+      </div>
+
+      <%!-- :show_feedbacks --%>
+      <div :if={@live_action == :show_feedbacks and Utils.is_non_empty_list?(@feedbacks)}>
+        <.live_component
+          :for={feedback <- @feedbacks}
+          module={Poffee.Social.FeedbackComponent}
+          id={feedback.id}
+          feedback={feedback}
+          brandpage_username={@streamer.username}
+          brandpage_id={@id}
+          current_user={@current_user}
+          user_vote={nil}
+          live_action={@live_action}
+        />
+        <%!-- 
+        <%= for feedback <- @feedbacks do %>
+          <LiveSvelte.svelte
+            name="Feedback"
+            ssr={true}
+            props={
+              %{
+                feedback: feedback,
+                brandpage_username: @streamer.username,
+                brandpage_id: @id,
+                current_user: @current_user,
+                user_vote: nil,
+                live_action: @live_action
+              }
+            }
+          /> 
+        <% end %>
+--%>
+      </div>
+      <%!-- end :show_feedbacks --%>
+      <%!-- :show_single_feedback --%>
+      <div :if={@live_action == :show_single_feedback and !is_nil(@feedback)}>
+        <.live_component
+          module={Poffee.Social.FeedbackComponent}
+          id={@feedback.id}
+          feedback={@feedback}
+          brandpage_username={@streamer.username}
+          brandpage_id={@id}
+          current_user={@current_user}
+          user_vote={nil}
+          comments={@comments}
+          feedback_votes={@feedback_votes}
+          live_action={@live_action}
+        />
+        <%!-- <LiveSvelte.svelte
+          name="Feedback"
+          ssr={true}
+          props={
+            %{
+              feedback: @feedback,
+              brandpage_username: @streamer.username,
+              brandpage_id: @id,
+              current_user: @current_user,
+              user_vote: nil,
+              comments: @comments,
+              voters: @voters,
+              live_action: @live_action
+            }
+          }
+        /> --%>
+      </div>
+      <%!-- end :show_single_feedback --%>
+    </div>
+  <% end %>
+  <%!-- end if @twitch_user --%>
+</div>

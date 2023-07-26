@@ -4,7 +4,6 @@ defmodule Poffee.Social.BrandPage do
 
   alias Poffee.Accounts.User
   alias Poffee.Social.Feedback
-  alias Poffee.Utils
 
   defenum(BrandPageStatusEnum, :brand_page_status, [
     :brand_page_status_public,
@@ -17,7 +16,7 @@ defmodule Poffee.Social.BrandPage do
     field :description, :string
     field :status, BrandPageStatusEnum, default: :brand_page_status_public
 
-    belongs_to :user, User, foreign_key: :owner_id
+    belongs_to :owner, User, foreign_key: :owner_id
     # has_many :feedbacks, Feedback, where: [status: :feedback_status_active]
     # we will perform filtering on context level instead
     has_many :feedbacks, Feedback
@@ -30,9 +29,14 @@ defmodule Poffee.Social.BrandPage do
   def changeset(brand_page, attrs) do
     brand_page
     |> cast(attrs, [:title, :description, :status, :owner_id])
-    |> Utils.sanitize_field(:title)
-    |> Utils.sanitize_field(:description)
+    |> sanitize_field(:title)
+    |> sanitize_field(:description)
     |> validate_required([:title, :status, :owner_id])
     |> unique_constraint(:owner_id)
+  end
+
+  defimpl Jason.Encoder, for: __MODULE__ do
+    @fields ~w(id title description status user feedbacks inserted_at updated_at)a
+    def encode(value, opts), do: jason_encode(value, @fields, opts)
   end
 end

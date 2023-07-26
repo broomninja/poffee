@@ -119,7 +119,7 @@ defmodule Poffee.AccountsTest do
     end
 
     test "validates username length" do
-      {:error, changeset} = Accounts.register_user(valid_user_attributes(username: "abc"))
+      {:error, changeset} = Accounts.register_user(valid_user_attributes(username: "a"))
 
       error_message = "should be at least #{Constant.username_min_length()} character(s)"
       assert %{username: [^error_message]} = errors_on(changeset)
@@ -135,7 +135,7 @@ defmodule Poffee.AccountsTest do
       username_in_uppercase = String.upcase(unique_user_username())
 
       {:ok, user} = Accounts.register_user(valid_user_attributes(username: username_in_uppercase))
-      assert user.username == String.downcase(username_in_uppercase)
+      assert user.username == username_in_uppercase
     end
 
     test "validates email case sensitivity" do

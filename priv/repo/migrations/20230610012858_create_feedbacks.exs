@@ -21,5 +21,6 @@ defmodule Poffee.Repo.Migrations.CreateFeedbacks do
     end
 
     create index(:feedbacks, [:author_id])
+    create index(:feedbacks, [:brand_page_id])
   end
 end

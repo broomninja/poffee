@@ -44,6 +44,11 @@ config :poffee, PoffeeWeb.Endpoint,
   ]
 
 ####################################
+# Twitch API
+####################################
+config :poffee, :twitch, api_client: TwitchApi
+
+####################################
 # DB Cache
 ####################################
 # Uncomment the following line to disable DB caching
@@ -97,3 +102,5 @@ config :phoenix, :stacktrace_depth, 20
 
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime
+
+import_config "dev.secret.exs"

@@ -58,7 +58,9 @@ defmodule Poffee.Seeds do
       if is_nil(Accounts.get_user_by_email(user_attr.email)) do
         with {:error, changeset} <- Accounts.register_user(user_attr) do
           if env != :test do
-            Logger.warn("Error running seeds: #{inspect(user_attr)} #{inspect(changeset.errors)}")
+            Logger.warning(
+              "Error running seeds: #{inspect(user_attr)} #{inspect(changeset.errors)}"
+            )
           end
         end
       end

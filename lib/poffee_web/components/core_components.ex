@@ -16,10 +16,10 @@ defmodule PoffeeWeb.CoreComponents do
   """
   use Phoenix.Component
 
+  alias PetalComponents, as: Petal
   alias Phoenix.LiveView.JS
-  import PoffeeWeb.Gettext
 
-  alias PetalComponents.Loading, as: PetalLoading
+  import PoffeeWeb.Gettext
 
   @doc """
   Renders a modal.
@@ -63,7 +63,7 @@ defmodule PoffeeWeb.CoreComponents do
         aria-modal="true"
         tabindex="0"
       >
-        <div class="flex min-h-full items-start mt-6 md:mt-16 justify-center">
+        <div class="flex items-start mt-6 md:mt-16 justify-center">
           <div class={"#{@modal_width} max-w-3xl"}>
             <.focus_wrap
               id={"#{@id}-container"}
@@ -177,7 +177,7 @@ defmodule PoffeeWeb.CoreComponents do
     >
       <div class="flex">
         <div class="flex-shrink-0">
-          <PetalLoading.spinner size="sm" />
+          <Petal.Loading.spinner size="sm" />
         </div>
         <div class="ml-3">
           <p class="text-sm font-medium" role="alert">

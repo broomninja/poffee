@@ -8,20 +8,22 @@ defmodule Poffee.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      # LiveSevlete
+      # LiveSvelte SSR
       {NodeJS.Supervisor, [path: LiveSvelte.SSR.server_path(), pool_size: 4]},
       # Start the Telemetry supervisor
       PoffeeWeb.Telemetry,
-      # Start the DB Cache
-      {Poffee.DBCache, []},
       # Start the Ecto repository
       Poffee.Repo,
+      # Start the DB Cache
+      {Poffee.DBCache, []},
       # Start the PubSub system
       {Phoenix.PubSub, name: Poffee.PubSub},
       # Start Finch
       {Finch, name: Poffee.Finch},
       # Start FunWithFlags
       FunWithFlags.Supervisor,
+      # Start Twitch Supervisor
+      Poffee.Streaming.TwitchSupervisor,
       # Start the Endpoint (http/https)
       PoffeeWeb.Endpoint
       # Start a worker by calling: Poffee.Worker.start_link(arg)

@@ -22,6 +22,15 @@ config :poffee, PoffeeWeb.Endpoint,
   server: true
 
 ####################################
+# Twitch API
+####################################
+config :poffee, :twitch,
+  api_client: Poffee.Streaming.TwitchApiMock,
+  client_id: "dummy_client_id",
+  client_secret: "dummy_client_secret",
+  callback_webhook_uri: "https://wwwdev.descafe.com/webhooks/twitch/callback"
+
+####################################
 # Wallaby E2E
 ####################################
 config :poffee, use_sandbox: true

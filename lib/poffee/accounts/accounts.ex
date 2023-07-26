@@ -29,12 +29,7 @@ defmodule Poffee.Accounts do
       nil
 
   """
-  @decorate cacheable(
-              cache: DBCache,
-              key: {User, email},
-              opts: [ttl: @ttl],
-              match: &Utils.can_be_cached?/1
-            )
+
   @spec get_user_by_email(String.t()) :: User.t()
   def get_user_by_email(email) when is_binary(email) do
     Repo.get_by(User, email: email)
@@ -71,12 +66,7 @@ defmodule Poffee.Accounts do
       nil
 
   """
-  @decorate cacheable(
-              cache: DBCache,
-              key: {User, username},
-              opts: [ttl: @ttl],
-              match: &Utils.can_be_cached?/1
-            )
+
   @spec get_user_by_username(String.t()) :: User.t()
   def get_user_by_username(username) when is_binary(username) do
     User
@@ -99,12 +89,6 @@ defmodule Poffee.Accounts do
       ** (Ecto.NoResultsError)
 
   """
-  @decorate cacheable(
-              cache: DBCache,
-              key: {User, id},
-              opts: [ttl: @ttl],
-              match: &Utils.can_be_cached?/1
-            )
   @spec get_user!(uuid()) :: User.t()
   def get_user!(id), do: Repo.get!(User, id)
 
@@ -198,7 +182,6 @@ defmodule Poffee.Accounts do
   If the token matches, the user email is updated and the token is deleted.
   The confirmed_at date is also updated to the current time.
   """
-  @decorate cache_put(cache: DBCache, key: {User, :email})
   def update_user_email(user, token) do
     context = "change:#{user.email}"
 

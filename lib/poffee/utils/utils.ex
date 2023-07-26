@@ -1,4 +1,11 @@
 defmodule Poffee.Utils do
+  @spec blank?(String.t()) :: boolean()
+  def blank?(nil), do: true
+
+  def blank?(str) do
+    "" == str |> to_string() |> String.trim()
+  end
+
   @spec normalize_string(String.t()) :: String.t()
   def normalize_string(nil), do: nil
 
@@ -7,22 +14,13 @@ defmodule Poffee.Utils do
     if string == "", do: nil, else: string
   end
 
-  @spec sanitize_field(Ecto.Changeset.t(), atom) :: Ecto.Changeset.t()
-  def sanitize_field(changeset, field) do
-    case Map.get(changeset.changes, field) do
-      nil ->
-        changeset
+  @spec is_non_empty_list?(any()) :: boolean()
+  def is_non_empty_list?([_ | _]), do: true
+  def is_non_empty_list?(_), do: false
 
-      unformatted ->
-        formatted =
-          unformatted
-          |> HtmlSanitizeEx.strip_tags()
-          # trimming must be the last action since HTML stripping can turn "<b> <b>" into " "
-          |> String.trim()
-
-        Ecto.Changeset.put_change(changeset, field, formatted)
-    end
-  end
+  @spec maybe_if(any, boolean(), fun()) :: any
+  def maybe_if(data, true, action) when is_function(action, 1), do: action.(data)
+  def maybe_if(data, false, _action), do: data
 
   @doc """
   returns true if the url is a valid local (not external) url
@@ -47,4 +45,16 @@ defmodule Poffee.Utils do
   def can_be_cached?({:ok, _}), do: true
   def can_be_cached?([]), do: false
   def can_be_cached?(_), do: true
+
+  # Get the relative time from now, nil if datetime is not in the correct format
+  @spec format_time(String.t()) :: String.t() | nil
+  def format_time(datetime) do
+    with {:ok, relative_str} <- Timex.format(datetime, "{relative}", :relative) do
+      relative_str
+    end
+  end
+
+  # show login modal when user is not logged in
+  def get_modal_name(nil, _), do: "live-login-modal"
+  def get_modal_name(%Poffee.Accounts.User{id: _}, modal_name), do: modal_name
 end

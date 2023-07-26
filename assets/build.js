@@ -26,7 +26,6 @@ let optsClient = {
         }),
     ],
     external: ["/fonts/*", "/images/*"],
-
 }
 
 let optsServer = {
@@ -50,7 +49,6 @@ let optsServer = {
         }),
     ],
     external: ["/fonts/*", "/images/*"],
-
 }
 
 const client = esbuild.build(optsClient)

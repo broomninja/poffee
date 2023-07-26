@@ -6,6 +6,8 @@ defmodule Poffee.Schema do
       import Ecto.Changeset
       import Ecto.Query
 
+      import Poffee.EctoUtils
+
       @primary_key {:id, Ecto.UUID, autogenerate: true}
       @foreign_key_type Ecto.UUID
 

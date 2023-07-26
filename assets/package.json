@@ -5,6 +5,7 @@
     "esbuild-plugin-import-glob": "^0.1.1",
     "esbuild-svelte": "^0.7.3",
     "svelte": "^3.59.1",
+    "svelte-loading-spinners": "^0.3.4",
     "svelte-preprocess": "^5.0.4",
     "typescript": "^5.1.3"
   },

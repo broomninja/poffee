@@ -3,8 +3,10 @@ defmodule Poffee.Accounts.User do
   import EctoEnum
 
   alias Poffee.Constant
+  alias Poffee.Utils
   alias Poffee.Social.BrandPage
   alias Poffee.Social.Feedback
+  alias Poffee.Social.FeedbackVote
 
   defenum(RolesEnum, :role, [
     :role_user,
@@ -22,8 +24,14 @@ defmodule Poffee.Accounts.User do
     field :confirmed_at, :naive_datetime
     field :role, RolesEnum, default: :role_user
 
+    # has_one :twitch_user, TwitchUser, foreign_key: :user_id
     has_one :brand_page, BrandPage, foreign_key: :owner_id
     has_many :feedbacks, Feedback, foreign_key: :author_id
+
+    many_to_many :feedback_votes, Feedback,
+      join_through: FeedbackVote,
+      on_replace: :delete,
+      on_delete: :delete_all
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -63,7 +71,8 @@ defmodule Poffee.Accounts.User do
     changeset
     |> format_string(:username)
     |> validate_required([:username])
-    |> validate_format(:username, ~r/^[\d\w_]+$/,
+    # /u is unicode modifier which will allow unicode characters from other languages like CJK
+    |> validate_format(:username, ~r/^[[:alnum:]_]+$/u,
       message: "can only contain letters, numbers and _"
     )
     |> validate_length(:username,
@@ -75,7 +84,7 @@ defmodule Poffee.Accounts.User do
 
   defp validate_email(changeset, opts) do
     changeset
-    |> format_string(:email)
+    |> format_string(:email, true)
     |> validate_required([:email])
     |> EctoCommons.EmailValidator.validate_email(:email, checks: [:html_input])
     |> validate_length(:email, max: Constant.email_max_length())
@@ -149,8 +158,8 @@ defmodule Poffee.Accounts.User do
     |> put_change(:role, :role_admin)
   end
 
-  @spec format_string(t, atom) :: t
-  defp format_string(changeset, field) do
+  @spec format_string(t, atom, boolean()) :: t
+  defp format_string(changeset, field, force_lowercase \\ false) do
     case Map.get(changeset.changes, field) do
       nil ->
         changeset
@@ -158,7 +167,7 @@ defmodule Poffee.Accounts.User do
       unformatted ->
         formatted =
           unformatted
-          |> String.downcase()
+          |> Utils.maybe_if(force_lowercase, &String.downcase/1)
           |> String.trim()
 
         put_change(changeset, field, formatted)
@@ -232,5 +241,10 @@ defmodule Poffee.Accounts.User do
     else
       add_error(changeset, :current_password, "is not valid")
     end
+  end
+
+  defimpl Jason.Encoder, for: __MODULE__ do
+    @fields ~w(id username email role brand_page feedbacks inserted_at updated_at)a
+    def encode(value, opts), do: jason_encode(value, @fields, opts)
   end
 end

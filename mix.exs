@@ -40,7 +40,7 @@ defmodule Poffee.MixProject do
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(:test), do: ["lib", "test/support", "test/poffee"]
   defp elixirc_paths(_), do: ["lib"]
 
   # Specifies your project dependencies.
@@ -60,7 +60,8 @@ defmodule Poffee.MixProject do
       # {:phoenix_live_view, "~> 0.18.18"},
       {:phoenix_live_dashboard, github: "phoenixframework/phoenix_live_dashboard"},
       # {:phoenix_live_dashboard, "~> 0.7.2"},
-      {:phoenix_live_session, "~> 0.1.3"},
+      # {:phoenix_live_session, "~> 0.1.3"},
+      {:phoenix_live_session, path: "../phoenix_live_session"},
       {:phoenix_live_reload, "~> 1.4", only: :dev},
 
       # auth
@@ -97,28 +98,29 @@ defmodule Poffee.MixProject do
       # misc / utils
       {:gettext, "~> 0.20"},
       {:jason, "~> 1.2"},
-      {:plug_cowboy, "~> 2.5"},
       {:timex, "~> 3.7.11"},
       {:ecto_commons, "~> 0.3.3"},
       {:decorator, "~> 1.4"},
       {:slugify, "~> 1.3"},
 
+      # twitch
+      {:twitch_api, path: "../twitch_api"},
+
       # debugging
       {:recon, "~> 2.5"},
       {:observer_cli, "~> 1.7"},
-      # {:load_control, github: "broomninja/load_control"},
+      {:load_control, github: "broomninja/load_control"},
 
       # dev and test deps
       {:benchee, "~> 1.0", only: :dev},
-      # {:exsync, "~> 0.2", only: :dev},
-      # {:file_system, "~> 0.2"},
-      # {:esbuild, "~> 0.7", runtime: Mix.env() == :dev},
       {:dialyxir, "~> 1.3", only: [:dev], runtime: false},
       {:gradient, github: "esl/gradient", only: [:dev], runtime: false},
       {:typed_ecto_schema, "~> 0.4.1", runtime: false},
       {:floki, ">= 0.34.2", only: :test},
       {:excoveralls, "~> 0.16", only: :test},
       {:ex_machina, "~> 2.7", only: :test},
+      {:mox, "~> 1.0", only: :test},
+      {:rewire, "~> 0.9", only: :test},
       {:wallaby, "~> 0.30", only: :test, runtime: false}
     ]
   end
