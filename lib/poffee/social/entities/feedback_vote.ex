@@ -24,4 +24,9 @@ defmodule Poffee.Social.FeedbackVote do
       name: :feedback_votes_pkey
     )
   end
+
+  defimpl Jason.Encoder, for: __MODULE__ do
+    @fields ~w(feedback user inserted_at updated_at)a
+    def encode(value, opts), do: jason_encode(value, @fields, opts)
+  end
 end

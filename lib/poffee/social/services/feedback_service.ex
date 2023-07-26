@@ -151,7 +151,7 @@ defmodule Poffee.Services.FeedbackService do
     |> join(:left, [c], c_a in User, on: c.author_id == c_a.id)
     |> order_by([fb], asc: fb.inserted_at)
     # |> Sorting.sort_query(Post, params, :posts)
-    |> preload([_, v, _, fb_a, _], author: fb_a)
+    |> preload([_, _, _, fb_a, _], author: fb_a)
     |> group_by([fb, _, _, fb_a, c_a], [fb.id, fb_a.id, c_a.id])
     |> select_merge([_, v, c, _, _], %{
       votes_count: count(v.id, :distinct),
@@ -160,15 +160,29 @@ defmodule Poffee.Services.FeedbackService do
     |> Repo.all()
   end
 
-  @spec get_feedback_voters_by_feedback_id(uuid) :: list(User.t())
-  def get_feedback_voters_by_feedback_id(nil), do: []
+  # @spec get_feedback_voters_by_feedback_id(uuid) :: list(User.t())
+  # def get_feedback_voters_by_feedback_id(nil), do: []
 
-  def get_feedback_voters_by_feedback_id(feedback_id) do
-    Feedback
-    |> where([fb], fb.id == ^feedback_id and fb.status == :feedback_status_active)
-    |> Repo.one()
-    |> Repo.preload(:voters)
-    |> Map.get(:voters)
+  # def get_feedback_voters_by_feedback_id(feedback_id) do
+  #   Feedback
+  #   |> where([fb], fb.id == ^feedback_id and fb.status == :feedback_status_active)
+  #   |> Repo.one()
+  #   |> Repo.preload(:voters)
+  #   |> Map.get(:voters)
+  # end
+
+  @spec get_feedback_votes_by_feedback_id(uuid) :: list(FeedbackVote.t())
+  def get_feedback_votes_by_feedback_id(nil), do: []
+
+  def get_feedback_votes_by_feedback_id(feedback_id) do
+    FeedbackVote
+    |> where([fbv], fbv.feedback_id == ^feedback_id)
+    |> join(:left, [fbv], fb in Feedback,
+      on: fb.id == fbv.feedback_id and fb.status == :feedback_status_active
+    )
+    |> join(:left, [fbv], u in assoc(fbv, :user))
+    |> preload([_, _, u], user: u)
+    |> Repo.all()
   end
 
   # @spec get_feedback_votes_by_user(%User{}) :: list(%FeedbackVote{})
@@ -197,7 +211,8 @@ defmodule Poffee.Services.FeedbackService do
       feedback =
         get_feedback_with_comments_count_and_voters_count_by_id(feedback_vote.feedback_id)
 
-      :ok = Notifications.broadcast_feedback(feedback)
+      feedback_votes = get_feedback_votes_by_feedback_id(feedback_vote.feedback_id)
+      :ok = Notifications.broadcast_feedback(feedback, feedback_votes)
     end
 
     result

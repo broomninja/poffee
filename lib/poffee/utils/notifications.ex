@@ -30,17 +30,21 @@ defmodule Poffee.Notifications do
   end
 
   # broadcast the updated feedback
-  def broadcast_feedback(feedback) do
+  def broadcast_feedback(feedback, feedback_votes) do
     Logger.debug("[Notification.broadcast_feedback] id #{feedback.id}")
 
     # broadcast to all
-    Phoenix.PubSub.broadcast(Poffee.PubSub, @topic_feedback, {__MODULE__, :update, feedback})
+    Phoenix.PubSub.broadcast(
+      Poffee.PubSub,
+      @topic_feedback,
+      {__MODULE__, :update, feedback, feedback_votes}
+    )
 
     # broadcast to individual feedback subscribers
     Phoenix.PubSub.broadcast(
       Poffee.PubSub,
       @topic_feedback <> ".#{feedback.id}",
-      {__MODULE__, :update, feedback}
+      {__MODULE__, :update, feedback, feedback_votes}
     )
   end
 end

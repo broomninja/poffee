@@ -1,100 +1,108 @@
 <div id={get_container_id(@feedback.id)} class="pt-5">
-  <div class="flex flex-col">
-    <%!-- Feedback --%>
-    <div class="grid grid-cols-9 pt-4 pb-2 pl-2 mb-2 bg-slate-100 rounded-md">
-      <%!-- Feedback title --%>
-      <div
-        :if={@live_action == :show_feedbacks}
-        class="col-span-7 ml-1 mb-2 text-lg font-bold text-gray-800 hover:text-blue-700 lg:leading-tight dark:text-white"
-      >
-        <.link navigate={~p"/u/#{@brandpage_username}/#{@feedback.id}"}>
-          <%= @feedback.title %>
-        </.link>
-      </div>
-      <div
-        :if={@live_action == :show_single_feedback}
-        class="col-span-7 ml-1 mb-2 text-lg font-bold text-gray-800 lg:leading-tight dark:text-white"
-      >
-        <%= @feedback.title %>
-      </div>
-      <%!-- End Feedback title --%>
-      <%!-- Vote Counter --%>
-      <div class="col-span-2 row-span-2 text-right">
-        <LiveSvelte.svelte
-          name="VoteCounter"
-          ssr={false}
-          props={
-            %{
-              current_user: @current_user,
-              feedback: @feedback,
-              brandpage_id: @brandpage_id,
-              user_vote: @user_vote
+  <%!-- Feedback and voters --%>
+  <div class="flex">
+    <%!-- Feedback content and comments--%>
+    <div class="flex flex-col">
+      <%!-- Feedback --%>
+      <div class="grid grid-cols-9 pt-4 pb-2 pl-2 bg-slate-100 rounded-md">
+        <%!-- Feedback title --%>
+        <.feedback_title
+          live_action={@live_action}
+          feedback={@feedback}
+          brandpage_username={@brandpage_username}
+        />
+        <%!-- End Feedback title --%>
+        <%!-- Vote Counter --%>
+        <div class="col-span-2 row-span-2 text-right">
+          <LiveSvelte.svelte
+            name="VoteCounter"
+            ssr={false}
+            props={
+              %{
+                current_user: @current_user,
+                feedback: @feedback,
+                brandpage_id: @brandpage_id,
+                user_vote: @user_vote
+              }
             }
-          }
-        />
-      </div>
-      <%!-- End Vote Counter --%>
-      <%!-- Author --%>
-      <div class="col-span-7 flex items-center justify-start ml-1 mb-1 font-semibold">
-        <Petal.HeroiconsV1.Solid.user class="w-5 h-5 pb-[0.025rem]" />
-        <span class="pl-1"><%= @feedback.author.username %></span>
-      </div>
-      <%!-- End Author --%>
-      <%!-- Feedback content --%>
-      <div class="col-span-9 mt-3 ml-1 mr-5 md:mr-16 mb-1 text-sm text-gray-800 lg:leading-relaxed">
-        <%= @feedback.content %>
-      </div>
-      <%!-- End Feedback content --%>
-      <%!-- Created time --%>
-      <div class="col-span-9 ml-1 mt-3 flex whitespace-nowrap text-gray-700 text-sm">
-        <Petal.HeroiconsV1.Solid.clock class="w-5 h-5 pb-[0.025rem]" />
-        <span class="pl-1">created <%= Utils.format_time(@feedback.inserted_at) %></span>
-      </div>
-      <%!-- End Created time --%>
-      <%!-- Comment Link --%>
-      <div
-        :if={@live_action == :show_feedbacks}
-        class="col-span-9 flex whitespace-nowrap text-gray-800 hover:text-blue-700 font-semibold justify-center"
-      >
-        <.link navigate={~p"/u/#{@brandpage_username}/#{@feedback.id}"}>
-          <LiveSvelte.svelte name="Button">
-            <span :if={@feedback.comments_count == 0}>Create a comment</span>
-            <span :if={@feedback.comments_count > 0}>View comments</span>
-          </LiveSvelte.svelte>
-        </.link>
-      </div>
-      <%!-- End Comment Link --%>
-    </div>
-    <%!-- End Feedback --%>
-    <div :if={@live_action == :show_single_feedback}>
-      <div class="pl-2">
-        <.tabler_icon_button
-          icon="tabler-plus"
-          label="Add Comment"
-          bgcolor={:blue}
-          iconcolor={:inherit}
-          textcolor={:inherit}
-          phx-click={show_modal(Utils.get_modal_name(@current_user, "live-create-comment-modal"))}
-          size={:auto}
+          />
+        </div>
+        <%!-- End Vote Counter --%>
+        <%!-- Author --%>
+        <div class="col-span-7 flex items-center justify-start ml-1 mb-1 font-semibold">
+          <Petal.HeroiconsV1.Solid.user class="w-5 h-5 pb-[0.025rem]" />
+          <span class="pl-1"><%= @feedback.author.username %></span>
+        </div>
+        <%!-- End Author --%>
+        <%!-- Feedback content --%>
+        <div class="col-span-9 mt-3 ml-1 mr-5 md:mr-16 mb-1 text-sm text-gray-800 lg:leading-relaxed">
+          <%= @feedback.content %>
+        </div>
+        <%!-- End Feedback content --%>
+        <%!-- Created time --%>
+        <div class="col-span-9 ml-1 mt-3 flex whitespace-nowrap text-gray-700 text-sm">
+          <Petal.HeroiconsV1.Solid.clock class="w-5 h-5 pb-[0.025rem]" />
+          <span class="pl-1">
+            <LiveSvelte.svelte
+              name="DateTimeDisplay"
+              props={%{prefix: "created", datetime: @feedback.inserted_at}}
+            />
+          </span>
+        </div>
+        <%!-- End Created time --%>
+        <%!-- Comment Link --%>
+        <div
+          :if={@live_action == :show_feedbacks}
+          class="col-span-9 flex whitespace-nowrap text-gray-800 hover:text-blue-700 font-semibold justify-center"
         >
-          Add Comment
-        </.tabler_icon_button>
+          <.link navigate={~p"/u/#{@brandpage_username}/#{@feedback.id}"}>
+            <LiveSvelte.svelte name="Button">
+              <span :if={@feedback.comments_count == 0}>Create a comment</span>
+              <span :if={@feedback.comments_count > 0}>View comments</span>
+            </LiveSvelte.svelte>
+          </.link>
+        </div>
+        <%!-- End Comment Link --%>
       </div>
-      <%!-- Comments List --%>
-      <div :if={Utils.is_non_empty_list?(@comments)}>
-        <.live_component
-          :for={comment <- @comments}
-          module={Poffee.Social.CommentComponent}
-          id={comment.id}
-          comment={comment}
-        />
+      <%!-- Feedback --%>
+      <%!-- :show_single_feedback --%>
+      <div :if={@live_action == :show_single_feedback}>
+        <%!-- Add Comment button --%>
+        <div class="pl-2 pt-2">
+          <.tabler_icon_button
+            icon="tabler-plus"
+            label="Add Comment"
+            bgcolor={:blue}
+            iconcolor={:inherit}
+            textcolor={:inherit}
+            phx-click={
+              show_modal(Utils.get_modal_name(@current_user, "live-create-comment-modal"))
+            }
+            size={:auto}
+          >
+            Add Comment
+          </.tabler_icon_button>
+        </div>
+        <%!-- End Add Comment button --%>
+        <%!-- Comments List --%>
+        <div :if={Utils.is_non_empty_list?(@comments)} class="pl-2">
+          <.live_component
+            :for={comment <- @comments}
+            module={Poffee.Social.CommentComponent}
+            id={comment.id}
+            comment={comment}
+          />
+        </div>
+        <%!-- End Comments List --%>
       </div>
-      <%!-- End Comments List --%>
+      <%!-- End :show_single_feedback --%>
     </div>
-    <div>
-      <%!-- Voters List --%>
-      <.voters_list :if={@live_action == :show_single_feedback} voters={@voters} />
-      <%!-- End Voters List --%>
+    <%!-- Feedback content and comments--%>
+    <%!-- Voters List --%>
+    <div :if={@live_action == :show_single_feedback} class="hidden md:block">
+      <.voters_list feedback_votes={@feedback_votes} />
     </div>
+    <%!-- End Voters List --%>
   </div>
+  <%!-- Feedback and voters --%>
 </div>

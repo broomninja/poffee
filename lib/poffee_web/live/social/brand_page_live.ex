@@ -111,13 +111,14 @@ defmodule PoffeeWeb.BrandPageLive do
   end
 
   # message sent by Notifications PubSub
-  def handle_info({Notifications, :update, feedback}, socket) do
+  def handle_info({Notifications, :update, feedback, feedback_votes}, socket) do
     Logger.debug("[BrandPageLive.handle_info.Notifications.update] #{feedback.id}")
 
     # forward to LiveComponent
     send_update(self(), BrandPageComponent,
       id: socket.assigns.streamer.brand_page.id,
-      updated_feedback: feedback
+      updated_feedback: feedback,
+      updated_feedback_votes: feedback_votes
     )
 
     {:noreply, socket}

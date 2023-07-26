@@ -44,14 +44,14 @@ defmodule Poffee.Social.BrandPageComponent do
     end
 
     comments = Social.get_comments_by_feedback_id(feedback_id)
-    voters = Social.get_feedback_voters_by_feedback_id(feedback_id)
+    feedback_votes = Social.get_feedback_votes_by_feedback_id(feedback_id)
     subscribe_for_notifications(feedback)
 
     [
       Map.merge(assigns, %{
         feedback: feedback,
         comments: comments,
-        voters: voters
+        feedback_votes: feedback_votes
       })
     ]
   end
@@ -66,13 +66,13 @@ defmodule Poffee.Social.BrandPageComponent do
 
     socket
     |> assign_new(:comments, fn -> nil end)
-    |> assign_new(:voters, fn -> nil end)
+    |> assign_new(:feedback_votes, fn -> nil end)
 
     {:ok, socket, temporary_assigns: []}
   end
 
   @impl Phoenix.LiveComponent
-  def update(%{updated_feedback: feedback}, socket) do
+  def update(%{updated_feedback: feedback, updated_feedback_votes: feedback_votes}, socket) do
     Logger.debug(
       "[BrandPageComponent.update.updated_feedback] live_action = #{inspect(socket.assigns.live_action)}"
     )
@@ -91,7 +91,8 @@ defmodule Poffee.Social.BrandPageComponent do
           assign(socket, feedbacks: feedbacks)
 
         :show_single_feedback ->
-          socket |> maybe_assign_feedback(feedback)
+          socket
+          |> maybe_assign_feedback(feedback, feedback_votes)
       end
 
     {:ok, socket}
@@ -171,9 +172,9 @@ defmodule Poffee.Social.BrandPageComponent do
   # Helper functions for data loading
   ##########################################
 
-  defp maybe_assign_feedback(socket, feedback) do
+  defp maybe_assign_feedback(socket, feedback, feedback_votes) do
     case socket.assigns.feedback.id == feedback.id do
-      true -> socket |> assign(feedback: feedback)
+      true -> socket |> assign(feedback: feedback, feedback_votes: feedback_votes)
       false -> socket
     end
   end

@@ -1,6 +1,6 @@
 <div id={"brandpage-#{@id}"}>
   <%= if @twitch_user do %>
-    <div class="max-w-screen-lg min-w-min pr-2 md:pr-8 flex flex-col w-full h-full mx-auto">
+    <div class="max-w-screen-lg min-w-min pr-2 md:pr-8 pt-2 md:pt-0 flex flex-col w-full h-full mx-auto">
       <div class="flex items-center justify-start">
         <div class="pr-3">
           <LiveSvelte.svelte name="TooltipDiv" ssr={true} props={%{text: "Visit Twitch channel"}}>
@@ -51,12 +51,7 @@
         <%= @twitch_user.description %>
       </div>
 
-      <%!-- <div class="flex space-x-5 pt-5 w-full h-full">
-        <div class="flex h-full w-full bg-gray-300 rounded-md">ABC</div>
-        <div class="flex h-full w-full bg-gray-300 rounded-md">DEF</div>
-      </div> --%>
-
-      <%!-- div :show_feedbacks --%>
+      <%!-- :show_feedbacks --%>
       <div :if={@live_action == :show_feedbacks and Utils.is_non_empty_list?(@feedbacks)}>
         <.live_component
           :for={feedback <- @feedbacks}
@@ -88,8 +83,8 @@
         <% end %>
 --%>
       </div>
-      <%!-- end div :show_feedbacks --%>
-      <%!-- div :show_single_feedback --%>
+      <%!-- end :show_feedbacks --%>
+      <%!-- :show_single_feedback --%>
       <div :if={@live_action == :show_single_feedback and !is_nil(@feedback)}>
         <.live_component
           module={Poffee.Social.FeedbackComponent}
@@ -100,7 +95,7 @@
           current_user={@current_user}
           user_vote={nil}
           comments={@comments}
-          voters={@voters}
+          feedback_votes={@feedback_votes}
           live_action={@live_action}
         />
         <%!-- <LiveSvelte.svelte
@@ -120,7 +115,7 @@
           }
         /> --%>
       </div>
-      <%!-- end div :show_single_feedback --%>
+      <%!-- end :show_single_feedback --%>
     </div>
   <% end %>
   <%!-- end if @twitch_user --%>

@@ -15,7 +15,12 @@
     <%!-- Comment creation time --%>
     <div class="col-span-9 flex ml-1 mt-3 items-center whitespace-nowrap text-gray-700 text-sm">
       <Petal.HeroiconsV1.Solid.clock class="w-5 h-5 pb-[0.025rem]" />
-      <span class="pl-1">created <%= Utils.format_time(@comment.inserted_at) %></span>
+      <span class="pl-1">
+        <LiveSvelte.svelte
+          name="DateTimeDisplay"
+          props={%{prefix: "created", datetime: @comment.inserted_at}}
+        />
+      </span>
     </div>
     <%!-- End Comment creation time --%>
   </div>

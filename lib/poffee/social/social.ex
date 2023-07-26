@@ -10,9 +10,7 @@ defmodule Poffee.Social do
   alias Poffee.{Repo, Utils, DBCache}
   alias Poffee.Accounts.User
   alias Poffee.Social.BrandPage
-  # alias Poffee.Social.Comment
   alias Poffee.Social.Feedback
-  alias Poffee.Social.FeedbackVote
   alias Poffee.Services.BrandPageService
   alias Poffee.Services.FeedbackService
   alias Poffee.Services.CommentService
@@ -112,7 +110,7 @@ defmodule Poffee.Social do
   defdelegate get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id(brand_page_id),
     to: FeedbackService
 
-  defdelegate get_feedback_voters_by_feedback_id(feedback_id), to: FeedbackService
+  defdelegate get_feedback_votes_by_feedback_id(feedback_id), to: FeedbackService
   defdelegate create_feedback(attrs \\ %{}, user, brand_page), to: FeedbackService
   defdelegate update_feedback(feedback, attrs \\ %{}), to: FeedbackService
   defdelegate delete_feedback(feedback), to: FeedbackService
