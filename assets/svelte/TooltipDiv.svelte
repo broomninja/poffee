@@ -1,5 +1,7 @@
 <script lang="ts">
   export let text;
+  export let text_size = "text-sm";
+  export let font_weight = "font-semibold";
   export let background_color = "#4b5563";
   export let text_color = "#FFF";
   export let classes = "";
@@ -8,7 +10,7 @@
 <div class="tooltip {classes}">
   <slot></slot>
   <!-- Tooltip -->
-  <span class="tooltiptext whitespace-nowrap text-sm font-semibold" 
+  <span class="tooltiptext whitespace-nowrap {font_weight} {text_size}"
         style="--background_color: {background_color}; --text_color: {text_color};">
       {text}
   </span>
