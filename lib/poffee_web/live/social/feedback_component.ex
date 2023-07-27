@@ -12,6 +12,35 @@ defmodule Poffee.Social.FeedbackComponent do
     {:ok, assign(socket, @default_assigns), temporary_assigns: []}
   end
 
+  # @impl Phoenix.LiveComponent
+  # def preload(list_of_assigns) do
+  #   IO.inspect(list_of_assigns)
+  #    list_of_assigns
+  # end
+
+  @impl Phoenix.LiveComponent
+  def update(%{feedback: feedback, user_voted_list: user_voted_list} = assigns, socket) do
+    Logger.debug("[FeedbackComponent.update.feedback] has_already_voted")
+
+    has_already_voted = Enum.member?(user_voted_list, feedback.id)
+
+    socket =
+      socket
+      |> assign(assigns)
+      |> assign(:has_already_voted, has_already_voted)
+
+    {:ok, socket}
+  end
+
+  def update(assigns, socket) do
+    Logger.debug("[FeedbackComponent.update.default]")
+    {:ok, socket |> assign(assigns)}
+  end
+
+  ##########################################
+  # Helper functions for data loading
+  ##########################################
+
   ##########################################
   # Helper functions for HEEX rendering
   ##########################################

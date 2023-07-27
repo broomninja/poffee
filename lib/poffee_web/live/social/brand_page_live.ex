@@ -44,7 +44,13 @@ defmodule PoffeeWeb.BrandPageLive do
     {:noreply, socket}
   end
 
-  # @impl Phoenix.LiveView
+  @impl Phoenix.LiveView
+  # display flash messages from LiveSvelte pushEvent()
+  def handle_event("flash", %{"level" => level, "message" => message}, socket) do
+    Logger.debug("[BrandPageLive.handle_event.flash] message = #{message}")
+    {:noreply, put_flash(socket, String.to_existing_atom(level), message)}
+  end
+
   # def handle_event(event, params, socket) do
   #   Logger.error("[BrandPageLive.handle_event] #{event}, #{inspect(params)}")
   #   {:noreply, socket}
@@ -53,7 +59,7 @@ defmodule PoffeeWeb.BrandPageLive do
   @impl Phoenix.LiveView
   # PubSub notifications from TwitchLiveStreamers
   def handle_info({TwitchLiveStreamers, :online, %Streamer{} = streamer}, socket) do
-    Logger.debug("[UserLive.online] #{streamer.display_name}")
+    Logger.debug("[BrandPageLive.handle_info.online] #{streamer.display_name}")
     user = socket.assigns.streamer
 
     # check if streamer is displayed
@@ -73,7 +79,7 @@ defmodule PoffeeWeb.BrandPageLive do
 
   # PubSub notifications from TwitchLiveStreamers
   def handle_info({TwitchLiveStreamers, :offline, %Streamer{} = streamer}, socket) do
-    Logger.debug("[UserLive.offline] #{streamer.display_name}")
+    Logger.debug("[BrandPageLive.handle_info.offline] #{streamer.display_name}")
 
     # check if streamer is displayed
     user = socket.assigns.streamer
@@ -94,7 +100,7 @@ defmodule PoffeeWeb.BrandPageLive do
 
   # message sent by self only
   def handle_info({__MODULE__, :get_streaming_status, user}, socket) do
-    Logger.debug("[BrandPageLive.get_streaming_status] #{user.username}")
+    Logger.debug("[BrandPageLive.handle_info.get_streaming_status] #{user.username}")
 
     socket =
       with %TwitchUser{twitch_user_id: twitch_user_id} <- get_twitch_user_from_db(user.id) do
@@ -108,6 +114,12 @@ defmodule PoffeeWeb.BrandPageLive do
       end
 
     {:noreply, socket}
+  end
+
+  # flash messages from child LiveComponent
+  def handle_info({BrandPageComponent, :flash, %{level: level, message: message}}, socket) do
+    Logger.debug("[BrandPageLive.handle_info.flash] #{message}")
+    {:noreply, put_flash(socket, level, message)}
   end
 
   # message sent by Notifications PubSub

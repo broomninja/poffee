@@ -115,8 +115,12 @@ defmodule Poffee.Social do
   defdelegate update_feedback(feedback, attrs \\ %{}), to: FeedbackService
   defdelegate delete_feedback(feedback), to: FeedbackService
   defdelegate change_feedback(feedback, attrs \\ %{}), to: FeedbackService
+  defdelegate user_has_voted_feedback?(user, feedback_id), to: FeedbackService
   defdelegate vote_feedback(user_id, feedback_id), to: FeedbackService
   defdelegate unvote_feedback(user_id, feedback_id), to: FeedbackService
+
+  defdelegate get_user_voted_feedback_ids_filtered_by(user, list_of_feedback_id),
+    to: FeedbackService
 
   ###########################
   # Comment

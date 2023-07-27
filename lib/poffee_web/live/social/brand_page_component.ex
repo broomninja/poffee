@@ -18,15 +18,19 @@ defmodule Poffee.Social.BrandPageComponent do
       "[BrandPageComponent.preload] loading feedbacks for brand_page_id #{inspect(brand_page_id)}"
     )
 
+    current_user = assigns.current_user
+
     feedbacks =
       Social.get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id(brand_page_id)
 
+    user_voted_list = get_user_voted_list(current_user, feedbacks)
     subscribe_for_notifications(feedbacks)
 
     [
       Map.merge(assigns, %{
         page: 1,
-        feedbacks: feedbacks
+        feedbacks: feedbacks,
+        user_voted_list: user_voted_list
       })
     ]
   end
@@ -36,22 +40,26 @@ defmodule Poffee.Social.BrandPageComponent do
       "[BrandPageComponent.preload] loading feedback for feedback_id #{inspect(assigns.feedback_id)}"
     )
 
+    current_user = assigns.current_user
     feedback_id = assigns.feedback_id
     feedback = Social.get_feedback_with_comments_count_and_voters_count_by_id(feedback_id)
 
     if is_nil(feedback) do
-      Logger.warn("[BrandPageComponent.preload] Feedback not found for id #{assigns.feedback_id}")
+      Logger.warn("[BrandPageComponent.preload] Feedback not found for id #{feedback_id}")
     end
 
     comments = Social.get_comments_by_feedback_id(feedback_id)
     feedback_votes = Social.get_feedback_votes_by_feedback_id(feedback_id)
+    user_voted_list = get_user_voted_list(current_user, [feedback])
+
     subscribe_for_notifications(feedback)
 
     [
       Map.merge(assigns, %{
         feedback: feedback,
         comments: comments,
-        feedback_votes: feedback_votes
+        feedback_votes: feedback_votes,
+        user_voted_list: user_voted_list
       })
     ]
   end
@@ -72,6 +80,7 @@ defmodule Poffee.Social.BrandPageComponent do
   end
 
   @impl Phoenix.LiveComponent
+  # forwarded from BrandPageLive.handle_info
   def update(%{updated_feedback: feedback, updated_feedback_votes: feedback_votes}, socket) do
     Logger.debug(
       "[BrandPageComponent.update.updated_feedback] live_action = #{inspect(socket.assigns.live_action)}"
@@ -88,11 +97,14 @@ defmodule Poffee.Social.BrandPageComponent do
               fb -> fb
             end)
 
-          assign(socket, feedbacks: feedbacks)
+          socket
+          |> assign(feedbacks: feedbacks)
+          |> assign(user_voted_list: get_user_voted_list(socket.assigns.current_user, feedbacks))
 
         :show_single_feedback ->
           socket
           |> maybe_assign_feedback(feedback, feedback_votes)
+          |> assign(user_voted_list: get_user_voted_list(socket.assigns.current_user, [feedback]))
       end
 
     {:ok, socket}
@@ -100,7 +112,6 @@ defmodule Poffee.Social.BrandPageComponent do
 
   # default update callback
   def update(assigns, socket) do
-    # Logger.error("[BrandPageComponent.update.default] assigns #{inspect(assigns)}")
     Logger.debug(
       "[BrandPageComponent.update.default] live_action = #{inspect(assigns.live_action)}"
     )
@@ -112,7 +123,17 @@ defmodule Poffee.Social.BrandPageComponent do
   def handle_event("vote", %{"user_id" => user_id, "feedback_id" => feedback_id}, socket)
       when not is_nil(user_id) do
     Logger.debug("[BrandPageComponent.handle_event.vote] user_id = #{user_id}")
-    Social.vote_feedback(user_id, feedback_id)
+
+    case Social.vote_feedback(user_id, feedback_id) do
+      {:ok, _feedback_vote} ->
+        # put_flash will not work when we are in the LC, so forward the flash
+        # message to the parent LV
+        send(self(), {__MODULE__, :flash, %{level: :info, message: "Vote saved!"}})
+
+      {:error, _} ->
+        send(self(), {__MODULE__, :flash, %{level: :error, message: "Error when saving vote!"}})
+    end
+
     {:noreply, socket}
   end
 
@@ -124,7 +145,17 @@ defmodule Poffee.Social.BrandPageComponent do
   def handle_event("unvote", %{"user_id" => user_id, "feedback_id" => feedback_id}, socket)
       when not is_nil(user_id) do
     Logger.debug("[BrandPageComponent.handle_event.unvote] user_id = #{user_id}")
-    Social.unvote_feedback(user_id, feedback_id)
+
+    case Social.unvote_feedback(user_id, feedback_id) do
+      {:ok, _feedback_vote} ->
+        # put_flash will not work when we are in the LC, so forward the flash
+        # message to the parent LV
+        send(self(), {__MODULE__, :flash, %{level: :info, message: "Vote removed!"}})
+
+      {:error, _} ->
+        send(self(), {__MODULE__, :flash, %{level: :error, message: "Error when removing vote!"}})
+    end
+
     {:noreply, socket}
   end
 
@@ -134,7 +165,7 @@ defmodule Poffee.Social.BrandPageComponent do
   end
 
   def handle_event("subscribe_feedback", %{"feedback_id" => feedback_id}, socket) do
-    Logger.error(
+    Logger.debug(
       "[BrandPageComponent.handle_event.subscribe_feedback] feedback_id = #{feedback_id}"
     )
 
@@ -143,7 +174,7 @@ defmodule Poffee.Social.BrandPageComponent do
   end
 
   def handle_event("unsubscribe_feedback", %{"feedback_id" => feedback_id}, socket) do
-    Logger.error(
+    Logger.debug(
       "[BrandPageComponent.handle_event.unsubscribe_feedback] feedback_id = #{feedback_id}"
     )
 
@@ -171,6 +202,17 @@ defmodule Poffee.Social.BrandPageComponent do
   ##########################################
   # Helper functions for data loading
   ##########################################
+
+  # returns a list containing the feedback_ids which the current
+  # user has voted already, we are only interested in the currently
+  # displayed feedbacks so this list will not include other feedbacks
+  # not currently displayed. 
+  defp get_user_voted_list(nil, _feedbacks), do: []
+
+  defp get_user_voted_list(current_user, feedbacks) do
+    list_of_ids = Enum.map(feedbacks, & &1.id)
+    Social.get_user_voted_feedback_ids_filtered_by(current_user, list_of_ids)
+  end
 
   defp maybe_assign_feedback(socket, feedback, feedback_votes) do
     case socket.assigns.feedback.id == feedback.id do

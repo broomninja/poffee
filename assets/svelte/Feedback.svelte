@@ -8,7 +8,7 @@
   export let brandpage_username;
   export let brandpage_id;
   export let feedback;
-  export let user_vote;
+  export let has_already_voted;
   export let live_action;
   export let pushEventTo;
 
@@ -36,7 +36,7 @@
     <!-- End Feedback title -->
     <!-- Vote Counter -->
     <div class="col-span-2 row-span-2 text-right">
-      <VoteCounter {current_user} {feedback} {brandpage_id} {user_vote} {pushEventTo} />
+      <VoteCounter {current_user} {feedback} {brandpage_id} {has_already_voted} {pushEventTo} />
     </div>
     <!-- End Vote Counter -->
     <!-- Author -->

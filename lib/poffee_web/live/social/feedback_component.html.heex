@@ -22,7 +22,7 @@
                 current_user: @current_user,
                 feedback: @feedback,
                 brandpage_id: @brandpage_id,
-                user_vote: @user_vote
+                has_already_voted: @has_already_voted
               }
             }
           />
@@ -105,4 +105,15 @@
     <%!-- End Voters List --%>
   </div>
   <%!-- Feedback and voters --%>
+
+  <%!-- Hidden modal for CreateCommentComponent --%>
+  <%!-- <.modal id="live-create-comment-modal" on_cancel={hide_modal("live-create-comment-modal")}>
+    <.live_component
+      module={Poffee.Social.CreateCommentComponent}
+      id="live-create-comment"
+      feedback={@feedback}
+      current_user={@current_user}
+    />
+  </.modal> --%>
+  <%!-- End Hidden modal for CreateCommentComponent --%>
 </div>

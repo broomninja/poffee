@@ -199,6 +199,28 @@ defmodule Poffee.Services.FeedbackService do
   #   |> Map.get(:voters)
   # end
 
+  @spec user_has_voted_feedback?(User.t(), uuid) :: boolean()
+  def user_has_voted_feedback?(nil, _feedback_id), do: false
+
+  def user_has_voted_feedback?(%User{id: user_id}, feedback_id) do
+    FeedbackVote
+    |> where(feedback_id: ^feedback_id)
+    |> where(user_id: ^user_id)
+    |> Repo.exists?()
+  end
+
+  @spec get_user_voted_feedback_ids_filtered_by(User.t(), list(uuid)) :: list(uuid)
+  def get_user_voted_feedback_ids_filtered_by(nil, _list_of_feedback_id), do: []
+
+  def get_user_voted_feedback_ids_filtered_by(%User{id: user_id}, list_of_feedback_id) do
+    FeedbackVote
+    |> where([fbv], fbv.feedback_id in ^list_of_feedback_id)
+    |> where(user_id: ^user_id)
+    |> select([fbv], fbv.feedback_id)
+    |> Repo.all()
+  end
+
+  @spec vote_feedback(uuid, uuid) :: {:ok, FeedbackVote.t()} | changeset_error
   def vote_feedback(user_id, feedback_id) do
     attrs = %{feedback_id: feedback_id, user_id: user_id}
 
@@ -207,29 +229,32 @@ defmodule Poffee.Services.FeedbackService do
       |> FeedbackVote.changeset(attrs)
       |> Repo.insert()
 
-    with {:ok, feedback_vote} <- result do
-      feedback =
-        get_feedback_with_comments_count_and_voters_count_by_id(feedback_vote.feedback_id)
-
-      feedback_votes = get_feedback_votes_by_feedback_id(feedback_vote.feedback_id)
+    with {:ok, _feedback_vote} <- result do
+      feedback = get_feedback_with_comments_count_and_voters_count_by_id(feedback_id)
+      feedback_votes = get_feedback_votes_by_feedback_id(feedback_id)
       :ok = Notifications.broadcast_feedback(feedback, feedback_votes)
     end
 
     result
   end
 
+  @spec unvote_feedback(uuid, uuid) :: {:ok, FeedbackVote.t()} | changeset_error
   def unvote_feedback(user_id, feedback_id) do
     result =
       FeedbackVote
       |> where(feedback_id: ^feedback_id)
       |> where(user_id: ^user_id)
-      |> Repo.delete_all()
+      |> Repo.one()
+      |> Repo.delete()
 
-    Logger.debug("[FeedbackService.unvote_feedback] result = #{inspect(result)}")
+    # Logger.debug("[FeedbackService.unvote_feedback] result = #{inspect(result)}")
 
-    #  case result do
-    #   {1, _} -> feedback = get_feedback_with_comments_count_and_votes_count_by_id(feedback_vote.feedback_id)
-    #             :ok = Notifications.broadcast_feedback(feedback)
-    #   {0, _} -> nil
+    with {:ok, _feedback_vote} <- result do
+      feedback = get_feedback_with_comments_count_and_voters_count_by_id(feedback_id)
+      feedback_votes = get_feedback_votes_by_feedback_id(feedback_id)
+      :ok = Notifications.broadcast_feedback(feedback, feedback_votes)
+    end
+
+    result
   end
 end
