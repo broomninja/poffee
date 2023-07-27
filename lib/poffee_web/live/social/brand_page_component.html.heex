@@ -61,7 +61,7 @@
           brandpage_username={@streamer.username}
           brandpage_id={@id}
           current_user={@current_user}
-          user_vote={nil}
+          user_voted_list={@user_voted_list}
           live_action={@live_action}
         />
         <%!-- 
@@ -93,9 +93,9 @@
           brandpage_username={@streamer.username}
           brandpage_id={@id}
           current_user={@current_user}
-          user_vote={nil}
           comments={@comments}
           feedback_votes={@feedback_votes}
+          user_voted_list={@user_voted_list}
           live_action={@live_action}
         />
         <%!-- <LiveSvelte.svelte

@@ -20,7 +20,7 @@ defmodule Poffee.Social.FeedbackVote do
     |> foreign_key_constraint(:feedback_id)
     |> foreign_key_constraint(:user_id)
     |> unique_constraint([:feedback_id, :user_id],
-      message: "already voted by user",
+      message: "VOTE_ALREADY_EXISTS",
       name: :feedback_votes_pkey
     )
   end

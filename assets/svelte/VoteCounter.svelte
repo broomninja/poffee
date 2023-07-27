@@ -5,7 +5,7 @@
   export let current_user;
   export let feedback;
   export let brandpage_id;
-  export let user_vote;
+  export let has_already_voted;
   export let pushEvent;
   export let pushEventTo;
 
@@ -43,7 +43,7 @@
 
 <div>
   <button class="group relative inline-block w-12 h-12 mr-5 border border-gray-800 bg-white rounded" 
-      on:click={!!user_vote ? 
+      on:click={has_already_voted ? 
                 clickUnvote(current_user, feedback) : 
                 clickVote(current_user, feedback)} 
   >
@@ -64,7 +64,7 @@
       {:else if current_user.id == feedback?.author?.id}
           Unable to vote your own feedback
       {:else}
-          Click to {!!user_vote ? 'remove' : ''} vote
+          Click to {has_already_voted ? 'remove' : ''} vote
       {/if}
     </span>
     <!-- End Tooltip -->
