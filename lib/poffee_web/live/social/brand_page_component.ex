@@ -80,7 +80,7 @@ defmodule Poffee.Social.BrandPageComponent do
   end
 
   @impl Phoenix.LiveComponent
-  # forwarded from BrandPageLive.handle_info
+  # send_update called from BrandPageComponent.handle_info.Notifications.update
   def update(%{updated_feedback: feedback, updated_feedback_votes: feedback_votes}, socket) do
     Logger.debug(
       "[BrandPageComponent.update.updated_feedback] live_action = #{inspect(socket.assigns.live_action)}"

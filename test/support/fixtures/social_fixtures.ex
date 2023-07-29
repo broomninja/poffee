@@ -45,7 +45,7 @@ defmodule Poffee.SocialFixtures do
       |> Enum.into(%{
         content: "default content"
       })
-      |> Poffee.Social.create_comment(user, feedback)
+      |> Poffee.Social.create_comment(user.id, feedback.id)
 
     comment
   end

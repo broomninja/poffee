@@ -10,7 +10,6 @@ defmodule Poffee.Social do
   alias Poffee.{Repo, Utils, DBCache}
   alias Poffee.Accounts.User
   alias Poffee.Social.BrandPage
-  alias Poffee.Social.Feedback
   alias Poffee.Services.BrandPageService
   alias Poffee.Services.FeedbackService
   alias Poffee.Services.CommentService
@@ -38,32 +37,32 @@ defmodule Poffee.Social do
     |> Repo.one()
   end
 
-  @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
-  @spec get_user_with_brand_page_and_feedbacks_by_username(String.t()) :: User.t()
-  def get_user_with_brand_page_and_feedbacks_by_username(username) when is_binary(username) do
-    User
-    |> where([u], u.username == ^username)
-    |> join(:left, [u], bp in BrandPage,
-      on: bp.owner_id == u.id and bp.status == :brand_page_status_public
-    )
-    |> join(:left, [_, bp], fb in Feedback,
-      on: fb.brand_page_id == bp.id and fb.status == :feedback_status_active
-    )
-    |> preload([_, bp, fb], brand_page: {bp, feedbacks: fb})
-    |> Repo.one()
-  end
+  # @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
+  # @spec get_user_with_brand_page_and_feedbacks_by_username(String.t()) :: User.t()
+  # def get_user_with_brand_page_and_feedbacks_by_username(username) when is_binary(username) do
+  #   User
+  #   |> where([u], u.username == ^username)
+  #   |> join(:left, [u], bp in BrandPage,
+  #     on: bp.owner_id == u.id and bp.status == :brand_page_status_public
+  #   )
+  #   |> join(:left, [_, bp], fb in Feedback,
+  #     on: fb.brand_page_id == bp.id and fb.status == :feedback_status_active
+  #   )
+  #   |> preload([_, bp, fb], brand_page: {bp, feedbacks: fb})
+  #   |> Repo.one()
+  # end
 
-  @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
-  @spec get_brand_page_with_feedbacks_by_user(User.t()) :: BrandPage.t()
-  def get_brand_page_with_feedbacks_by_user(%User{} = user) do
-    BrandPage
-    |> where([bp], bp.owner_id == ^user.id and bp.status == :brand_page_status_public)
-    |> join(:left, [bp], fb in Feedback,
-      on: fb.brand_page_id == bp.id and fb.status == :feedback_status_active
-    )
-    |> preload([bp, fb], feedbacks: fb)
-    |> Repo.one()
-  end
+  # @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
+  # @spec get_brand_page_with_feedbacks_by_user(User.t()) :: BrandPage.t()
+  # def get_brand_page_with_feedbacks_by_user(%User{} = user) do
+  #   BrandPage
+  #   |> where([bp], bp.owner_id == ^user.id and bp.status == :brand_page_status_public)
+  #   |> join(:left, [bp], fb in Feedback,
+  #     on: fb.brand_page_id == bp.id and fb.status == :feedback_status_active
+  #   )
+  #   |> preload([bp, fb], feedbacks: fb)
+  #   |> Repo.one()
+  # end
 
   # @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
   # @spec get_feedbacks_by_user(User.t()) :: [Feedback.t()]
@@ -128,7 +127,7 @@ defmodule Poffee.Social do
   defdelegate list_comments, to: CommentService
   defdelegate get_comment!(id), to: CommentService
   defdelegate get_comments_by_feedback_id(feedback_id), to: CommentService
-  defdelegate create_comment(attrs \\ %{}, user, feedback), to: CommentService
+  defdelegate create_comment(attrs \\ %{}, user_id, feedback_id), to: CommentService
   defdelegate update_comment(feedback, attrs \\ %{}), to: CommentService
   defdelegate delete_comment(feedback), to: CommentService
   defdelegate change_comment(feedback, attrs \\ %{}), to: CommentService

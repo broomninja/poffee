@@ -1,4 +1,4 @@
-defmodule Poffee.Social.CreateCommentComponent do
+defmodule Poffee.Social.CreateFeedbackComponent do
   use PoffeeWeb, :live_component
 
   require Logger
@@ -14,7 +14,9 @@ defmodule Poffee.Social.CreateCommentComponent do
   def render(assigns) do
     ~H"""
     <div class="mx-auto max-w-sm pt-10 pb-14">
-      Create Comment
+      <.header class="text-center">
+        Create a feedback for <%= @streamer.display_name %>
+      </.header>
     </div>
     """
   end

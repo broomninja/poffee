@@ -244,10 +244,12 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
              |> Social.create_feedback(get_random_test_user(), brand_page) do
         1..5
         |> Enum.each(fn iy ->
-          %{content: "Demo comment #{iy} for feedback id #{feedback.id}"}
-          |> Social.create_comment(get_random_test_user(), feedback)
+          user = get_random_test_user()
 
-          Process.sleep(1000)
+          %{content: "Demo comment #{iy} for feedback id #{feedback.id}"}
+          |> Social.create_comment(user.id, feedback.id)
+
+          Process.sleep(1200)
         end)
       end
     end)

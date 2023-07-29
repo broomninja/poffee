@@ -117,7 +117,7 @@ defmodule PoffeeWeb.BrandPageLive do
   end
 
   # flash messages from child LiveComponent
-  def handle_info({BrandPageComponent, :flash, %{level: level, message: message}}, socket) do
+  def handle_info({_module, :flash, %{level: level, message: message}}, socket) do
     Logger.debug("[BrandPageLive.handle_info.flash] #{message}")
     {:noreply, put_flash(socket, level, message)}
   end
@@ -126,7 +126,7 @@ defmodule PoffeeWeb.BrandPageLive do
   def handle_info({Notifications, :update, feedback, feedback_votes}, socket) do
     Logger.debug("[BrandPageLive.handle_info.Notifications.update] #{feedback.id}")
 
-    # forward to LiveComponent
+    # forward to child LiveComponent
     send_update(self(), BrandPageComponent,
       id: socket.assigns.streamer.brand_page.id,
       updated_feedback: feedback,

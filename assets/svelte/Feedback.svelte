@@ -1,7 +1,7 @@
 <script lang="ts">
   import ClockIcon from './icons/ClockIcon.svelte';
   import VoteCounter from './VoteCounter.svelte';
-	import DateTimeDisplay from './DateTimeDisplay.svelte';
+	import DateTimeLiveDisplay from './DateTimeLiveDisplay.svelte';
 	import Button from './Button.svelte';
 
   export let current_user;
@@ -53,7 +53,7 @@
     <div class="col-span-9 mt-3 flex whitespace-nowrap text-gray-700 text-sm">
       <ClockIcon />
       <span class="pl-1">
-        <DateTimeDisplay prefix="created" datetime={feedback.inserted_at} /> 
+        <DateTimeLiveDisplay prefix="created" datetime={feedback.inserted_at} /> 
       </span>
     </div>
     <!-- End Created time -->
