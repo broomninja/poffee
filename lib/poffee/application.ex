@@ -8,8 +8,6 @@ defmodule Poffee.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      # LiveSvelte SSR
-      {NodeJS.Supervisor, [path: LiveSvelte.SSR.server_path(), pool_size: 10]},
       # Start the Telemetry supervisor
       PoffeeWeb.Telemetry,
       # Start the Ecto repository
@@ -30,6 +28,14 @@ defmodule Poffee.Application do
       # {Poffee.Worker, arg}
     ]
 
+    # optionally add LiveSvelte SSR, without this all LiveSvelte will not be able to use SSR
+    children =
+      children
+      |> prepend_if(
+        Poffee.Env.livesvelte_enable_ssr(),
+        {NodeJS.Supervisor, [path: LiveSvelte.SSR.server_path(), pool_size: 10]}
+      )
+
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Poffee.Supervisor]
@@ -47,5 +53,9 @@ defmodule Poffee.Application do
   def config_change(changed, _new, removed) do
     PoffeeWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp prepend_if(list, condition, item) do
+    if condition, do: [item | list], else: list
   end
 end

@@ -1,4 +1,7 @@
 defmodule Poffee.Env do
+  # LiveSvelte SSR
+  def livesvelte_enable_ssr, do: get_env(:live_svelte)[:enable_ssr]
+
   # API mock
   def twitch_api_client, do: get_env(:twitch)[:api_client]
 

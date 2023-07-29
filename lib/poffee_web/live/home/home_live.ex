@@ -128,8 +128,13 @@ defmodule PoffeeWeb.HomeLive do
       </div>
     <% end %>
 
-    <div>
-      <LiveSvelte.svelte name="Number" props={%{number: @number}} />
+    <div class="flex gap-10">
+      <div>
+        SSR: <LiveSvelte.svelte name="Number" props={%{number: @number}} ssr={true} />
+      </div>
+      <div>
+        No SSR: <LiveSvelte.svelte name="Number" props={%{number: @number}} ssr={false} />
+      </div>
     </div>
     """
   end
