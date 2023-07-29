@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { fade } from 'svelte/transition';
   import { has as __has } from "lodash";
 
   export let feedback;
@@ -67,7 +66,7 @@
 
 </script>
 
-<div in:fade>
+<div>
   <form
     method="POST"
     on:submit|preventDefault={submitCreateComment} 

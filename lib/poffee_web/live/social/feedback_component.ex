@@ -109,18 +109,18 @@ defmodule Poffee.Social.FeedbackComponent do
 
   # show the login modal if user is not logged in,
   # otherwise show the create form
-  defp toggle_create_comment_form(js \\ %JS{}, user, feedback_id)
+  defp maybe_toggle_create_comment_form(js \\ %JS{}, user, feedback_id)
 
-  defp toggle_create_comment_form(_js, nil, _feedback_id) do
+  defp maybe_toggle_create_comment_form(_js, nil, _feedback_id) do
     show_modal("live-login-modal")
   end
 
-  defp toggle_create_comment_form(js, %User{}, feedback_id) do
+  defp maybe_toggle_create_comment_form(js, %User{}, feedback_id) do
     js
     |> JS.toggle(
       to: "#" <> get_create_comment_container_id(feedback_id),
-      in: "fade-in",
-      out: "fade-out"
+      in: {"ease-out duration-300", "opacity-0", "opacity-100"},
+      out: {"ease-out duration-300", "opacity-100", "opacity-0"}
     )
   end
 

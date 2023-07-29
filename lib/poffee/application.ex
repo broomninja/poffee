@@ -9,7 +9,7 @@ defmodule Poffee.Application do
   def start(_type, _args) do
     children = [
       # LiveSvelte SSR
-      {NodeJS.Supervisor, [path: LiveSvelte.SSR.server_path(), pool_size: 4]},
+      {NodeJS.Supervisor, [path: LiveSvelte.SSR.server_path(), pool_size: 10]},
       # Start the Telemetry supervisor
       PoffeeWeb.Telemetry,
       # Start the Ecto repository

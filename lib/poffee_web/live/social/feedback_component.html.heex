@@ -75,14 +75,14 @@
             bgcolor={:blue}
             iconcolor={:inherit}
             textcolor={:inherit}
-            phx-click={toggle_create_comment_form(@current_user, @feedback.id)}
+            phx-click={maybe_toggle_create_comment_form(@current_user, @feedback.id)}
             size={:auto}
           >
             Add Comment
           </.tabler_icon_button>
         </div>
         <%!-- End Add Comment button --%>
-        <%!-- End Create Comment --%>
+        <%!-- Create Comment Form --%>
         <div
           id={get_create_comment_container_id(@feedback.id)}
           class="hidden"
@@ -94,7 +94,7 @@
             props={%{feedback: @feedback, current_user: @current_user}}
           />
         </div>
-        <%!-- End Create Comment --%>
+        <%!-- End Create Comment Form --%>
         <%!-- Comments List --%>
         <div :if={Utils.is_non_empty_list?(@comments)} class="">
           <.live_component
