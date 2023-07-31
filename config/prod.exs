@@ -21,6 +21,11 @@ config :poffee, PoffeeWeb.Endpoint, cache_static_manifest: "priv/static/cache_ma
 config :swoosh, api_client: Swoosh.ApiClient.Finch, finch_name: Poffee.Finch
 
 ####################################
+# Twitch API
+####################################
+config :poffee, :twitch, api_client: TwitchApi
+
+####################################
 # Logger
 ####################################
 # Do not print debug messages in production

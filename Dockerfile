@@ -15,9 +15,8 @@
 ARG ELIXIR_VERSION=1.14.4
 ARG OTP_VERSION=25.3.1
 ARG DEBIAN_VERSION=bullseye-20230227-slim
-ARG NODE_VERSION=20.2.0
-ARG MAX_OLD_SPACE_SIZE=1024
-ENV NODE_OPTIONS=--max-old-space-size=${MAX_OLD_SPACE_SIZE}
+ARG NODE_VERSION=20.5.0
+ARG NODE_MAX_OLD_SPACE_SIZE=1024
 
 ARG BUILDER_IMAGE="hexpm/elixir:${ELIXIR_VERSION}-erlang-${OTP_VERSION}-debian-${DEBIAN_VERSION}"
 ARG RUNNER_IMAGE="debian:${DEBIAN_VERSION}"
@@ -88,6 +87,8 @@ RUN mix release
 # the compiled release and other runtime necessities
 FROM ${RUNNER_IMAGE}
 ARG NODE_VERSION
+ARG NODE_MAX_OLD_SPACE_SIZE
+ENV NODE_OPTIONS=--max-old-space-size=${NODE_MAX_OLD_SPACE_SIZE}
 
 RUN apt-get update -y && apt-get install -y libstdc++6 openssl libncurses5 curl pgpgpg locales \
   && apt-get clean && rm -f /var/lib/apt/lists/*_*

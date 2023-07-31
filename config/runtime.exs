@@ -18,6 +18,9 @@ import Config
 # script that automatically sets the env var above.
 if System.get_env("PHX_SERVER") do
   config :poffee, PoffeeWeb.Endpoint, server: true
+  # phoenix serve_endpoints is set when we run mix phx.server in dev but we cannot do the 
+  # same in prod, so we set it to allow starting different children in Application.ex
+  config :phoenix, :serve_endpoints, true
 end
 
 defmodule RuntimeConfig do
