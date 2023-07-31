@@ -101,7 +101,11 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
   def handle_cast({:online, twitch_user_id}, streamers) do
     new_streamer = get_streamer_info(twitch_user_id)
 
-    streamers = [new_streamer | streamers]
+    streamers =
+      case new_streamer do
+        %Streamer{} -> [new_streamer | streamers]
+        _ -> streamers
+      end
 
     broadcast_new_streamers(streamers)
     broadcast_online_streamer(new_streamer)
@@ -240,24 +244,30 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
     1..5
     |> Enum.each(fn ix ->
       with {:ok, feedback} <-
-             %{title: "Demo feedback #{ix} for #{user.username}", content: @dummy_content}
-             |> Social.create_feedback(get_random_test_user(), brand_page) do
+             %{
+               title: "Demo feedback #{ix} for #{user.username}",
+               content: @dummy_content,
+               author_id: get_random_test_user_id(),
+               brand_page_id: brand_page.id
+             }
+             |> Social.create_feedback() do
         1..5
         |> Enum.each(fn iy ->
           %{content: "Demo comment #{iy} for feedback id #{feedback.id}"}
-          |> Social.create_comment(get_random_test_user(), feedback)
+          |> Social.create_comment(get_random_test_user_id(), feedback.id)
 
-          Process.sleep(1000)
+          Process.sleep(1200)
         end)
       end
     end)
   end
 
   # TODO remove - for demo only
-  defp get_random_test_user() do
+  defp get_random_test_user_id() do
     ~w(bob1 cara_123 dave3371 eve__11 fred991 greg_13 henry_19190922 iris_15 jay_31)
     |> Enum.random()
     |> Accounts.get_user_by_username()
+    |> Map.get(:id)
   end
 
   defp maybe_subscribe_to_events(nil), do: nil
@@ -280,8 +290,12 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
   end
 
   # only broadcast when streamers are removed from the list or other changes 
+  defp broadcast_updated_streamers(nil) do
+    Logger.warning("[TwitchLiveStreamers.broadcast_updated_streamers] Ignoring nil streamers")
+  end
+
   defp broadcast_updated_streamers(streamers) do
-    Logger.debug("[broadcast_updated_streamers]")
+    Logger.debug("[TwitchLiveStreamers.broadcast_updated_streamers]")
 
     Phoenix.PubSub.broadcast(
       Poffee.PubSub,
@@ -290,12 +304,20 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
     )
   end
 
+  defp broadcast_online_streamer(nil) do
+    Logger.warning("[TwitchLiveStreamers.broadcast_online_streamer] Ignoring nil streamer")
+  end
+
   defp broadcast_online_streamer(streamer) do
     Phoenix.PubSub.broadcast(
       Poffee.PubSub,
       @topic_twitch <> streamer.twitch_user_id,
       {__MODULE__, :online, streamer}
     )
+  end
+
+  defp broadcast_offline_streamer(nil) do
+    Logger.warning("[TwitchLiveStreamers.broadcast_offline_streamer] Ignoring nil streamer")
   end
 
   defp broadcast_offline_streamer(streamer) do

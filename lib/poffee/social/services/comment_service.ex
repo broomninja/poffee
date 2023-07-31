@@ -6,9 +6,7 @@ defmodule Poffee.Services.CommentService do
   import Ecto.Query, warn: false
   alias Poffee.Repo
 
-  alias Poffee.Accounts.User
   alias Poffee.Social.Comment
-  alias Poffee.Social.Feedback
 
   @type changeset_error :: {:error, Ecto.Changeset.t()}
   @type uuid :: <<_::128>>
@@ -68,8 +66,8 @@ defmodule Poffee.Services.CommentService do
       {:error, %Ecto.Changeset{}}
 
   """
-  @spec create_comment(map, User.t(), Feedback.t()) :: {:ok, Comment.t()} | changeset_error
-  def create_comment(attrs \\ %{}, %User{id: user_id}, %Feedback{id: feedback_id}) do
+  @spec create_comment(map, uuid, uuid) :: {:ok, Comment.t()} | changeset_error
+  def create_comment(attrs \\ %{}, user_id, feedback_id) do
     attrs =
       attrs
       |> Map.put(:author_id, user_id)

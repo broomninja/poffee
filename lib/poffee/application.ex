@@ -7,9 +7,42 @@ defmodule Poffee.Application do
 
   @impl true
   def start(_type, _args) do
+    children = get_children(Poffee.Env.phoenix_server?())
+
+    # See https://hexdocs.pm/elixir/Supervisor.html
+    # for other strategies and supported options
+    opts = [strategy: :one_for_one, name: Poffee.Supervisor]
+    result = Supervisor.start_link(children, opts)
+
+    # Replace default Repo logging
+    # Ecto.DevLogger.install(Poffee.Repo)
+
+    result
+  end
+
+  # Tell Phoenix to update the endpoint configuration
+  # whenever the application is updated.
+  @impl true
+  def config_change(changed, _new, removed) do
+    PoffeeWeb.Endpoint.config_change(changed, removed)
+    :ok
+  end
+
+  defp prepend_if(list, condition, item) do
+    if condition, do: [item | list], else: list
+  end
+
+  # eg we are running "mix run priv/repo/seeds.exs" 
+  defp get_children(false) do
+    [
+      # Start the Ecto repository
+      Poffee.Repo
+    ]
+  end
+
+  # we are running inside phoenix server, start all the services as normal
+  defp get_children(true) do
     children = [
-      # LiveSvelte SSR
-      {NodeJS.Supervisor, [path: LiveSvelte.SSR.server_path(), pool_size: 4]},
       # Start the Telemetry supervisor
       PoffeeWeb.Telemetry,
       # Start the Ecto repository
@@ -30,22 +63,11 @@ defmodule Poffee.Application do
       # {Poffee.Worker, arg}
     ]
 
-    # See https://hexdocs.pm/elixir/Supervisor.html
-    # for other strategies and supported options
-    opts = [strategy: :one_for_one, name: Poffee.Supervisor]
-    result = Supervisor.start_link(children, opts)
-
-    # Replace default Repo logging
-    # Ecto.DevLogger.install(Poffee.Repo)
-
-    result
-  end
-
-  # Tell Phoenix to update the endpoint configuration
-  # whenever the application is updated.
-  @impl true
-  def config_change(changed, _new, removed) do
-    PoffeeWeb.Endpoint.config_change(changed, removed)
-    :ok
+    # optionally add LiveSvelte SSR, without this all LiveSvelte will not be able to use SSR
+    children
+    |> prepend_if(
+      Poffee.Env.livesvelte_enable_ssr?(),
+      {NodeJS.Supervisor, [path: LiveSvelte.SSR.server_path(), pool_size: 10]}
+    )
   end
 end

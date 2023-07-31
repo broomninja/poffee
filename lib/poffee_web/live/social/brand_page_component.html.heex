@@ -1,4 +1,4 @@
-<div id={"brandpage-#{@id}"}>
+<div id={get_container_id(@id)}>
   <%= if @twitch_user do %>
     <div class="max-w-screen-lg min-w-min pr-2 md:pr-8 pt-2 md:pt-0 flex flex-col w-full h-full mx-auto">
       <div class="flex items-center justify-start">
@@ -59,7 +59,7 @@
           id={feedback.id}
           feedback={feedback}
           brandpage_username={@streamer.username}
-          brandpage_id={@id}
+          brand_page_id={@id}
           current_user={@current_user}
           user_voted_list={@user_voted_list}
           live_action={@live_action}
@@ -73,7 +73,7 @@
               %{
                 feedback: feedback,
                 brandpage_username: @streamer.username,
-                brandpage_id: @id,
+                brand_page_id: @id,
                 current_user: @current_user,
                 user_vote: nil,
                 live_action: @live_action
@@ -91,7 +91,7 @@
           id={@feedback.id}
           feedback={@feedback}
           brandpage_username={@streamer.username}
-          brandpage_id={@id}
+          brand_page_id={@id}
           current_user={@current_user}
           comments={@comments}
           feedback_votes={@feedback_votes}
@@ -105,7 +105,7 @@
             %{
               feedback: @feedback,
               brandpage_username: @streamer.username,
-              brandpage_id: @id,
+              brand_page_id: @id,
               current_user: @current_user,
               user_vote: nil,
               comments: @comments,
@@ -119,4 +119,14 @@
     </div>
   <% end %>
   <%!-- end if @twitch_user --%>
+  <.modal id="live-create-feedback-modal" on_cancel={hide_modal("live-create-feedback-modal")}>
+    <.live_component
+      id="live-create-feedback-{@id}"
+      module={Poffee.Social.CreateFeedbackComponent}
+      brandpage_username={@streamer.username}
+      brand_page_id={@id}
+      current_user={@current_user}
+      live_action={@live_action}
+    />
+  </.modal>
 </div>

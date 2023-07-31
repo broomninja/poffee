@@ -3,6 +3,7 @@ defmodule Poffee.Social.Feedback do
   import EctoEnum
 
   alias Poffee.Accounts.User
+  alias Poffee.Constant
   alias Poffee.Social.BrandPage
   alias Poffee.Social.Comment
   alias Poffee.Social.FeedbackVote
@@ -33,12 +34,32 @@ defmodule Poffee.Social.Feedback do
   end
 
   @doc false
-  def changeset(feedback, attrs) do
+  def changeset(feedback, attrs \\ %{}) do
     feedback
     |> cast(attrs, [:title, :content, :status, :author_id, :brand_page_id])
+    |> validate_required([:status, :author_id, :brand_page_id])
+    |> validate_title
+    |> validate_content
+  end
+
+  defp validate_title(changeset) do
+    changeset
     |> sanitize_field(:title)
+    |> validate_required([:title])
+    |> validate_length(:title,
+      min: Constant.feedback_title_min_length(),
+      max: Constant.feedback_title_max_length()
+    )
+  end
+
+  defp validate_content(changeset) do
+    changeset
     |> sanitize_field(:content)
-    |> validate_required([:title, :content, :status, :author_id, :brand_page_id])
+    |> validate_required([:content])
+    |> validate_length(:content,
+      min: Constant.feedback_content_min_length(),
+      max: Constant.feedback_content_max_length()
+    )
   end
 
   defimpl Jason.Encoder, for: __MODULE__ do

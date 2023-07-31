@@ -2,7 +2,7 @@
   <%!-- Feedback and voters --%>
   <div class="flex">
     <%!-- Feedback content and comments--%>
-    <div class="flex flex-col">
+    <div class="flex flex-col w-full">
       <%!-- Feedback --%>
       <div class="grid grid-cols-9 pt-4 pb-2 pl-2 bg-slate-100 rounded-md">
         <%!-- Feedback title --%>
@@ -21,7 +21,7 @@
               %{
                 current_user: @current_user,
                 feedback: @feedback,
-                brandpage_id: @brandpage_id,
+                brand_page_id: @brand_page_id,
                 has_already_voted: @has_already_voted
               }
             }
@@ -44,7 +44,7 @@
           <Petal.HeroiconsV1.Solid.clock class="w-5 h-5 pb-[0.025rem]" />
           <span class="pl-1">
             <LiveSvelte.svelte
-              name="DateTimeDisplay"
+              name="DateTimeLiveDisplay"
               props={%{prefix: "created", datetime: @feedback.inserted_at}}
             />
           </span>
@@ -68,24 +68,41 @@
       <%!-- :show_single_feedback --%>
       <div :if={@live_action == :show_single_feedback}>
         <%!-- Add Comment button --%>
-        <div class="pl-2 pt-2">
+        <div class="pt-2">
           <.tabler_icon_button
             icon="tabler-plus"
             label="Add Comment"
             bgcolor={:blue}
             iconcolor={:inherit}
             textcolor={:inherit}
-            phx-click={
-              show_modal(Utils.get_modal_name(@current_user, "live-create-comment-modal"))
-            }
+            phx-click={maybe_toggle_create_comment_form(@current_user, @feedback.id)}
             size={:auto}
           >
-            Add Comment
+            Add a Comment
           </.tabler_icon_button>
         </div>
         <%!-- End Add Comment button --%>
+        <%!-- Create Comment Form --%>
+        <div
+          id={get_create_comment_container_id(@feedback.id)}
+          class="hidden"
+          data-hide-action={hide_create_comment_form(@feedback.id)}
+        >
+          <LiveSvelte.svelte
+            name="CreateComment"
+            ssr={false}
+            props={
+              %{
+                feedback: @feedback,
+                current_user: @current_user,
+                max_content_length: Constant.comment_content_max_length()
+              }
+            }
+          />
+        </div>
+        <%!-- End Create Comment Form --%>
         <%!-- Comments List --%>
-        <div :if={Utils.is_non_empty_list?(@comments)} class="pl-2">
+        <div :if={Utils.is_non_empty_list?(@comments)} class="">
           <.live_component
             :for={comment <- @comments}
             module={Poffee.Social.CommentComponent}
@@ -105,15 +122,4 @@
     <%!-- End Voters List --%>
   </div>
   <%!-- Feedback and voters --%>
-
-  <%!-- Hidden modal for CreateCommentComponent --%>
-  <%!-- <.modal id="live-create-comment-modal" on_cancel={hide_modal("live-create-comment-modal")}>
-    <.live_component
-      module={Poffee.Social.CreateCommentComponent}
-      id="live-create-comment"
-      feedback={@feedback}
-      current_user={@current_user}
-    />
-  </.modal> --%>
-  <%!-- End Hidden modal for CreateCommentComponent --%>
 </div>

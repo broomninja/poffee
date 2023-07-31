@@ -1,0 +1,32 @@
+<div class="mx-auto max-w-sm pt-8 pb-14">
+  <.header class="text-center">
+    Create new feedback for <%= @brandpage_username %>
+  </.header>
+  <.simple_form
+    id="create_feedback_form"
+    for={@form}
+    phx-submit="create_feedback"
+    phx-target={@myself}
+  >
+    <.input field={@form[:title]} type="text" label="Title" required />
+    <.input field={@form[:content]} type="textarea" label="Content" required />
+
+    <.input field={@form[:author_id]} type="hidden" value={Utils.get_field(@current_user, :id)} />
+    <.input field={@form[:brand_page_id]} type="hidden" value={@brand_page_id} />
+
+    <:actions>
+      <div class="flex flex-col items-center justity-center text-center w-full">
+        <button
+          type="submit"
+          phx-disable-with="Saving ..."
+          class="phx-submit-loading:opacity-75 py-3 px-4 w-40 inline-flex justify-center gap-2 rounded-md 
+                 border border-transparent font-semibold bg-blue-500 text-white hover:bg-blue-600 
+                 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-all 
+                 dark:focus:ring-offset-gray-800"
+        >
+          Save
+        </button>
+      </div>
+    </:actions>
+  </.simple_form>
+</div>

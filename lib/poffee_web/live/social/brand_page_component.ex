@@ -64,7 +64,10 @@ defmodule Poffee.Social.BrandPageComponent do
     ]
   end
 
-  def preload(list_of_assigns), do: list_of_assigns
+  def preload(list_of_assigns) do
+    Logger.debug("[BrandPageComponent.preload.default]}")
+    list_of_assigns
+  end
 
   @impl Phoenix.LiveComponent
   def mount(socket) do
@@ -80,7 +83,8 @@ defmodule Poffee.Social.BrandPageComponent do
   end
 
   @impl Phoenix.LiveComponent
-  # forwarded from BrandPageLive.handle_info
+  # send_update can be called from:
+  # 1. BrandPageComponent.handle_info.Notifications.update (via PubSub)
   def update(%{updated_feedback: feedback, updated_feedback_votes: feedback_votes}, socket) do
     Logger.debug(
       "[BrandPageComponent.update.updated_feedback] live_action = #{inspect(socket.assigns.live_action)}"
@@ -88,8 +92,9 @@ defmodule Poffee.Social.BrandPageComponent do
 
     socket =
       case socket.assigns.live_action do
-        # replace the old feedback in assigns
         :show_feedbacks ->
+          # replace the old feedback in assigns, only if we are currently display it in our list of
+          # feedbacks, ignore it otherwise
           feedbacks =
             socket.assigns.feedbacks
             |> Enum.map(fn
@@ -97,14 +102,16 @@ defmodule Poffee.Social.BrandPageComponent do
               fb -> fb
             end)
 
+          user_voted_list = get_user_voted_list(socket.assigns.current_user, feedbacks)
+
           socket
           |> assign(feedbacks: feedbacks)
-          |> assign(user_voted_list: get_user_voted_list(socket.assigns.current_user, feedbacks))
+          |> assign(user_voted_list: user_voted_list)
 
         :show_single_feedback ->
           socket
-          |> maybe_assign_feedback(feedback, feedback_votes)
-          |> assign(user_voted_list: get_user_voted_list(socket.assigns.current_user, [feedback]))
+          |> maybe_assign_feedback_and_votes(feedback, feedback_votes)
+          |> maybe_assign_voted_list(feedback)
       end
 
     {:ok, socket}
@@ -112,10 +119,7 @@ defmodule Poffee.Social.BrandPageComponent do
 
   # default update callback
   def update(assigns, socket) do
-    Logger.debug(
-      "[BrandPageComponent.update.default] live_action = #{inspect(assigns.live_action)}"
-    )
-
+    Logger.debug("[BrandPageComponent.update.default]}")
     {:ok, socket |> assign(assigns)}
   end
 
@@ -207,17 +211,28 @@ defmodule Poffee.Social.BrandPageComponent do
   # user has voted already, we are only interested in the currently
   # displayed feedbacks so this list will not include other feedbacks
   # not currently displayed. 
-  defp get_user_voted_list(nil, _feedbacks), do: []
+  defp get_user_voted_list(nil, _list_of_feedbacks), do: []
 
-  defp get_user_voted_list(current_user, feedbacks) do
-    list_of_ids = Enum.map(feedbacks, & &1.id)
+  defp get_user_voted_list(current_user, list_of_feedbacks) do
+    list_of_ids = Enum.map(list_of_feedbacks, & &1.id)
     Social.get_user_voted_feedback_ids_filtered_by(current_user, list_of_ids)
   end
 
-  defp maybe_assign_feedback(socket, feedback, feedback_votes) do
+  defp maybe_assign_feedback_and_votes(socket, feedback, feedback_votes) do
     case socket.assigns.feedback.id == feedback.id do
       true -> socket |> assign(feedback: feedback, feedback_votes: feedback_votes)
       false -> socket
+    end
+  end
+
+  defp maybe_assign_voted_list(socket, feedback) do
+    case socket.assigns.feedback.id == feedback.id do
+      true ->
+        socket
+        |> assign(user_voted_list: get_user_voted_list(socket.assigns.current_user, [feedback]))
+
+      false ->
+        socket
     end
   end
 
@@ -236,6 +251,14 @@ defmodule Poffee.Social.BrandPageComponent do
   ##########################################
   # Helper functions for HEEX rendering
   ##########################################
+
+  defp get_container_id(brand_page_id) do
+    "brandpage-#{brand_page_id}"
+  end
+
+  # defp get_create_feedback_container_id(brand_page_id) do
+  #   "create-feedback-#{brand_page_id}"
+  # end
 
   # Renders a badge showing online or offline status
   attr :status, :string,

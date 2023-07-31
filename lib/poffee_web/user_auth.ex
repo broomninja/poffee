@@ -48,7 +48,7 @@ defmodule PoffeeWeb.UserAuth do
     redirect_to = validate_return_to(params["user_return_to"], signed_in_path(conn))
 
     conn
-    |> redirect(to: redirect_to)
+    |> unsafe_redirect(to: redirect_to)
   end
 
   # defp maybe_write_remember_me_cookie(conn, token, %{"remember_me" => "true"}) do
@@ -101,7 +101,7 @@ defmodule PoffeeWeb.UserAuth do
     conn
     |> renew_session()
     |> delete_resp_cookie(@remember_me_cookie)
-    |> redirect(to: ~p"/")
+    |> unsafe_redirect(to: ~p"/")
   end
 
   @doc """
@@ -138,7 +138,7 @@ defmodule PoffeeWeb.UserAuth do
       redirect_to = validate_return_to(conn.query_params["user_return_to"], signed_in_path(conn))
 
       conn
-      |> redirect(to: redirect_to)
+      |> unsafe_redirect(to: redirect_to)
       |> halt()
     else
       conn
@@ -165,7 +165,7 @@ defmodule PoffeeWeb.UserAuth do
 
     conn
     |> put_flash(:warn, Constant.require_authenticated_text())
-    |> redirect(to: redirect_to)
+    |> unsafe_redirect(to: redirect_to)
     |> halt()
   end
 
@@ -181,7 +181,7 @@ defmodule PoffeeWeb.UserAuth do
     else
       conn
       |> put_flash(:warn, Constant.require_admin_text())
-      |> redirect(to: signed_in_path(conn))
+      |> unsafe_redirect(to: signed_in_path(conn))
       |> halt()
     end
   end
@@ -192,7 +192,7 @@ defmodule PoffeeWeb.UserAuth do
 
     conn
     |> put_flash(:warn, Constant.require_authenticated_text())
-    |> redirect(to: redirect_to)
+    |> unsafe_redirect(to: redirect_to)
     |> halt()
   end
 
@@ -220,4 +220,34 @@ defmodule PoffeeWeb.UserAuth do
   end
 
   def signed_in_path(_conn), do: ~p"/"
+
+  # TODO: remove this block after the following two issues are properly resolved:
+  # https://github.com/phoenixframework/phoenix/pull/5482
+  # https://github.com/phoenixframework/phoenix/issues/5508
+  defp unsafe_redirect(conn, opts) do
+    url = opts[:to]
+    html = Plug.HTML.html_escape(url)
+    body = "<html><body>You are being <a href=\"#{html}\">redirected</a>.</body></html>"
+
+    conn
+    |> put_resp_header("location", url)
+    |> send_resp(conn.status || 302, "text/html", body)
+  end
+
+  defp send_resp(conn, default_status, default_content_type, body) do
+    conn
+    |> ensure_resp_content_type(default_content_type)
+    |> send_resp(conn.status || default_status, body)
+  end
+
+  defp ensure_resp_content_type(%Plug.Conn{resp_headers: resp_headers} = conn, content_type) do
+    if List.keyfind(resp_headers, "content-type", 0) do
+      conn
+    else
+      content_type = content_type <> "; charset=utf-8"
+      %Plug.Conn{conn | resp_headers: [{"content-type", content_type} | resp_headers]}
+    end
+  end
+
+  # END TODO remove
 end

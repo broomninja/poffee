@@ -57,4 +57,10 @@ defmodule Poffee.Utils do
   # show login modal when user is not logged in
   def get_modal_name(nil, _), do: "live-login-modal"
   def get_modal_name(%Poffee.Accounts.User{id: _}, modal_name), do: modal_name
+
+  # returns the field value of any struct or map, 
+  # nil is returned of field does not exist or map is nil
+  @spec get_field(any, atom()) :: any | nil
+  def get_field(nil, _field), do: nil
+  def get_field(struct_or_map, field), do: Map.get(struct_or_map, field)
 end

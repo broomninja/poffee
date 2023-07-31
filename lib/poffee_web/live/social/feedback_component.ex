@@ -1,6 +1,9 @@
 defmodule Poffee.Social.FeedbackComponent do
   use PoffeeWeb, :live_component
 
+  alias Poffee.Accounts.User
+  alias Poffee.Constant
+  alias Poffee.Social
   alias Poffee.Utils
 
   require Logger
@@ -12,15 +15,10 @@ defmodule Poffee.Social.FeedbackComponent do
     {:ok, assign(socket, @default_assigns), temporary_assigns: []}
   end
 
-  # @impl Phoenix.LiveComponent
-  # def preload(list_of_assigns) do
-  #   IO.inspect(list_of_assigns)
-  #    list_of_assigns
-  # end
-
   @impl Phoenix.LiveComponent
+  # update invoked from BrandPageComponent.html.heex
   def update(%{feedback: feedback, user_voted_list: user_voted_list} = assigns, socket) do
-    Logger.debug("[FeedbackComponent.update.feedback] has_already_voted")
+    Logger.debug("[FeedbackComponent.update.feedback] has_already_voted: #{feedback.id}")
 
     has_already_voted = Enum.member?(user_voted_list, feedback.id)
 
@@ -37,6 +35,46 @@ defmodule Poffee.Social.FeedbackComponent do
     {:ok, socket |> assign(assigns)}
   end
 
+  @impl Phoenix.LiveComponent
+  # called from CreateComment.svelte
+  def handle_event(
+        "create_comment",
+        %{"content" => comment_content, "user_id" => user_id, "feedback_id" => feedback_id},
+        socket
+      )
+      when not is_nil(user_id) do
+    Logger.debug("[FeedbackComponent.handle_event.create_comment] user_id = #{user_id}")
+
+    create_result = Social.create_comment(%{content: comment_content}, user_id, feedback_id)
+
+    socket =
+      case create_result do
+        {:ok, _comment} ->
+          # put_flash will not work when we are in the LC, so forward the flash
+          # message to the parent LV
+          send(self(), {__MODULE__, :flash, %{level: :info, message: "Comment created!"}})
+          comments = Social.get_comments_by_feedback_id(feedback_id)
+
+          socket
+          |> assign(:comments, comments)
+
+        _ ->
+          send(
+            self(),
+            {__MODULE__, :flash, %{level: :error, message: "Error when creating comment!"}}
+          )
+
+          socket
+      end
+
+    {:reply, %{create_comment_reply: Map.new([create_result])}, socket}
+  end
+
+  def handle_event("create_comment", _, socket) do
+    Logger.warning("[FeedbackComponent.handle_event.create_comment] user_id is nil")
+    {:reply, %{create_comment_reply: %{error: "User not logged in"}}, socket}
+  end
+
   ##########################################
   # Helper functions for data loading
   ##########################################
@@ -45,8 +83,34 @@ defmodule Poffee.Social.FeedbackComponent do
   # Helper functions for HEEX rendering
   ##########################################
 
-  def get_container_id(id) do
-    "feedback-#{id}"
+  defp get_container_id(feedback_id) do
+    "feedback-#{feedback_id}"
+  end
+
+  defp get_create_comment_container_id(feedback_id) do
+    "create-comment-#{feedback_id}"
+  end
+
+  # show the login modal if user is not logged in,
+  # otherwise show the create form
+  defp maybe_toggle_create_comment_form(js \\ %JS{}, user, feedback_id)
+
+  defp maybe_toggle_create_comment_form(_js, nil, _feedback_id) do
+    show_modal("live-login-modal")
+  end
+
+  defp maybe_toggle_create_comment_form(js, %User{}, feedback_id) do
+    js
+    |> JS.toggle(
+      to: "#" <> get_create_comment_container_id(feedback_id),
+      in: {"ease-out duration-300", "opacity-0", "opacity-100"},
+      out: {"ease-in duration-300", "opacity-100", "opacity-0"}
+    )
+  end
+
+  defp hide_create_comment_form(js \\ %JS{}, feedback_id) do
+    js
+    |> JS.hide(to: "#" <> get_create_comment_container_id(feedback_id))
   end
 
   attr :live_action, :atom, required: true
@@ -76,7 +140,7 @@ defmodule Poffee.Social.FeedbackComponent do
 
   defp voters_list(assigns) do
     ~H"""
-    <div class="ml-2 pl-3 pr-5 pt-2 pb-4 bg-slate-100 rounded-md">
+    <div class="flex flex-col min-w-[185px] ml-2 pl-3 pr-5 pt-2 pb-4 bg-slate-100 rounded-md">
       <div class="pl-1 pr-10 mb-2 font-semibold">Voters</div>
       <div :if={Utils.is_non_empty_list?(@feedback_votes)}>
         <.voter
@@ -104,7 +168,7 @@ defmodule Poffee.Social.FeedbackComponent do
         <div class="font-semibold"><%= @username %></div>
         <div class="text-xs text-gray-700">
           <LiveSvelte.svelte
-            name="DateTimeDisplay"
+            name="DateTimeLiveDisplay"
             props={%{prefix: "voted", datetime: @creation_time}}
           />
         </div>

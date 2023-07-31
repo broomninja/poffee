@@ -1,6 +1,6 @@
 <div id={get_container_id(@comment.id)} class="pt-2">
   <%!-- Comment --%>
-  <div class="grid grid-cols-9 pt-2 pb-2 pl-2 mb-2 bg-slate-100 rounded-md">
+  <div class="grid grid-cols-9 pt-2 pb-2 pl-2 mb-2 bg-orange-50 rounded-md">
     <%!-- Comment author --%>
     <div class="col-span-9 flex items-center font-semibold">
       <Petal.HeroiconsV1.Solid.user class="w-5 h-5 pb-[0.025rem]" />
@@ -17,7 +17,7 @@
       <Petal.HeroiconsV1.Solid.clock class="w-5 h-5 pb-[0.025rem]" />
       <span class="pl-1">
         <LiveSvelte.svelte
-          name="DateTimeDisplay"
+          name="DateTimeLiveDisplay"
           props={%{prefix: "created", datetime: @comment.inserted_at}}
         />
       </span>
