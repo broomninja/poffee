@@ -27,7 +27,7 @@ defmodule RuntimeConfig do
   end
 
   def get_boolean_env(name, default \\ false) do
-    case System.get_env(name) do
+    case String.downcase(System.get_env(name) || "") do
       "true" -> true
       "false" -> false
       _ -> default

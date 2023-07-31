@@ -2,6 +2,7 @@ defmodule Poffee.Social.FeedbackComponent do
   use PoffeeWeb, :live_component
 
   alias Poffee.Accounts.User
+  alias Poffee.Constant
   alias Poffee.Social
   alias Poffee.Utils
 
@@ -17,7 +18,7 @@ defmodule Poffee.Social.FeedbackComponent do
   @impl Phoenix.LiveComponent
   # update invoked from BrandPageComponent.html.heex
   def update(%{feedback: feedback, user_voted_list: user_voted_list} = assigns, socket) do
-    Logger.debug("[FeedbackComponent.update.feedback] has_already_voted")
+    Logger.debug("[FeedbackComponent.update.feedback] has_already_voted: #{feedback.id}")
 
     has_already_voted = Enum.member?(user_voted_list, feedback.id)
 
@@ -28,23 +29,6 @@ defmodule Poffee.Social.FeedbackComponent do
 
     {:ok, socket}
   end
-
-  # # send_update called from BrandPageComponent.handle_event.create_comment
-  # def update(%{feedback_id: feedback_id, create_comment_result: result} = assigns, socket) do
-  #   Logger.debug("[FeedbackComponent.update.comment]")
-
-  #   case result do
-  #     {:ok, _comment} -> 
-  #       comments = Social.get_comments_by_feedback_id(feedback_id)
-  #     {:error, _} -> 
-
-  #   socket =
-  #     socket
-  #     |> assign(assigns)
-  #     |> assign(:comments, comments)
-
-  #   {:ok, socket}
-  # end
 
   def update(assigns, socket) do
     Logger.debug("[FeedbackComponent.update.default]")
@@ -120,7 +104,7 @@ defmodule Poffee.Social.FeedbackComponent do
     |> JS.toggle(
       to: "#" <> get_create_comment_container_id(feedback_id),
       in: {"ease-out duration-300", "opacity-0", "opacity-100"},
-      out: {"ease-out duration-300", "opacity-100", "opacity-0"}
+      out: {"ease-in duration-300", "opacity-100", "opacity-0"}
     )
   end
 

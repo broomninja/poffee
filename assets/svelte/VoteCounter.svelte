@@ -4,13 +4,13 @@
 
   export let current_user;
   export let feedback;
-  export let brandpage_id;
+  export let brand_page_id;
   export let has_already_voted;
   export let pushEvent;
   export let pushEventTo;
 
   // console.log(`feedback = ${JSON.stringify(feedback, null, 2)}`);
-  // console.log(`[VoteCounter] brandpage_id = ${JSON.stringify(brandpage_id, null, 2)}`);
+  // console.log(`[VoteCounter] brand_page_id = ${JSON.stringify(brand_page_id, null, 2)}`);
 
   const clickVote = (user, feedback) => {
     if (!user?.id) {
@@ -23,7 +23,7 @@
       return;
     }
     // send event to BrandPageComponent
-    pushEventTo(`#brandpage-${brandpage_id}`, "vote", {user_id: user.id, feedback_id: feedback.id});
+    pushEventTo(`#brandpage-${brand_page_id}`, "vote", {user_id: user.id, feedback_id: feedback.id});
   }
 
   const clickUnvote = (user, feedback_id) => {
@@ -36,7 +36,7 @@
       return;
     }
     // send event to BrandPageComponent
-    pushEventTo(`#brandpage-${brandpage_id}`, "unvote", {user_id: user.id, feedback_id: feedback.id});
+    pushEventTo(`#brandpage-${brand_page_id}`, "unvote", {user_id: user.id, feedback_id: feedback.id});
   }
 
 </script>

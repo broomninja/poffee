@@ -2,7 +2,7 @@
   <%!-- Feedback and voters --%>
   <div class="flex">
     <%!-- Feedback content and comments--%>
-    <div class="flex flex-col">
+    <div class="flex flex-col w-full">
       <%!-- Feedback --%>
       <div class="grid grid-cols-9 pt-4 pb-2 pl-2 bg-slate-100 rounded-md">
         <%!-- Feedback title --%>
@@ -21,7 +21,7 @@
               %{
                 current_user: @current_user,
                 feedback: @feedback,
-                brandpage_id: @brandpage_id,
+                brand_page_id: @brand_page_id,
                 has_already_voted: @has_already_voted
               }
             }
@@ -78,7 +78,7 @@
             phx-click={maybe_toggle_create_comment_form(@current_user, @feedback.id)}
             size={:auto}
           >
-            Add Comment
+            Add a Comment
           </.tabler_icon_button>
         </div>
         <%!-- End Add Comment button --%>
@@ -91,7 +91,13 @@
           <LiveSvelte.svelte
             name="CreateComment"
             ssr={false}
-            props={%{feedback: @feedback, current_user: @current_user}}
+            props={
+              %{
+                feedback: @feedback,
+                current_user: @current_user,
+                max_content_length: Constant.comment_content_max_length()
+              }
+            }
           />
         </div>
         <%!-- End Create Comment Form --%>

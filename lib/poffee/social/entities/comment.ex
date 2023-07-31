@@ -3,6 +3,7 @@ defmodule Poffee.Social.Comment do
   import EctoEnum
 
   alias Poffee.Accounts.User
+  alias Poffee.Constant
   alias Poffee.Social.Feedback
 
   defenum(CommentStatusEnum, :comment_status, [
@@ -24,8 +25,18 @@ defmodule Poffee.Social.Comment do
   def changeset(comment, attrs) do
     comment
     |> cast(attrs, [:content, :status, :author_id, :feedback_id])
+    |> validate_required([:status, :author_id, :feedback_id])
+    |> validate_content
+  end
+
+  defp validate_content(changeset) do
+    changeset
     |> sanitize_field(:content)
-    |> validate_required([:content, :status, :author_id, :feedback_id])
+    |> validate_required([:content])
+    |> validate_length(:content,
+      min: Constant.comment_content_min_length(),
+      max: Constant.comment_content_max_length()
+    )
   end
 
   defimpl Jason.Encoder, for: __MODULE__ do

@@ -10,7 +10,6 @@ defmodule Poffee.Services.FeedbackService do
   alias Poffee.Social.Comment
   alias Poffee.Social.Feedback
   alias Poffee.Social.FeedbackVote
-  alias Poffee.Social.BrandPage
   alias Poffee.Notifications
 
   @type changeset_error :: {:error, Ecto.Changeset.t()}
@@ -55,13 +54,8 @@ defmodule Poffee.Services.FeedbackService do
   @doc """
   Creates a feedback.
   """
-  @spec create_feedback(map, User.t(), BrandPage.t()) :: {:ok, Feedback.t()} | changeset_error
-  def create_feedback(attrs \\ %{}, %User{id: user_id}, %BrandPage{id: brand_page_id}) do
-    attrs =
-      attrs
-      |> Map.put(:author_id, user_id)
-      |> Map.put(:brand_page_id, brand_page_id)
-
+  @spec create_feedback(map) :: {:ok, Feedback.t()} | changeset_error
+  def create_feedback(attrs \\ %{}) do
     result =
       %Feedback{}
       |> Feedback.changeset(attrs)

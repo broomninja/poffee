@@ -6,6 +6,7 @@ defmodule PoffeeWeb.BrandPageLive do
   alias Poffee.Social
   alias Poffee.Social.BrandPage
   alias Poffee.Social.BrandPageComponent
+  alias Poffee.Social.CreateFeedbackComponent
   alias Poffee.Streaming.{TwitchUser, TwitchApiConnector, TwitchLiveStreamers}
   alias Poffee.Streaming.Twitch.Streamer
 
@@ -116,10 +117,22 @@ defmodule PoffeeWeb.BrandPageLive do
     {:noreply, socket}
   end
 
-  # flash messages from child LiveComponent
+  # flash messages from child LiveComponents
   def handle_info({_module, :flash, %{level: level, message: message}}, socket) do
     Logger.debug("[BrandPageLive.handle_info.flash] #{message}")
     {:noreply, put_flash(socket, level, message)}
+  end
+
+  # from child LiveComponent CreateFeedbackComponent after a new feedback has been created
+  # simply remount this liveview which will determine if we need to load the new feedback
+  # according to the sorting
+  def handle_info({CreateFeedbackComponent, :new_feedback_created_refresh, %{flash_message: message}}, socket) do
+    Logger.debug("[BrandPageLive.handle_info.new_feedback_created_refresh]")
+
+    {:noreply,
+     socket
+     |> put_flash(:info, message)
+     |> push_navigate(to: socket.assigns.current_uri)}
   end
 
   # message sent by Notifications PubSub

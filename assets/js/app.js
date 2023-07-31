@@ -104,6 +104,12 @@ let liveSocket = new LiveSocket("/live", Socket, {
 topbar.config({ barColors: { 0: "#29D" }, shadowColor: "rgba(0, 0, 0, .3)" });
 window.addEventListener("phx:page-loading-start", (_info) => topbar.show(180));
 window.addEventListener("phx:page-loading-stop", (_info) => topbar.hide());
+// Uncomment below when server triggered js is needed (see https://fly.io/phoenix-files/server-triggered-js/)
+// window.addEventListener("phx:js-exec", ({detail}) => {
+//   document.querySelectorAll(detail.to).forEach(el => {
+//       liveSocket.execJS(el, el.getAttribute(detail.attr))
+//   })
+// })
 
 // connect if there are any LiveViews on the page
 liveSocket.getSocket().onOpen(() => execJS("#disconnected", "js-hide"))

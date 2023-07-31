@@ -1,6 +1,6 @@
 defmodule Poffee.Seeds do
   alias Poffee.Accounts
-  alias Poffee.Social
+  # alias Poffee.Social
 
   require Logger
 
@@ -24,7 +24,7 @@ defmodule Poffee.Seeds do
   # dev/test only seeds
   defp seed(env) when env in [:dev, :test] do
     create_users(env)
-    create_brand_pages_and_feedbacks()
+    # create_brand_pages_and_feedbacks()
   end
 
   defp create_users(env) do
@@ -67,44 +67,61 @@ defmodule Poffee.Seeds do
     end)
   end
 
-  defp create_brand_pages_and_feedbacks do
-    user_bob = Accounts.get_user_by_email("bob@test.cc")
-    user_cara = Accounts.get_user_by_email("cara@test.cc")
+  # defp create_brand_pages_and_feedbacks do
+  #   user_bob = Accounts.get_user_by_email("bob@test.cc")
+  #   user_cara = Accounts.get_user_by_email("cara@test.cc")
 
-    if is_nil(Social.get_brand_page_by_user(user_bob)) do
-      {:ok, brandpage_bob} =
-        %{title: "Bob's Brand Page", description: "I love feedbacks from our fans."}
-        |> Social.create_brand_page(user_bob)
+  #   if is_nil(Social.get_brand_page_by_user(user_bob)) do
+  #     {:ok, brandpage_bob} =
+  #       %{title: "Bob's Brand Page", description: "I love feedbacks from our fans."}
+  #       |> Social.create_brand_page(user_bob)
 
-      {:ok, _fb1} =
-        %{content: "first feedback content from Bob", title: "Bob's first feedback"}
-        |> Social.create_feedback(user_bob, brandpage_bob)
+  #     {:ok, _fb1} =
+  #       %{
+  #         content: "first feedback content from Bob",
+  #         title: "Bob's first feedback",
+  #         author_id: user_bob.id,
+  #         brand_page_id: brandpage_bob.id
+  #       }
+  #       |> Social.create_feedback()
 
-      {:ok, _fb2} =
-        %{
-          content: "second feedback content from Bob",
-          title: "Bob's second feedback - NOW REMOVED",
-          status: :feedback_status_removed
-        }
-        |> Social.create_feedback(user_bob, brandpage_bob)
+  #     {:ok, _fb2} =
+  #       %{
+  #         content: "second feedback content from Bob",
+  #         title: "Bob's second feedback - NOW REMOVED",
+  #         author_id: user_bob.id,
+  #         brand_page_id: brandpage_bob.id,
+  #         status: :feedback_status_removed
+  #       }
+  #       |> Social.create_feedback()
 
-      {:ok, _fb3} =
-        %{content: "first feedback content from Cara", title: "Cara's first feedback "}
-        |> Social.create_feedback(user_cara, brandpage_bob)
-    end
+  #     {:ok, _fb3} =
+  #       %{
+  #         content: "first feedback content from Cara",
+  #         title: "Cara's first feedback ",
+  #         author_id: user_cara.id,
+  #         brand_page_id: brandpage_bob.id
+  #       }
+  #       |> Social.create_feedback()
+  #   end
 
-    if is_nil(Social.get_brand_page_by_user(user_cara)) do
-      {:ok, brandpage_cara} =
-        %{
-          title: "Cara's Brand Page",
-          description: "This should not be visible to the public.",
-          status: :brand_page_status_private
-        }
-        |> Social.create_brand_page(user_cara)
+  #   if is_nil(Social.get_brand_page_by_user(user_cara)) do
+  #     {:ok, brandpage_cara} =
+  #       %{
+  #         title: "Cara's Brand Page",
+  #         description: "This should not be visible to the public.",
+  #         status: :brand_page_status_private
+  #       }
+  #       |> Social.create_brand_page(user_cara)
 
-      {:ok, _fb4} =
-        %{content: "second feedback content from Cara", title: "Cara's second feedback "}
-        |> Social.create_feedback(user_cara, brandpage_cara)
-    end
-  end
+  #     {:ok, _fb4} =
+  #       %{
+  #         content: "second feedback content from Cara",
+  #         title: "Cara's second feedback ",
+  #         author_id: user_cara.id,
+  #         brand_page_id: brandpage_cara.id
+  #       }
+  #       |> Social.create_feedback()
+  #   end
+  # end
 end

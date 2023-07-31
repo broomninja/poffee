@@ -12,7 +12,7 @@ defmodule PoffeeWeb.HomeLive do
       |> assign_new(:page_title, fn -> "Home" end)
       |> assign_new(:current_user, fn -> nil end)
       |> assign_new(:somevalue, fn -> nil end)
-      |> assign_new(:number, fn -> 15 end)
+      |> assign_new(:number, fn -> 5 end)
       |> assign_new(:selected_fruit, fn -> nil end)
       |> assign_new(:selected_time, fn -> nil end)
 
@@ -129,6 +129,9 @@ defmodule PoffeeWeb.HomeLive do
     <% end %>
 
     <div class="flex gap-10">
+      <div>
+        Default SSR: <LiveSvelte.svelte name="Number" props={%{number: @number}} />
+      </div>
       <div>
         SSR: <LiveSvelte.svelte name="Number" props={%{number: @number}} ssr={true} />
       </div>

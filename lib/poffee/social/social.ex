@@ -110,7 +110,7 @@ defmodule Poffee.Social do
     to: FeedbackService
 
   defdelegate get_feedback_votes_by_feedback_id(feedback_id), to: FeedbackService
-  defdelegate create_feedback(attrs \\ %{}, user, brand_page), to: FeedbackService
+  defdelegate create_feedback(attrs \\ %{}), to: FeedbackService
   defdelegate update_feedback(feedback, attrs \\ %{}), to: FeedbackService
   defdelegate delete_feedback(feedback), to: FeedbackService
   defdelegate change_feedback(feedback, attrs \\ %{}), to: FeedbackService

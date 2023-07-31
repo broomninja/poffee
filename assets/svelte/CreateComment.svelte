@@ -4,6 +4,7 @@
   export let feedback;
   export let current_user;
   export let pushEventTo;
+  export let max_content_length: number = 500;
 
   const browser = !!window;
 
@@ -15,8 +16,7 @@
   
   const submit_button_id = `create-comment-button-${feedback?.id}`;
 
-  const reply_max_length: number = 500;
-  $: chars_remaining = reply_max_length - formData.content.length;
+  $: chars_remaining = max_content_length - formData.content.length;
 
   const submitCreateComment: SubmitFunction = async () => {
     if (formData.content.trim().length == 0) return;
@@ -78,7 +78,7 @@
         placeholder="Type your comment here"
         rows="3"
         required
-        maxlength={reply_max_length}
+        maxlength={max_content_length}
         bind:value={formData.content}
         class="bg-slate-100 rounded-[5px] py-3 px-4 placeholder:text-sm md:placeholder:text-sm placeholder:text-gray-400 
                text-gray-900 text-sm md:text-sm w-full outline-none ring-blue-400 focus-within:ring-1 hover:ring-1"
@@ -87,14 +87,14 @@
     <input type="hidden" name="user_id" bind:value={formData.user_id} />
     <input type="hidden" name="feedback_id" bind:value={formData.feedback_id} />
 
-    <div class="flex items-start md:items-center justify-between md:flex-col-reverse md:justify-center md:h-full md:gap-2 md:max-w-[130px]">
+    <div class="flex items-start md:items-center justify-between md:flex-col-reverse md:justify-center md:h-full md:gap-2 md:w-[120px]">
       <div>
         {#if browser}
             <p class="text-xs text-gray-600 whitespace-nowrap">
                 {chars_remaining} characters left
             </p>
         {:else}
-            <p class="text-xs text-gray-600 whitespace-nowrap">Max {reply_max_length} characters</p>
+            <p class="text-xs text-gray-600 whitespace-nowrap">Max {max_content_length} characters</p>
         {/if}
       </div>
       <div>

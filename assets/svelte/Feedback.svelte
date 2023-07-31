@@ -6,14 +6,14 @@
 
   export let current_user;
   export let brandpage_username;
-  export let brandpage_id;
+  export let brand_page_id;
   export let feedback;
   export let has_already_voted;
   export let live_action;
   export let pushEventTo;
 
   console.log(`feedback = ${JSON.stringify(feedback, null, 2)}`);
-  //console.log(`[Feedback] brandpage_id = ${JSON.stringify(brandpage_id, null, 2)}`);
+  //console.log(`[Feedback] brand_page_id = ${JSON.stringify(brand_page_id, null, 2)}`);
 
   $: comments_text = feedback?.comments_count > 0 ? "View comments" : "Create a comment";
 </script>
@@ -36,7 +36,7 @@
     <!-- End Feedback title -->
     <!-- Vote Counter -->
     <div class="col-span-2 row-span-2 text-right">
-      <VoteCounter {current_user} {feedback} {brandpage_id} {has_already_voted} {pushEventTo} />
+      <VoteCounter {current_user} {feedback} {brand_page_id} {has_already_voted} {pushEventTo} />
     </div>
     <!-- End Vote Counter -->
     <!-- Author -->
