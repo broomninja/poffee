@@ -61,7 +61,7 @@ defmodule Poffee.MixProject do
       {:phoenix_live_dashboard, github: "phoenixframework/phoenix_live_dashboard"},
       # {:phoenix_live_dashboard, "~> 0.7.2"},
       # {:phoenix_live_session, "~> 0.1.3"},
-      {:phoenix_live_session, path: "../phoenix_live_session"},
+      {:phoenix_live_session, github: "broomninja/phoenix_live_session"},
       {:phoenix_live_reload, "~> 1.4", only: :dev},
 
       # auth
@@ -104,7 +104,7 @@ defmodule Poffee.MixProject do
       {:slugify, "~> 1.3"},
 
       # twitch
-      {:twitch_api, path: "../twitch_api"},
+      {:twitch_api, github: "broomninja/twitch_api"},
 
       # debugging
       {:recon, "~> 2.5"},
