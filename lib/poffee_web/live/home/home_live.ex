@@ -56,88 +56,27 @@ defmodule PoffeeWeb.HomeLive do
   @impl Phoenix.LiveView
   def render(assigns) do
     ~H"""
-    <button phx-click={JS.dispatch("set_input_value", bubbles: false)}>Click me!</button>
+    <div class="px-10 md:px-20 pt-3 pb-5">
+      <pre>
+    How to use:
 
-    <a href="/">Home Live</a>
-    <a href="/">
-      <img src={~p"/images/logo.svg"} width="36" />
-    </a>
-    <div class="" style="display: inline-flex; transform-style: preserve-3d">
-      Hero: <.icon name="hero-arrow-top-right-on-square-solid" class="h-6 w-6 animate-spin " />
-    </div>
+    - Click on any of the profile icons above, they are some of the streamers currently live on Twitch.
 
-    <span class="" style="display: inline-flex; transform-style: preserve-3d">
-      Tabler: <.tabler_icon name="tabler-refresh" class="ml-1 w-8 h-8 animate-spin " />
-    </span>
+    - Any one will be able to create a feedback or suggestion and reply with a comment after logging in.
 
-    <span class="" style="display: inline-flex; transform-style: preserve-3d">
-      Tabler: <.tabler_icon name="tabler-abc" class="ml-1 w-10 h-10 animate-spin" />
-    </span>
-    <div>user_return_to = <%= assigns[:user_return_to] %></div>
-    <div>current_uri = <%= assigns[:current_uri] %></div>
-    <div>socket = <%= # {inspect(@socket)} %></div>
-    <div>
-      <.link navigate={~p"/protected"}>
-        Protected Link
-      </.link>
-    </div>
-    <div>
-      <.link navigate={~p"/demolive"}>
-        Demo Link <%!-- <img src={~p"/images/logo.svg"} width="36" /> --%>
-      </.link>
-    </div>
+    Main features implemented:
+    [x] User login and registration
+    [x] Twitch API connection and subscription on streamer events
+    [x] Create Feedbacks and Comments
+    [x] Vote count and voter list will update in real-time for all users (via PubSub) 
+    [x] Time displayed is real-time and auto updated without page reloading (LiveSvelte)
+    [x] Basic user search (username only)
 
-    <div>
-      Fruit = <%= @selected_fruit %> Time = <%= @selected_time %>
-      <p
-        phx-click="select-fruit"
-        phx-value-fruit="apple"
-        class="font-bold hover:cursor-pointer hover:text-blue-500"
-      >
-        Apple
-      </p>
-      <p
-        phx-click="select-fruit"
-        phx-value-fruit="banana"
-        class="font-bold hover:cursor-pointer hover:text-blue-500"
-      >
-        Banana
-      </p>
-      <p
-        phx-click="select-fruit"
-        phx-value-fruit="orange"
-        class="font-bold hover:cursor-pointer hover:text-blue-500"
-      >
-        Orange
-      </p>
-    </div>
-    <%= if @current_user do %>
-      Welcome <%= @current_user.email %>
-    <% else %>
-      <div>
-        Please log in
-      </div>
-      <div class="mt-4 flex items-end justify-between">
-        <.tabler_icon_button
-          icon="tabler-trash-x"
-          label="Login"
-          bgcolor={:warning}
-          phx-click={show_modal("live-login-modal")}
-          size={:md}
-        />
-      </div>
-    <% end %>
-
-    <div class="flex gap-10">
-      <div>
-        Default SSR: <LiveSvelte.svelte name="Number" props={%{number: @number}} />
-      </div>
-      <div>
-        SSR: <LiveSvelte.svelte name="Number" props={%{number: @number}} ssr={true} />
-      </div>
-      <div>
-        No SSR: <LiveSvelte.svelte name="Number" props={%{number: @number}} ssr={false} />
-      </div>
+    To be implemented:
+    [ ] Most Active list
+    [ ] Notification feed on new feedbacks, comments, votes etc for all users
+    [ ] Sorting and Pagination
+      </pre>
     </div>
     """
   end

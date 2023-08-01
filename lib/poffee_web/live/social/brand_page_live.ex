@@ -126,7 +126,10 @@ defmodule PoffeeWeb.BrandPageLive do
   # from child LiveComponent CreateFeedbackComponent after a new feedback has been created
   # simply remount this liveview which will determine if we need to load the new feedback
   # according to the sorting
-  def handle_info({CreateFeedbackComponent, :new_feedback_created_refresh, %{flash_message: message}}, socket) do
+  def handle_info(
+        {CreateFeedbackComponent, :new_feedback_created_refresh, %{flash_message: message}},
+        socket
+      ) do
     Logger.debug("[BrandPageLive.handle_info.new_feedback_created_refresh]")
 
     {:noreply,

@@ -33,7 +33,10 @@ defmodule Poffee.Social.CreateFeedbackComponent do
         # socket = hide_create_feedback_modal(socket) 
 
         # send message to the parent LV to reload the current page and display successful flash message
-        send(self(), {__MODULE__, :new_feedback_created_refresh, %{flash_message: "Feedback saved!"}})
+        send(
+          self(),
+          {__MODULE__, :new_feedback_created_refresh, %{flash_message: "Feedback saved!"}}
+        )
 
         {:noreply, socket |> assign_form(changeset)}
 
