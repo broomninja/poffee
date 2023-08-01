@@ -44,7 +44,7 @@ config :poffee, compile_env: config_env()
 ### LiveSvelte
 ########################
 config :poffee, :live_svelte,
-  enable_ssr: RuntimeConfig.get_boolean_env("LIVESVELTE_ENABLE_SSR", true)
+  enable_ssr: RuntimeConfig.get_boolean_env("LIVESVELTE_ENABLE_SSR", false)
 
 ########################
 ### PRODUCTION ENV
