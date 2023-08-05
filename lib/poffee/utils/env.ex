@@ -1,8 +1,4 @@
 defmodule Poffee.Env do
-  # In Phoenix server, used in Poffee.Application 
-  # if we are running "mix run some_script.exs" this will evaluate to false
-  def phoenix_server?, do: get_env(:phoenix, :serve_endpoints)
-
   # LiveSvelte SSR
   def livesvelte_enable_ssr?, do: get_env(:live_svelte)[:enable_ssr]
 

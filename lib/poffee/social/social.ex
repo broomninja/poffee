@@ -10,6 +10,7 @@ defmodule Poffee.Social do
   alias Poffee.{Repo, Utils, DBCache}
   alias Poffee.Accounts.User
   alias Poffee.Social.BrandPage
+  alias Poffee.Social.Feedback
   alias Poffee.Services.BrandPageService
   alias Poffee.Services.FeedbackService
   alias Poffee.Services.CommentService
@@ -35,6 +36,58 @@ defmodule Poffee.Social do
     )
     |> preload([_, bp], brand_page: bp)
     |> Repo.one()
+  end
+
+  @doc """
+  Returns a list of BrandPage with the highest number of feedbacks 
+  """
+  @spec get_top_streamers_with_most_feedbacks(Integer.t()) :: list(BrandPage.t())
+  def get_top_streamers_with_most_feedbacks(limit \\ 10) do
+    BrandPage
+    |> where([bp], bp.status == :brand_page_status_public)
+    |> join(:inner, [bp], u in assoc(bp, :owner))
+    |> join(:left, [bp], fb in Feedback,
+      on: fb.brand_page_id == bp.id and fb.status == :feedback_status_active
+    )
+    |> preload([_, u, _], owner: u)
+    |> group_by([bp, u, _], [bp.id, u.id])
+    |> order_by([_, u, fb], desc: count(fb.id, :distinct), asc: u.username)
+    |> limit(^limit)
+    |> select_merge([..., fb], %{feedbacks_count: count(fb.id, :distinct)})
+    |> Repo.all()
+  end
+
+  @doc """
+  Returns a list of BrandPage with the highest number of feedback votes 
+  """
+  @spec get_top_streamers_with_most_feedback_votes(integer) :: list(BrandPage.t())
+  def get_top_streamers_with_most_feedback_votes(limit \\ 10) do
+    feedback_with_votes_count_query =
+      Feedback
+      |> where([fb], fb.status == :feedback_status_active)
+      |> join(:left, [fb], v in assoc(fb, :voters))
+      |> group_by([fb], [fb.id])
+      |> select([fb, v], %{brand_page_id: fb.brand_page_id, votes_count: count(v.id, :distinct)})
+
+    BrandPage
+    |> where([bp], bp.status == :brand_page_status_public)
+    |> join(:inner, [bp], u in assoc(bp, :owner))
+    |> join(:left, [bp], fb in subquery(feedback_with_votes_count_query),
+      on: fb.brand_page_id == bp.id
+    )
+    |> preload([_, u, _], owner: u)
+    |> group_by([bp, u, _], [bp.id, u.id])
+    |> order_by([_, u, fb], desc: selected_as(:total_feedback_votes_count), asc: u.username)
+    |> limit(^limit)
+    |> select_merge([..., fb], %{
+      total_feedback_votes_count:
+        fb.votes_count
+        |> coalesce(0)
+        |> sum()
+        |> type(:integer)
+        |> selected_as(:total_feedback_votes_count)
+    })
+    |> Repo.all()
   end
 
   # @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
@@ -64,13 +117,13 @@ defmodule Poffee.Social do
   #   |> Repo.one()
   # end
 
-  # @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
-  # @spec get_feedbacks_by_user(User.t()) :: [Feedback.t()]
-  # def get_feedbacks_by_user(%User{} = user) do
-  #   user
-  #   |> Ecto.assoc(:feedbacks)
-  #   |> Repo.all()
-  # end
+  @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
+  @spec get_feedbacks_by_user(User.t()) :: [Feedback.t()]
+  def get_feedbacks_by_user(%User{} = user) do
+    user
+    |> Ecto.assoc(:feedbacks)
+    |> Repo.all()
+  end
 
   # @decorate cacheable(cache: DBCache, opts: [ttl: @ttl], match: &Utils.can_be_cached?/1)
   # @spec get_feedbacks_by_brand_page(BrandPage.t()) :: [Feedback.t()]
@@ -79,10 +132,6 @@ defmodule Poffee.Social do
   #   |> Ecto.assoc(:feedbacks)
   #   |> Repo.all()
   # end
-
-  ###########################
-  # FeedbackVote
-  ###########################
 
   ###########################
   # BrandPage
@@ -109,6 +158,8 @@ defmodule Poffee.Social do
   defdelegate get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id(brand_page_id),
     to: FeedbackService
 
+  defdelegate get_voted_feedbacks_by_user(user), to: FeedbackService
+  # defdelegate get_feedback_votes_by_feedback(feedback), to: FeedbackService
   defdelegate get_feedback_votes_by_feedback_id(feedback_id), to: FeedbackService
   defdelegate create_feedback(attrs \\ %{}), to: FeedbackService
   defdelegate update_feedback(feedback, attrs \\ %{}), to: FeedbackService

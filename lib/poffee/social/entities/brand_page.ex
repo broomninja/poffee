@@ -17,10 +17,15 @@ defmodule Poffee.Social.BrandPage do
     field :status, BrandPageStatusEnum, default: :brand_page_status_public
 
     belongs_to :owner, User, foreign_key: :owner_id
-    # has_many :feedbacks, Feedback, where: [status: :feedback_status_active]
+    # has_many :active_feedbacks, Feedback, where: [status: :feedback_status_active]
     # we will perform filtering on context level instead
     has_many :feedbacks, Feedback
     # has_many :followers, User, through 
+
+    # number of feedbacks this brand_page has
+    field :feedbacks_count, :integer, default: 0, virtual: true
+    # sum of all feedback votes under this brand_page
+    field :total_feedback_votes_count, :integer, default: 0, virtual: true
 
     timestamps(type: :utc_datetime_usec)
   end

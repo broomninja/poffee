@@ -1,4 +1,6 @@
 defmodule Poffee.EctoUtils do
+  @type uuid :: <<_::128>>
+
   @spec sanitize_field(Ecto.Changeset.t(), atom) :: Ecto.Changeset.t()
   def sanitize_field(changeset, field) do
     case Map.get(changeset.changes, field) do
@@ -26,4 +28,7 @@ defmodule Poffee.EctoUtils do
     end)
     |> Jason.Encoder.encode(opts)
   end
+
+  @spec binary_to_ecto_uuid(uuid) :: Ecto.UUID.t()
+  def binary_to_ecto_uuid(uuid) when is_binary(uuid), do: uuid |> Ecto.UUID.dump() |> elem(1)
 end

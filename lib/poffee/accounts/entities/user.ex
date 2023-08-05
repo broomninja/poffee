@@ -28,7 +28,7 @@ defmodule Poffee.Accounts.User do
     has_one :brand_page, BrandPage, foreign_key: :owner_id
     has_many :feedbacks, Feedback, foreign_key: :author_id
 
-    many_to_many :feedback_votes, Feedback,
+    many_to_many :voted_feedbacks, Feedback,
       join_through: FeedbackVote,
       on_replace: :delete,
       on_delete: :delete_all

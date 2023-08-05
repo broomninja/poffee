@@ -95,7 +95,7 @@ defmodule Poffee.SocialTest do
   end
 
   describe "feedbacks" do
-    @invalid_attrs %{content: nil, title: nil}
+    @invalid_attrs %{content: nil, title: nil, author_id: nil, brand_page_id: nil}
 
     setup do
       user = user_fixture()
@@ -120,9 +120,14 @@ defmodule Poffee.SocialTest do
       user: user,
       brand_page: brand_page
     } do
-      valid_attrs = %{content: " some content ", title: " some title "}
+      valid_attrs = %{
+        content: " some content ",
+        title: " some title ",
+        author_id: user.id,
+        brand_page_id: brand_page.id
+      }
 
-      assert {:ok, %Feedback{} = feedback} = Social.create_feedback(valid_attrs, user, brand_page)
+      assert {:ok, %Feedback{} = feedback} = Social.create_feedback(valid_attrs)
       assert feedback.content == "some content"
       assert feedback.title == "some title"
     end
@@ -133,10 +138,12 @@ defmodule Poffee.SocialTest do
     } do
       html_attrs = %{
         content: "<div>some <b>content</b></div>",
-        title: "some <script>title</script>"
+        title: "some <script>title</script>",
+        author_id: user.id,
+        brand_page_id: brand_page.id
       }
 
-      assert {:ok, %Feedback{} = feedback} = Social.create_feedback(html_attrs, user, brand_page)
+      assert {:ok, %Feedback{} = feedback} = Social.create_feedback(html_attrs)
       assert feedback.content == "some content"
       assert feedback.title == "some title"
     end
@@ -145,17 +152,18 @@ defmodule Poffee.SocialTest do
       user: user,
       brand_page: brand_page
     } do
-      html_attrs = %{content: " <div> <b></b></div> ", title: " <script> </script> "}
+      html_attrs = %{
+        content: " <div> <b></b></div> ",
+        title: " <script> </script> ",
+        author_id: user.id,
+        brand_page_id: brand_page.id
+      }
 
-      assert {:error, %Ecto.Changeset{}} = Social.create_feedback(html_attrs, user, brand_page)
+      assert {:error, %Ecto.Changeset{}} = Social.create_feedback(html_attrs)
     end
 
-    test "create_feedback/1 with invalid data returns error changeset", %{
-      user: user,
-      brand_page: brand_page
-    } do
-      assert {:error, %Ecto.Changeset{}} =
-               Social.create_feedback(@invalid_attrs, user, brand_page)
+    test "create_feedback/1 with invalid data returns error changeset", %{} do
+      assert {:error, %Ecto.Changeset{}} = Social.create_feedback(@invalid_attrs)
     end
 
     test "update_feedback/2 with valid data updates the feedback", %{
@@ -324,12 +332,6 @@ defmodule Poffee.SocialTest do
   end
 
   describe "feedback_votes" do
-    alias Poffee.Social.FeedbackVote
-
-    import Poffee.SocialFixtures
-
-    @invalid_attrs %{}
-
     setup do
       user = user_fixture()
       brand_page = brand_page_fixture(user)
@@ -341,27 +343,138 @@ defmodule Poffee.SocialTest do
       user: user,
       feedback: feedback
     } do
-      {:ok, feedback_vote} = Social.vote_feedback(user, feedback)
-      assert Social.get_feedback_votes_by_user(user) == [feedback_vote]
-      assert Social.get_feedback_votes_by_feedback_id(feedback.id) == [feedback_vote]
+      {:ok, feedback_vote} = Social.vote_feedback(user.id, feedback.id)
+      assert Social.get_voted_feedbacks_by_user(user) == [feedback]
+      [new_feedback_vote] = Social.get_feedback_votes_by_feedback_id(feedback.id)
+      assert new_feedback_vote.feedback_id == feedback_vote.feedback_id
+      assert new_feedback_vote.user_id == feedback_vote.user_id
     end
 
     test "vote_feedback/2 with duplicate data returns error changeset", %{
       user: user,
       feedback: feedback
     } do
-      {:ok, feedback_vote} = Social.vote_feedback(user, feedback)
-      assert {:error, %Ecto.Changeset{}} = Social.vote_feedback(user, feedback)
+      {:ok, _feedback_vote} = Social.vote_feedback(user.id, feedback.id)
+      assert {:error, %Ecto.Changeset{}} = Social.vote_feedback(user.id, feedback.id)
     end
 
     test "unvote_feedback/2 deletes the vote", %{
       user: user,
       feedback: feedback
     } do
-      {:ok, _feedback_vote} = Social.vote_feedback(user, feedback)
-      assert {1, _} = Social.unvote_feedback(user, feedback)
-      assert {0, _} = Social.unvote_feedback(user, feedback)
-      assert Social.get_feedback_votes_by_user(user) == []
+      {:ok, feedback_vote} = Social.vote_feedback(user.id, feedback.id)
+      assert {:ok, deleted_feedback_vote} = Social.unvote_feedback(user.id, feedback.id)
+
+      assert %{feedback_vote | __meta__: nil, inserted_at: nil, updated_at: nil} ==
+               %{deleted_feedback_vote | __meta__: nil, inserted_at: nil, updated_at: nil}
+
+      assert {:error, _} = Social.unvote_feedback(user.id, feedback.id)
+      assert Social.get_voted_feedbacks_by_user(user) == []
+    end
+
+    test "get_feedback_with_comments_count_and_voters_count_by_id/1", %{
+      user: user,
+      feedback: feedback
+    } do
+      feedback_with_counts =
+        Social.get_feedback_with_comments_count_and_voters_count_by_id(feedback.id)
+
+      assert feedback_with_counts.comments_count == 0
+      assert feedback_with_counts.votes_count == 0
+
+      # add a comment
+      _comment = comment_fixture(user, feedback)
+      _comment = comment_fixture(user, feedback)
+
+      # add a vote
+      assert {:ok, _feedback_vote} = Social.vote_feedback(user.id, feedback.id)
+
+      feedback_with_counts =
+        Social.get_feedback_with_comments_count_and_voters_count_by_id(feedback.id)
+
+      assert feedback_with_counts.comments_count == 2
+      assert feedback_with_counts.votes_count == 1
+
+      # remove the vote
+      assert {:ok, _feedback_vote} = Social.unvote_feedback(user.id, feedback.id)
+
+      feedback_with_counts =
+        Social.get_feedback_with_comments_count_and_voters_count_by_id(feedback.id)
+
+      assert feedback_with_counts.comments_count == 2
+      assert feedback_with_counts.votes_count == 0
+    end
+  end
+
+  describe "top ranks" do
+    import Poffee.StreamingFixtures
+
+    setup do
+      user = user_fixture()
+      %{user: user, twitch_user: twitch_user_fixture(user)}
+    end
+
+    test "get_top_streamers_with_most_feedbacks/1", %{
+      user: user_1,
+      twitch_user: twitch_user_1
+    } do
+      assert [] == Social.get_top_streamers_with_most_feedbacks(1)
+      brand_page_1 = brand_page_fixture(user_1, %{description: twitch_user_1.description})
+      [loaded_brand_page] = Social.get_top_streamers_with_most_feedbacks(1)
+      assert loaded_brand_page.id == brand_page_1.id
+      assert loaded_brand_page.owner_id == user_1.id
+      assert loaded_brand_page.description == twitch_user_1.description
+      assert loaded_brand_page.feedbacks_count == 0
+
+      # add user_2
+      user_2 = user_fixture()
+
+      twitch_user_2 =
+        twitch_user_fixture(user_2, %{description: "Dummy description for user ID #{user_2.id}"})
+
+      brand_page_2 = brand_page_fixture(user_2, %{description: twitch_user_2.description})
+
+      # add a feedback for user_2
+      _feedback = feedback_fixture(user_2, brand_page_2)
+
+      [loaded_brand_page] = Social.get_top_streamers_with_most_feedbacks(1)
+      assert loaded_brand_page.id == brand_page_2.id
+      assert loaded_brand_page.owner_id == user_2.id
+      assert loaded_brand_page.description == twitch_user_2.description
+      assert loaded_brand_page.feedbacks_count == 1
+    end
+
+    test "get_top_streamers_with_most_feedback_votes/1", %{
+      user: user_1,
+      twitch_user: twitch_user_1
+    } do
+      assert [] == Social.get_top_streamers_with_most_feedback_votes(1)
+      brand_page_1 = brand_page_fixture(user_1, %{description: twitch_user_1.description})
+      [loaded_brand_page] = Social.get_top_streamers_with_most_feedback_votes(1)
+      assert loaded_brand_page.id == brand_page_1.id
+      assert loaded_brand_page.owner_id == user_1.id
+      assert loaded_brand_page.description == twitch_user_1.description
+      assert loaded_brand_page.total_feedback_votes_count == 0
+
+      # add user_2
+      user_2 = user_fixture()
+
+      twitch_user_2 =
+        twitch_user_fixture(user_2, %{description: "Dummy description for user ID #{user_2.id}"})
+
+      brand_page_2 = brand_page_fixture(user_2, %{description: twitch_user_2.description})
+
+      # add a feedback for user_1 and user_2
+      _feedback_1 = feedback_fixture(user_1, brand_page_1)
+      feedback_2 = feedback_fixture(user_2, brand_page_2)
+
+      assert {:ok, _feedback_vote} = Social.vote_feedback(user_1.id, feedback_2.id)
+
+      [loaded_brand_page] = Social.get_top_streamers_with_most_feedback_votes(1)
+      assert loaded_brand_page.id == brand_page_2.id
+      assert loaded_brand_page.owner_id == user_2.id
+      assert loaded_brand_page.description == twitch_user_2.description
+      assert loaded_brand_page.total_feedback_votes_count == 1
     end
   end
 end

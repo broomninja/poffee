@@ -45,7 +45,7 @@ defmodule Poffee.Social.BrandPageComponent do
     feedback = Social.get_feedback_with_comments_count_and_voters_count_by_id(feedback_id)
 
     if is_nil(feedback) do
-      Logger.warn("[BrandPageComponent.preload] Feedback not found for id #{feedback_id}")
+      Logger.warning("[BrandPageComponent.preload] Feedback not found for id #{feedback_id}")
     end
 
     comments = Social.get_comments_by_feedback_id(feedback_id)

@@ -11,6 +11,7 @@ defmodule Poffee.Services.FeedbackService do
   alias Poffee.Social.Feedback
   alias Poffee.Social.FeedbackVote
   alias Poffee.Notifications
+  alias Poffee.EctoUtils
 
   @type changeset_error :: {:error, Ecto.Changeset.t()}
   @type uuid :: <<_::128>>
@@ -113,7 +114,7 @@ defmodule Poffee.Services.FeedbackService do
     )
     |> join(:left, [fb], fb_a in User, on: fb.author_id == fb_a.id)
     |> join(:left, [c], c_a in User, on: c.author_id == c_a.id)
-    |> preload([_, v, _, fb_a, _], author: fb_a)
+    |> preload([_, _, _, fb_a, _], author: fb_a)
     |> group_by([fb, _, _, fb_a, c_a], [fb.id, fb_a.id, c_a.id])
     |> select_merge([_, v, c, _, _], %{
       votes_count: count(v.id, :distinct),
@@ -179,14 +180,14 @@ defmodule Poffee.Services.FeedbackService do
     |> Repo.all()
   end
 
-  # @spec get_feedback_votes_by_user(%User{}) :: list(%FeedbackVote{})
-  # def get_feedback_votes_by_user(%User{} = user) do
-  #   user
-  #   |> Repo.preload(:feedback_votes)
-  #   |> Map.get(:feedback_votes)
-  # end
+  @spec get_voted_feedbacks_by_user(%User{}) :: list(FeedbackVote.t({}))
+  def get_voted_feedbacks_by_user(%User{} = user) do
+    user
+    |> Repo.preload(:voted_feedbacks)
+    |> Map.get(:voted_feedbacks)
+  end
 
-  # @spec get_feedback_votes_by_feedback(%Feedback{}) :: list(%FeedbackVote{})
+  # @spec get_feedback_votes_by_feedback(%Feedback{}) :: list(FeedbackVote.t{})
   # def get_feedback_votes_by_feedback(%Feedback{} = feedback) do
   #   feedback
   #   |> Repo.preload(:voters)
@@ -215,7 +216,7 @@ defmodule Poffee.Services.FeedbackService do
   end
 
   @spec vote_feedback(uuid, uuid) :: {:ok, FeedbackVote.t()} | changeset_error
-  def vote_feedback(user_id, feedback_id) do
+  def vote_feedback(user_id, feedback_id) when is_binary(user_id) and is_binary(feedback_id) do
     attrs = %{feedback_id: feedback_id, user_id: user_id}
 
     result =
@@ -224,6 +225,7 @@ defmodule Poffee.Services.FeedbackService do
       |> Repo.insert()
 
     with {:ok, _feedback_vote} <- result do
+      # TODO - run in new Task
       feedback = get_feedback_with_comments_count_and_voters_count_by_id(feedback_id)
       feedback_votes = get_feedback_votes_by_feedback_id(feedback_id)
       :ok = Notifications.broadcast_feedback(feedback, feedback_votes)
@@ -233,17 +235,20 @@ defmodule Poffee.Services.FeedbackService do
   end
 
   @spec unvote_feedback(uuid, uuid) :: {:ok, FeedbackVote.t()} | changeset_error
-  def unvote_feedback(user_id, feedback_id) do
+  def unvote_feedback(user_id, feedback_id) when is_binary(user_id) and is_binary(feedback_id) do
     result =
       FeedbackVote
-      |> where(feedback_id: ^feedback_id)
-      |> where(user_id: ^user_id)
-      |> Repo.one()
-      |> Repo.delete()
-
-    # Logger.debug("[FeedbackService.unvote_feedback] result = #{inspect(result)}")
+      |> Repo.load(%{
+        user_id: EctoUtils.binary_to_ecto_uuid(user_id),
+        feedback_id: EctoUtils.binary_to_ecto_uuid(feedback_id)
+      })
+      |> Repo.delete(
+        stale_error_field: :feedback,
+        stale_error_message: "feedback vote does not exist"
+      )
 
     with {:ok, _feedback_vote} <- result do
+      # TODO - run in new Task
       feedback = get_feedback_with_comments_count_and_voters_count_by_id(feedback_id)
       feedback_votes = get_feedback_votes_by_feedback_id(feedback_id)
       :ok = Notifications.broadcast_feedback(feedback, feedback_votes)

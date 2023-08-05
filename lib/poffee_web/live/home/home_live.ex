@@ -58,11 +58,11 @@ defmodule PoffeeWeb.HomeLive do
     ~H"""
     <div class="px-10 md:px-20 pt-3 pb-5">
       <pre>
-    How to use:
+    Quick Guide:
 
-    - Click on any of the profile icons above, they are some of the streamers currently live on Twitch.
+    - Click on any of the profile icons above, a real-time display of streamers currently streaming live on Twitch.
 
-    - Any one will be able to create a feedback or suggestion and reply with a comment after logging in.
+    - After login, users will be able to create feedbacks and reply with comments.
 
     Main features implemented:
     [x] User login and registration
@@ -71,9 +71,9 @@ defmodule PoffeeWeb.HomeLive do
     [x] Vote count and voter list will update in real-time for all users (via PubSub) 
     [x] Time displayed is real-time and auto updated without page reloading (LiveSvelte)
     [x] Basic user search (username only)
+    [x] Most Active lists
 
     To be implemented:
-    [ ] Most Active list
     [ ] Notification feed on new feedbacks, comments, votes etc for all users
     [ ] Sorting and Pagination
       </pre>

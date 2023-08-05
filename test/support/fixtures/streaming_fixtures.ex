@@ -7,7 +7,7 @@ defmodule Poffee.StreamingFixtures do
   @doc """
   Generate a twitch_user.
   """
-  def twitch_user_fixture(attrs \\ %{}) do
+  def twitch_user_fixture(user, attrs \\ %{}) do
     {:ok, twitch_user} =
       attrs
       |> Enum.into(%{
@@ -15,9 +15,9 @@ defmodule Poffee.StreamingFixtures do
         display_name: "some display_name",
         login: "some login",
         profile_image_url: "some profile_image_url",
-        twitch_user_id: 42
+        twitch_user_id: "42"
       })
-      |> Poffee.Streaming.create_twitch_user()
+      |> Poffee.Streaming.create_twitch_user(user)
 
     twitch_user
   end
