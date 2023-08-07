@@ -17,7 +17,8 @@ defmodule Poffee.Streaming.TwitchSupervisor do
       {Task.Supervisor, name: Poffee.Streaming.TaskSupervisor},
       {Poffee.Streaming.TwitchApiConnector, twitch_api_client: Env.twitch_api_client()},
       Poffee.Streaming.TwitchSubscriptionManager,
-      Poffee.Streaming.TwitchLiveStreamers
+      Poffee.Streaming.TwitchLiveStreamers,
+      Poffee.Social.MostActiveStore
     ]
 
     # :one_for_one strategy: if a child process crashes, only that process is restarted.

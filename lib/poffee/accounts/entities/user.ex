@@ -7,6 +7,7 @@ defmodule Poffee.Accounts.User do
   alias Poffee.Social.BrandPage
   alias Poffee.Social.Feedback
   alias Poffee.Social.FeedbackVote
+  alias Poffee.Streaming.TwitchUser
 
   defenum(RolesEnum, :role, [
     :role_user,
@@ -24,11 +25,11 @@ defmodule Poffee.Accounts.User do
     field :confirmed_at, :naive_datetime
     field :role, RolesEnum, default: :role_user
 
-    # has_one :twitch_user, TwitchUser, foreign_key: :user_id
+    has_one :twitch_user, TwitchUser, foreign_key: :user_id
     has_one :brand_page, BrandPage, foreign_key: :owner_id
     has_many :feedbacks, Feedback, foreign_key: :author_id
 
-    many_to_many :feedback_votes, Feedback,
+    many_to_many :voted_feedbacks, Feedback,
       join_through: FeedbackVote,
       on_replace: :delete,
       on_delete: :delete_all

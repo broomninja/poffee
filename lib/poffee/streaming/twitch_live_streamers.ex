@@ -196,8 +196,8 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
         streamer
 
       response ->
-        Logger.error(
-          "[TwitchLiveStreamers.get_streamer_info] returning nil for user_id #{twitch_user_id}, reason: #{inspect(response)}"
+        Logger.warning(
+          "[TwitchLiveStreamers.get_streamer_info] returning nil for user_id #{twitch_user_id}, data: #{inspect(response)}"
         )
 
         nil

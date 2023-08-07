@@ -29,7 +29,8 @@ config :poffee, :twitch, api_client: TwitchApi
 # Logger
 ####################################
 # Do not print debug messages in production
-config :logger, level: :info
+config :logger, level: :info, utc_log: true
+# config :logger, :default_handler, level: :info, utc_log: true
 
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.

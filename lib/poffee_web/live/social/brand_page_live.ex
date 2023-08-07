@@ -2,7 +2,7 @@ defmodule PoffeeWeb.BrandPageLive do
   use PoffeeWeb, :live_view
 
   alias Poffee.Accounts.User
-  alias Poffee.Notifications
+  alias Poffee.Social.Notifications
   alias Poffee.Social
   alias Poffee.Social.BrandPage
   alias Poffee.Social.BrandPageComponent

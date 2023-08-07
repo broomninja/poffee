@@ -1,0 +1,32 @@
+<div class="bg-gray-200 flex flex-row md:flex-col items-center rounded-lg justify-between 
+              px-3 pt-2 pb-2 md:pb-8 mx-2 lg:ml-3 xl:ml-6">
+  <div class="ml-5 md:ml-0 w-full">
+    <div class="font-semibold text-md whitespace-nowrap mb-2 md:mb-5 text-left md:text-center">
+      Most Feedbacks
+    </div>
+    <div>
+      <%= for brand_page <- @top_by_feedback_counts do %>
+        <.top_streamer
+          display_name={brand_page.twitch_user.display_name}
+          image_url={brand_page.twitch_user.profile_image_url}
+          value={brand_page.feedbacks_count}
+        />
+      <% end %>
+    </div>
+  </div>
+
+  <div class="ml-20 md:ml-0 md:mt-6 w-full">
+    <div class="font-semibold text-md whitespace-nowrap mb-2 md:mb-5 text-left md:text-center">
+      Most Total Votes
+    </div>
+    <div>
+      <%= for brand_page <- @top_by_feedback_vote_counts do %>
+        <.top_streamer
+          display_name={brand_page.twitch_user.display_name}
+          image_url={brand_page.twitch_user.profile_image_url}
+          value={brand_page.total_feedback_votes_count}
+        />
+      <% end %>
+    </div>
+  </div>
+</div>

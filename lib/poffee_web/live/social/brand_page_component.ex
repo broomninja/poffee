@@ -1,7 +1,7 @@
 defmodule Poffee.Social.BrandPageComponent do
   use PoffeeWeb, :live_component
 
-  alias Poffee.Notifications
+  alias Poffee.Social.Notifications
   alias Poffee.Social
   alias Poffee.Social.Feedback
   alias Poffee.Utils
@@ -45,7 +45,7 @@ defmodule Poffee.Social.BrandPageComponent do
     feedback = Social.get_feedback_with_comments_count_and_voters_count_by_id(feedback_id)
 
     if is_nil(feedback) do
-      Logger.warn("[BrandPageComponent.preload] Feedback not found for id #{feedback_id}")
+      Logger.warning("[BrandPageComponent.preload] Feedback not found for id #{feedback_id}")
     end
 
     comments = Social.get_comments_by_feedback_id(feedback_id)
@@ -255,10 +255,6 @@ defmodule Poffee.Social.BrandPageComponent do
   defp get_container_id(brand_page_id) do
     "brandpage-#{brand_page_id}"
   end
-
-  # defp get_create_feedback_container_id(brand_page_id) do
-  #   "create-feedback-#{brand_page_id}"
-  # end
 
   # Renders a badge showing online or offline status
   attr :status, :string,

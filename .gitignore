@@ -60,3 +60,6 @@ phoenix_live_sessions
 # dev secrets
 /config/dev.secret.exs
 
+# log files
+/log/
+

@@ -5,9 +5,13 @@ defmodule Poffee.Application do
 
   use Application
 
+  require Logger
+
   @impl true
   def start(_type, _args) do
-    children = get_children(Poffee.Env.phoenix_server?())
+    is_server = Phoenix.Endpoint.server?(:poffee, PoffeeWeb.Endpoint)
+    Logger.notice("[Application] Phoenix Endpoint server started? #{is_server}")
+    children = get_children(is_server)
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
@@ -32,6 +36,7 @@ defmodule Poffee.Application do
     if condition, do: [item | list], else: list
   end
 
+  # Endpoint server is not started, only start Repo
   # eg we are running "mix run priv/repo/seeds.exs" 
   defp get_children(false) do
     [
@@ -40,7 +45,7 @@ defmodule Poffee.Application do
     ]
   end
 
-  # we are running inside phoenix server, start all the services as normal
+  # Endpoint server is running, start all the services as normal
   defp get_children(true) do
     children = [
       # Start the Telemetry supervisor
