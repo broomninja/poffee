@@ -46,7 +46,7 @@ defmodule Poffee.Social.MostActiveStore.Impl do
   end
 
   def update_and_broadcast(state) do
-    Logger.error("[MostActiveStore.Impl.update_and_broadcast]")
+    Logger.debug("[MostActiveStore.Impl.update_and_broadcast]")
 
     limit = state |> Map.get(:limit)
 
