@@ -25,7 +25,7 @@ defmodule PoffeeWeb.ActiveStreamersLive do
          top_by_feedback_vote_counts},
         socket
       ) do
-    Logger.error("[ActiveStreamersLive.handle_info.updated_most_active]")
+    Logger.debug("[ActiveStreamersLive.handle_info.updated_most_active]")
 
     socket =
       socket
