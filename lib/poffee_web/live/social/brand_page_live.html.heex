@@ -1,12 +1,12 @@
 <div class="flex flex-col md:flex-row">
-  <aside class="flex p-2 md:flex-row w-full md:w-[300px] overflow-hidden bg-green-200">
+  <aside class="flex md:flex-row w-full md:w-[300px]">
     <%= live_render(@socket, PoffeeWeb.ActiveStreamersLive,
       id: "active_streamers",
       session: %{},
       sticky: true
     ) %>
   </aside>
-  <main class="min-h-screen pl-1 md:pl-2 grow">
+  <main class="min-h-screen pl-1 md:pl-0 w-full">
     <%= if is_nil(@streamer) do %>
       <div>
         <Petal.Card.card>

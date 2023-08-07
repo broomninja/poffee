@@ -2,16 +2,13 @@
   <%= if @twitch_user do %>
     <div class="max-w-screen-lg min-w-min pr-2 md:pr-8 pt-2 md:pt-0 flex flex-col w-full h-full mx-auto">
       <div class="flex items-center justify-start">
-        <div class="pr-3">
+        <div class="pr-3 w-[60px]">
           <LiveSvelte.svelte name="TooltipDiv" ssr={true} props={%{text: "Visit Twitch channel"}}>
             <a href={"https://www.twitch.tv/#{@twitch_user.login}"} target="_blank">
-              <img
-                class="rounded-full inline-block"
-                width="55"
-                height="55"
-                src={@twitch_user.profile_image_url}
-                alt={@twitch_user.display_name}
-                onerror="this.src='/images/profile_image_not_found.jpg';this.onerror='';"
+              <.profile_image
+                size={55}
+                image_url={@twitch_user.profile_image_url}
+                name={@twitch_user.display_name}
               />
             </a>
           </LiveSvelte.svelte>

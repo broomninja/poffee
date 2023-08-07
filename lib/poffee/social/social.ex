@@ -46,12 +46,13 @@ defmodule Poffee.Social do
     BrandPage
     |> where([bp], bp.status == :brand_page_status_public)
     |> join(:inner, [bp], u in assoc(bp, :owner))
+    |> join(:left, [bp], tu in assoc(bp, :twitch_user))
     |> join(:left, [bp], fb in Feedback,
       on: fb.brand_page_id == bp.id and fb.status == :feedback_status_active
     )
-    |> preload([_, u, _], owner: u)
-    |> group_by([bp, u, _], [bp.id, u.id])
-    |> order_by([_, u, fb], desc: count(fb.id, :distinct), asc: u.username)
+    |> preload([_, u, tu, _], owner: u, twitch_user: tu)
+    |> group_by([bp, u, tu, _], [bp.id, u.id, tu.id])
+    |> order_by([_, u, _, fb], desc: count(fb.id, :distinct), asc: u.username)
     |> limit(^limit)
     |> select_merge([..., fb], %{feedbacks_count: count(fb.id, :distinct)})
     |> Repo.all()
@@ -72,12 +73,13 @@ defmodule Poffee.Social do
     BrandPage
     |> where([bp], bp.status == :brand_page_status_public)
     |> join(:inner, [bp], u in assoc(bp, :owner))
+    |> join(:left, [bp], tu in assoc(bp, :twitch_user))
     |> join(:left, [bp], fb in subquery(feedback_with_votes_count_query),
       on: fb.brand_page_id == bp.id
     )
-    |> preload([_, u, _], owner: u)
-    |> group_by([bp, u, _], [bp.id, u.id])
-    |> order_by([_, u, fb], desc: selected_as(:total_feedback_votes_count), asc: u.username)
+    |> preload([_, u, tu, _], owner: u, twitch_user: tu)
+    |> group_by([bp, u, tu, _], [bp.id, u.id, tu.id])
+    |> order_by([_, u, _, fb], desc: selected_as(:total_feedback_votes_count), asc: u.username)
     |> limit(^limit)
     |> select_merge([..., fb], %{
       total_feedback_votes_count:

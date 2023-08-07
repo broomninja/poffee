@@ -440,6 +440,8 @@ defmodule Poffee.SocialTest do
       [loaded_brand_page] = Social.get_top_streamers_with_most_feedbacks(1)
       assert loaded_brand_page.id == brand_page_2.id
       assert loaded_brand_page.owner_id == user_2.id
+      assert loaded_brand_page.twitch_user.id == twitch_user_2.id
+      assert loaded_brand_page.twitch_user.profile_image_url == twitch_user_2.profile_image_url
       assert loaded_brand_page.description == twitch_user_2.description
       assert loaded_brand_page.feedbacks_count == 1
     end
@@ -473,6 +475,8 @@ defmodule Poffee.SocialTest do
       [loaded_brand_page] = Social.get_top_streamers_with_most_feedback_votes(1)
       assert loaded_brand_page.id == brand_page_2.id
       assert loaded_brand_page.owner_id == user_2.id
+      assert loaded_brand_page.twitch_user.id == twitch_user_2.id
+      assert loaded_brand_page.twitch_user.profile_image_url == twitch_user_2.profile_image_url
       assert loaded_brand_page.description == twitch_user_2.description
       assert loaded_brand_page.total_feedback_votes_count == 1
     end

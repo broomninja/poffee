@@ -594,6 +594,23 @@ defmodule PoffeeWeb.CoreComponents do
     """
   end
 
+  attr :size, :integer, required: true
+  attr :image_url, :string, required: true
+  attr :name, :string, required: true
+
+  def profile_image(assigns) do
+    ~H"""
+    <img
+      class="rounded-full inline-block"
+      width={@size}
+      height={@size}
+      src={@image_url}
+      alt={@name}
+      onerror="this.src='/images/profile_image_not_found.jpg';this.onerror='';"
+    />
+    """
+  end
+
   ## JS Commands
 
   def show(js \\ %JS{}, selector) do

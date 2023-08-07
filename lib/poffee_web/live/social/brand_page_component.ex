@@ -1,7 +1,7 @@
 defmodule Poffee.Social.BrandPageComponent do
   use PoffeeWeb, :live_component
 
-  alias Poffee.Notifications
+  alias Poffee.Social.Notifications
   alias Poffee.Social
   alias Poffee.Social.Feedback
   alias Poffee.Utils
@@ -255,10 +255,6 @@ defmodule Poffee.Social.BrandPageComponent do
   defp get_container_id(brand_page_id) do
     "brandpage-#{brand_page_id}"
   end
-
-  # defp get_create_feedback_container_id(brand_page_id) do
-  #   "create-feedback-#{brand_page_id}"
-  # end
 
   # Renders a badge showing online or offline status
   attr :status, :string,

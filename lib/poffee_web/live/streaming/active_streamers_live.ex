@@ -1,36 +1,85 @@
 defmodule PoffeeWeb.ActiveStreamersLive do
   use PoffeeWeb, :live_view
 
+  alias Poffee.Social.MostActiveStore
+  alias Poffee.Social.Notifications
+
   require Logger
 
+  @default_assigns %{}
+  @display_limit 8
+
   @impl Phoenix.LiveView
-  def mount(_params, session, socket) do
+  def mount(_params, _session, socket) do
     socket =
       socket
-      # |> PhoenixLiveSession.maybe_subscribe(session)
-      |> put_session_assigns(session)
-      |> assign_new(:number, fn -> 15 end)
+      |> assign_most_active()
+      |> maybe_subscribe_to_most_active_store()
 
-    {:ok, socket, layout: false, temporary_assigns: []}
+    {:ok, assign(socket, @default_assigns), layout: false, temporary_assigns: []}
   end
 
-  defp put_session_assigns(socket, _session) do
-    # we defer the display of streamers after we have received the first "window_width_change" 
-    # event from liveview client. See handle_event("window_width_change", ...) below.
+  @impl Phoenix.LiveView
+  def handle_info(
+        {MostActiveStore, :updated_most_active, top_by_feedback_counts,
+         top_by_feedback_vote_counts},
+        socket
+      ) do
+    Logger.error("[ActiveStreamersLive.handle_info.updated_most_active]")
+
+    socket =
+      socket
+      |> assign(top_by_feedback_counts: top_by_feedback_counts)
+      |> assign(top_by_feedback_vote_counts: top_by_feedback_vote_counts)
+
+    {:noreply, socket}
+  end
+
+  ##########################################
+  # Helper functions for data loading
+  ##########################################
+
+  defp assign_most_active(socket) do
+    socket
+    |> assign(
+      top_by_feedback_counts: MostActiveStore.get_most_active_by_feedbacks_count(@display_limit)
+    )
+    |> assign(
+      top_by_feedback_vote_counts:
+        MostActiveStore.get_most_active_by_feedback_votes_count(@display_limit)
+    )
+  end
+
+  defp maybe_subscribe_to_most_active_store(socket) do
+    if connected?(socket), do: Notifications.subscribe_most_active()
+
     socket
   end
 
-  @impl Phoenix.LiveView
-  def handle_event("set_number", %{"number" => number}, socket) do
-    {:noreply, assign(socket, :number, number)}
-  end
+  ##########################################
+  # Helper functions for HEEX rendering
+  ##########################################
 
-  @impl Phoenix.LiveView
-  def render(assigns) do
+  attr :display_name, :string, required: true
+  attr :image_url, :string, required: true
+  attr :value, :integer, required: true
+
+  defp top_streamer(assigns) do
     ~H"""
-    <div class="bg-gray-200 flex items-center justify-between px-5 xl:px-8 py-1">
-      Most Active Streamers
-      <div></div>
+    <div class="pb-1 md:pb-2">
+      <.link navigate={~p"/u/#{@display_name}"}>
+        <div class="flex items-center justify-start">
+          <div class="w-[60px]">
+            <.profile_image size={30} image_url={@image_url} name={@display_name} />
+          </div>
+          <div class="w-full font-semibold text-sm whitespace-nowrap pl-1">
+            <%= @display_name %>
+          </div>
+          <div class="min-w-[30px] text-black bg-white text-center whitespace-nowrap py-0.5 px-2 rounded-full text-xs font-normal">
+            <%= @value %>
+          </div>
+        </div>
+      </.link>
     </div>
     """
   end

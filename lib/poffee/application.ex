@@ -5,9 +5,12 @@ defmodule Poffee.Application do
 
   use Application
 
+  require Logger
+
   @impl true
   def start(_type, _args) do
     is_server = Phoenix.Endpoint.server?(:poffee, PoffeeWeb.Endpoint)
+    Logger.notice("[Application] Phoenix Endpoint server started? #{is_server}")
     children = get_children(is_server)
 
     # See https://hexdocs.pm/elixir/Supervisor.html

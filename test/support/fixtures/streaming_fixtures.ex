@@ -14,7 +14,7 @@ defmodule Poffee.StreamingFixtures do
         description: "some description",
         display_name: "some display_name",
         login: "some login",
-        profile_image_url: "some profile_image_url",
+        profile_image_url: "https://some.website.com/profile_image_url",
         twitch_user_id: "42"
       })
       |> Poffee.Streaming.create_twitch_user(user)

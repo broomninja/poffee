@@ -71,7 +71,7 @@ defmodule PoffeeWeb.HomeLive do
     [x] Vote count and voter list will update in real-time for all users (via PubSub) 
     [x] Time displayed is real-time and auto updated without page reloading (LiveSvelte)
     [x] Basic user search (username only)
-    [x] Most Active lists
+    [x] Most Popular lists, a real-time display of the top ranked streamers. 
 
     To be implemented:
     [ ] Notification feed on new feedbacks, comments, votes etc for all users

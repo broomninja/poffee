@@ -10,7 +10,7 @@ defmodule Poffee.Services.FeedbackService do
   alias Poffee.Social.Comment
   alias Poffee.Social.Feedback
   alias Poffee.Social.FeedbackVote
-  alias Poffee.Notifications
+  alias Poffee.Social.Notifications
   alias Poffee.EctoUtils
 
   @type changeset_error :: {:error, Ecto.Changeset.t()}
@@ -62,8 +62,8 @@ defmodule Poffee.Services.FeedbackService do
       |> Feedback.changeset(attrs)
       |> Repo.insert()
 
-    with {:ok, _feedback} <- result do
-      # :ok = Notifications.feedback_created(feedback)
+    with {:ok, feedback} <- result do
+      :ok = Notifications.broadcast_feedback(feedback)
     end
 
     result
@@ -228,7 +228,7 @@ defmodule Poffee.Services.FeedbackService do
       # TODO - run in new Task
       feedback = get_feedback_with_comments_count_and_voters_count_by_id(feedback_id)
       feedback_votes = get_feedback_votes_by_feedback_id(feedback_id)
-      :ok = Notifications.broadcast_feedback(feedback, feedback_votes)
+      :ok = Notifications.broadcast_feedback_and_votes(feedback, feedback_votes)
     end
 
     result
@@ -251,7 +251,7 @@ defmodule Poffee.Services.FeedbackService do
       # TODO - run in new Task
       feedback = get_feedback_with_comments_count_and_voters_count_by_id(feedback_id)
       feedback_votes = get_feedback_votes_by_feedback_id(feedback_id)
-      :ok = Notifications.broadcast_feedback(feedback, feedback_votes)
+      :ok = Notifications.broadcast_feedback_and_votes(feedback, feedback_votes)
     end
 
     result
