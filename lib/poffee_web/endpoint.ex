@@ -28,7 +28,9 @@ defmodule PoffeeWeb.Endpoint do
   ]
 
   socket("/live", Phoenix.LiveView.Socket,
-    websocket: [connect_info: [:user_agent, session: @session_options]]
+    websocket: [
+      connect_info: [:user_agent, :peer_data, :x_headers, session: @session_options]
+    ]
   )
 
   # Serve at "/" the static files from "priv/static" directory.
@@ -56,6 +58,8 @@ defmodule PoffeeWeb.Endpoint do
 
   plug Plug.RequestId
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
+
+  plug RemoteIp
 
   # replace with a custom parser that can preserve raw_body for webhook verfications
   plug :parse_body

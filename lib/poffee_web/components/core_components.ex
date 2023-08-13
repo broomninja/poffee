@@ -611,6 +611,16 @@ defmodule PoffeeWeb.CoreComponents do
     """
   end
 
+  attr :value, :string, required: true
+
+  def count_display(assigns) do
+    ~H"""
+    <span class="text-black bg-white text-center whitespace-nowrap py-0.5 px-2 rounded-full text-xs font-normal">
+      <%= @value %>
+    </span>
+    """
+  end
+
   ## JS Commands
 
   def show(js \\ %JS{}, selector) do

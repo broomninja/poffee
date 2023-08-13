@@ -132,6 +132,10 @@ config :logger, :default_handler,
     compress_on_rotate: true
   ]
 
+#  config :logger,
+#   handle_otp_reports: true,
+#   handle_sasl_reports: true
+
 ####################################
 # Use Jason for JSON parsing in Phoenix
 ####################################

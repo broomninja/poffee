@@ -64,7 +64,7 @@ config :poffee, nebulex_adapter: Nebulex.Adapters.Nil
 ####################################
 # Print only warnings and errors during test
 config :logger, level: :warning
-config :logger, :default_handler, false
+# config :logger, :default_handler, false
 
 ####################################
 # Misc

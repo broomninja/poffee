@@ -58,7 +58,12 @@
           <.link navigate={~p"/u/#{@brandpage_username}/#{@feedback.id}"}>
             <LiveSvelte.svelte name="Button">
               <span :if={@feedback.comments_count == 0}>Create a comment</span>
-              <span :if={@feedback.comments_count > 0}>View comments</span>
+              <span :if={@feedback.comments_count > 0}>
+                View comments
+                <span class="pl-2">
+                  <.count_display value={@feedback.comments_count} />
+                </span>
+              </span>
             </LiveSvelte.svelte>
           </.link>
         </div>
@@ -67,21 +72,41 @@
       <%!-- Feedback --%>
       <%!-- :show_single_feedback --%>
       <div :if={@live_action == :show_single_feedback}>
-        <%!-- Add Comment button --%>
-        <div class="pt-2">
-          <.tabler_icon_button
-            icon="tabler-plus"
-            label="Add Comment"
-            bgcolor={:blue}
-            iconcolor={:inherit}
-            textcolor={:inherit}
-            phx-click={maybe_toggle_create_comment_form(@current_user, @feedback.id)}
-            size={:auto}
-          >
-            Add a Comment
-          </.tabler_icon_button>
+        <div class="pt-2 flex">
+          <%!-- Add Comment button --%>
+          <div>
+            <.tabler_icon_button
+              icon="tabler-plus"
+              label="Add Comment"
+              bgcolor={:blue}
+              iconcolor={:inherit}
+              textcolor={:inherit}
+              phx-click={maybe_toggle_create_comment_form(@current_user, @feedback.id)}
+              size={:auto}
+            >
+              Add a Comment
+            </.tabler_icon_button>
+          </div>
+          <%!-- End Add Comment button --%>
+          <%!-- Comment Sort By --%>
+          <div class="flex items-center justify-end w-full text-xs">
+            <div class="pr-2 font-semibold whitespace-nowrap">
+              Sort By
+            </div>
+            <.form :let={f} for={@sort_by_form} phx-change="sort_by_update">
+              <%= select(
+                f,
+                :sort_by,
+                @sort_by_options,
+                selected: @sort_by,
+                class:
+                  "text-xs rounded-md border border-gray-300 bg-white shadow-sm focus:border-zinc-400 focus:ring-0",
+                id: "sort_by_dropdown"
+              ) %>
+            </.form>
+          </div>
+          <%!-- End Comment Sort By --%>
         </div>
-        <%!-- End Add Comment button --%>
         <%!-- Create Comment Form --%>
         <div
           id={get_create_comment_container_id(@feedback.id)}
@@ -102,7 +127,7 @@
         </div>
         <%!-- End Create Comment Form --%>
         <%!-- Comments List --%>
-        <div :if={Utils.is_non_empty_list?(@comments)} class="">
+        <div :if={Utils.is_non_empty_list?(@comments)}>
           <.live_component
             :for={comment <- @comments}
             module={Poffee.Social.CommentComponent}

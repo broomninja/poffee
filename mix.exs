@@ -102,6 +102,7 @@ defmodule Poffee.MixProject do
       {:ecto_commons, "~> 0.3.3"},
       {:decorator, "~> 1.4"},
       {:slugify, "~> 1.3"},
+      {:remote_ip, "~> 1.1"},
 
       # twitch
       {:twitch_api, github: "broomninja/twitch_api"},

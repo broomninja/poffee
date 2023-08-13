@@ -8,7 +8,13 @@ defmodule Poffee.Social.FeedbackComponent do
 
   require Logger
 
-  @default_assigns %{}
+  @default_assigns %{
+    sort_by_options: [
+      Oldest: "oldest",
+      Newest: "newest"
+    ],
+    sort_by_form: to_form(%{}, as: "sort_by_form")
+  }
 
   @impl Phoenix.LiveComponent
   def mount(socket) do
@@ -53,7 +59,7 @@ defmodule Poffee.Social.FeedbackComponent do
           # put_flash will not work when we are in the LC, so forward the flash
           # message to the parent LV
           send(self(), {__MODULE__, :flash, %{level: :info, message: "Comment created!"}})
-          comments = Social.get_comments_by_feedback_id(feedback_id)
+          comments = Social.get_comments_by_feedback_id(feedback_id, socket.assigns.params)
 
           socket
           |> assign(:comments, comments)

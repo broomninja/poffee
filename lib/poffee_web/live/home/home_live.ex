@@ -4,7 +4,7 @@ defmodule PoffeeWeb.HomeLive do
   require Logger
 
   @impl Phoenix.LiveView
-  def mount(_params, session, socket) do
+  def mount(params, %{"remote_ip" => remote_ip} = session, socket) do
     socket =
       socket
       |> PhoenixLiveSession.maybe_subscribe(session)
@@ -15,6 +15,12 @@ defmodule PoffeeWeb.HomeLive do
       |> assign_new(:number, fn -> 5 end)
       |> assign_new(:selected_fruit, fn -> nil end)
       |> assign_new(:selected_time, fn -> nil end)
+
+    user_agent = get_connect_info(socket, :user_agent)
+
+    Logger.info(
+      "[HomeLive.mount] REMOTE_IP: #{remote_ip}, UA: #{user_agent}, params: #{inspect(params)}"
+    )
 
     {:ok, socket}
   end
@@ -60,9 +66,13 @@ defmodule PoffeeWeb.HomeLive do
       <pre>
     Quick Guide:
 
-    - Click on any of the profile icons above, a real-time display of streamers currently streaming live on Twitch.
+    - Click on any of the profile icons above, a real-time display of streamers currently 
+      streaming live on Twitch.
 
-    - After login, users will be able to create feedbacks and reply with comments.
+    - After login, users will be able to create feedbacks and reply with comments. 
+
+    - It is strongly encouraged to create an account, have two browser windows opened and
+      watch the real-time updates in action when voting or creating feedbacks.
 
     Main features implemented:
     [x] User login and registration
@@ -72,10 +82,11 @@ defmodule PoffeeWeb.HomeLive do
     [x] Time displayed is real-time and auto updated without page reloading (LiveSvelte)
     [x] Basic user search (username only)
     [x] Most Popular lists, a real-time display of the top ranked streamers. 
+    [x] Sorting for feedbacks and comments. 
 
     To be implemented:
+    [ ] Pagination
     [ ] Notification feed on new feedbacks, comments, votes etc for all users
-    [ ] Sorting and Pagination
       </pre>
     </div>
     """

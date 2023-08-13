@@ -92,10 +92,10 @@ defmodule PoffeeWeb do
     quote do
       # HTML escaping functionality
       import Phoenix.HTML
+      import Phoenix.HTML.Form
       # Core UI components and translation
       import PoffeeWeb.CoreComponents
       import PoffeeWeb.Components.TablerIcon
-
       import PoffeeWeb.Gettext
 
       # Shortcut for generating JS commands

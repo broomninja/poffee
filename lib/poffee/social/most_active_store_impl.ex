@@ -1,6 +1,11 @@
 defmodule Poffee.Social.MostActiveStore.Impl do
   @moduledoc """
-  Implementation for MostActiveStore
+  Implementation for MostActiveStore.
+
+  It will fetch the state from the database during start.
+
+  It will then update the state every time it receives a PubSub message for updated feedbacks.
+  Finally it will broadcast the latest top ranks to its subscribers.
   """
 
   alias Poffee.Social

@@ -157,8 +157,11 @@ defmodule Poffee.Social do
   defdelegate get_feedback_with_comments_count_and_voters_count_by_id(feedback_id),
     to: FeedbackService
 
-  defdelegate get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id(brand_page_id),
-    to: FeedbackService
+  defdelegate get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id(
+                brand_page_id,
+                options
+              ),
+              to: FeedbackService
 
   defdelegate get_voted_feedbacks_by_user(user), to: FeedbackService
   # defdelegate get_feedback_votes_by_feedback(feedback), to: FeedbackService
@@ -179,7 +182,7 @@ defmodule Poffee.Social do
   ###########################
   defdelegate list_comments, to: CommentService
   defdelegate get_comment!(id), to: CommentService
-  defdelegate get_comments_by_feedback_id(feedback_id), to: CommentService
+  defdelegate get_comments_by_feedback_id(feedback_id, options), to: CommentService
   defdelegate create_comment(attrs \\ %{}, user_id, feedback_id), to: CommentService
   defdelegate update_comment(feedback, attrs \\ %{}), to: CommentService
   defdelegate delete_comment(feedback), to: CommentService

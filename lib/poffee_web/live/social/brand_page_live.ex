@@ -9,6 +9,9 @@ defmodule PoffeeWeb.BrandPageLive do
   alias Poffee.Social.CreateFeedbackComponent
   alias Poffee.Streaming.{TwitchUser, TwitchApiConnector, TwitchLiveStreamers}
   alias Poffee.Streaming.Twitch.Streamer
+  alias Poffee.Utils
+
+  import Ecto.Changeset, only: [apply_changes: 1, cast: 3]
 
   require Logger
 
@@ -19,30 +22,19 @@ defmodule PoffeeWeb.BrandPageLive do
   }
 
   @impl Phoenix.LiveView
-  def mount(_params, _session, socket) do
+  def mount(params, %{"remote_ip" => remote_ip} = _session, socket) do
+    user_agent = get_connect_info(socket, :user_agent)
+
+    Logger.info(
+      "[BrandPageLive.mount] REMOTE_IP: #{remote_ip}, UA: #{user_agent}, params: #{inspect(params)}"
+    )
+
     {:ok, assign(socket, @default_assigns), temporary_assigns: []}
   end
 
   @impl Phoenix.LiveView
-
-  # Loads a specific feedback and its comments from db using the feedback_id
-  # @live_action == :show_single_feedback
-  def handle_params(%{"username" => username, "feedback_id" => feedback_id}, _url, socket) do
-    # feedback = Social.get_feedback(feedback_id)
-
-    socket =
-      socket
-      |> assign(:feedback_id, feedback_id)
-      |> assign_streamer(username)
-
-    {:noreply, socket}
-  end
-
-  # Loads a specific streamer based on the given username
-  # @live_action == :show_feedbacks
-  def handle_params(%{"username" => username}, _url, socket) do
-    socket = assign_streamer(socket, username)
-    {:noreply, socket}
+  def handle_params(params, _url, socket) do
+    {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
 
   @impl Phoenix.LiveView
@@ -52,10 +44,46 @@ defmodule PoffeeWeb.BrandPageLive do
     {:noreply, put_flash(socket, String.to_existing_atom(level), message)}
   end
 
-  # def handle_event(event, params, socket) do
-  #   Logger.error("[BrandPageLive.handle_event] #{event}, #{inspect(params)}")
-  #   {:noreply, socket}
-  # end
+  def handle_event("sort_by_update", %{"sort_by_form" => sort_by_params}, socket) do
+    Logger.debug(
+      "[BrandPageLive.handle_event.sort_by_update] sort_by_form = #{inspect(sort_by_params)}"
+    )
+
+    socket =
+      sort_by_params
+      |> sort_by_changeset()
+      |> case do
+        %{valid?: true} = changeset ->
+          new_sort_by_attrs = Utils.stringify_keys(apply_changes(changeset))
+
+          socket
+          |> assign_params(Map.merge(socket.assigns.params, new_sort_by_attrs))
+          |> assign_sort_by(new_sort_by_attrs)
+          |> then(fn s ->
+            # reference the latest sockets.assigns.params updated by assign_params above using get_in/2
+            push_patch_to_self(
+              s,
+              socket.assigns.live_action,
+              socket.assigns.streamer.username,
+              socket.assigns.feedback_id,
+              get_in(Map.from_struct(s), [:assigns, :params])
+            )
+          end)
+
+        _ ->
+          socket
+      end
+
+    {:noreply, socket}
+  end
+
+  def handle_event(event_name, params, socket) do
+    Logger.error(
+      "[BrandPageLive.handle_event] Unknown event: #{event_name}, params: #{inspect(params)}"
+    )
+
+    {:noreply, socket}
+  end
 
   @impl Phoenix.LiveView
   # PubSub notifications from TwitchLiveStreamers
@@ -156,6 +184,28 @@ defmodule PoffeeWeb.BrandPageLive do
   # Helper functions for data loading
   ##########################################
 
+  # @live_action == :show_single_feedback
+  defp apply_action(socket, :show_single_feedback, %{"feedback_id" => feedback_id} = params) do
+    socket
+    |> assign(:feedback_id, feedback_id)
+    |> assign_common(params)
+  end
+
+  # @live_action == :show_feedbacks
+  defp apply_action(socket, :show_feedbacks, params) do
+    assign_common(socket, params)
+  end
+
+  defp assign_common(socket, %{"username" => username} = params) do
+    socket
+    |> assign_streamer(username)
+    |> assign_params(params)
+    |> assign_sort_by(params)
+
+    # |> assign_page(params)
+  end
+
+  # Loads a specific streamer based on the given username
   defp assign_streamer(socket, username) do
     case Social.get_user_with_brand_page_by_username(username) do
       nil ->
@@ -185,6 +235,72 @@ defmodule PoffeeWeb.BrandPageLive do
 
   defp assign_page_title(socket, %BrandPage{} = brand_page, _username) do
     assign(socket, :page_title, brand_page.title)
+  end
+
+  # only allow "page" and "sort_by" params
+  defp assign_params(socket, params) do
+    Logger.debug("[BrandPageLive.assign_params] new params = #{inspect(params)}")
+
+    params =
+      params
+      |> Map.take(["page", "sort_by"])
+      |> Enum.reject(fn {_k, v} -> Utils.blank?(v) end)
+      |> Map.new()
+
+    assign(socket, :params, params)
+  end
+
+  defp assign_sort_by(socket, %{"sort_by" => sort_by}) do
+    Logger.debug("[BrandPageLive.assign_sort_by] selected sort_by: #{sort_by}")
+    assign(socket, :sort_by, sort_by)
+  end
+
+  defp assign_sort_by(socket, _params) do
+    default = Poffee.Constant.feedback_default_sort_by()
+    Logger.debug("[BrandPageLive.assign_sort_by] default sort_by: #{inspect(default)}")
+    assign(socket, :sort_by, default)
+  end
+
+  # defp assign_page(socket, %{"page" => page}) do
+  #   assign(socket, :page, String.to_integer(page))
+  # end
+
+  # defp assign_page(socket, _params) do
+  #   assign(socket, :page, 1)
+  # end
+
+  defp sort_by_changeset(%{} = attrs) do
+    cast({%{}, %{sort_by: :string}}, attrs, [:sort_by])
+  end
+
+  defp self_path(socket, :show_feedbacks = action, username, _feedback_id, query_string_attrs) do
+    Logger.debug(
+      "[BrandPageLive.self_path.show_feedbacks] query_string_attrs = #{inspect(query_string_attrs)}"
+    )
+
+    route = Routes.brand_page_path(socket, action, username, query_string_attrs)
+    Logger.debug("[BrandPageLive.self_path.show_feedbacks] new route = #{route}")
+    route
+  end
+
+  defp self_path(
+         socket,
+         :show_single_feedback = action,
+         username,
+         feedback_id,
+         query_string_attrs
+       ) do
+    Logger.debug(
+      "[BrandPageLive.self_path.show_single_feedbacks] query_string_attrs = #{inspect(query_string_attrs)}"
+    )
+
+    route = Routes.brand_page_path(socket, action, username, feedback_id, query_string_attrs)
+    Logger.debug("[BrandPageLive.self_path.show_single_feedbacks] new route = #{route}")
+    route
+  end
+
+  defp push_patch_to_self(socket, action, username, feedback_id, query_string_attrs) do
+    push_patch(socket, to: self_path(socket, action, username, feedback_id, query_string_attrs))
   end
 
   # check if user is a twitch user, then subscribe to online events and
