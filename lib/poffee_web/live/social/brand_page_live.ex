@@ -61,7 +61,7 @@ defmodule PoffeeWeb.BrandPageLive do
           |> assign_sort_by(new_sort_by_attrs)
           |> then(fn s ->
             # reference the latest sockets.assigns.params updated by assign_params above using get_in/2
-            push_patch_to_self(
+            push_navigate_to_self(
               s,
               socket.assigns.live_action,
               socket.assigns.streamer.username,
@@ -299,8 +299,12 @@ defmodule PoffeeWeb.BrandPageLive do
     route
   end
 
-  defp push_patch_to_self(socket, action, username, feedback_id, query_string_attrs) do
-    push_patch(socket, to: self_path(socket, action, username, feedback_id, query_string_attrs))
+  # we must use push_navigate instead of push_patch because we need UserLoginLive to be
+  # re-mounted to include the query string param for user_return_to after user login redirection
+  defp push_navigate_to_self(socket, action, username, feedback_id, query_string_attrs) do
+    push_navigate(socket,
+      to: self_path(socket, action, username, feedback_id, query_string_attrs)
+    )
   end
 
   # check if user is a twitch user, then subscribe to online events and
