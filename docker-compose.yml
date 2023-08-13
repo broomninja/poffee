@@ -23,6 +23,8 @@ services:
         - MIX_ENV=prod
         - SECRET_KEY_BASE=${SECRET_KEY_BASE}
         - DATABASE_URL=${DATABASE_URL}
+    volumes:
+      - ./log:/app/log
     ports:
       - "${WEBAPP_PORT:-4000}:${WEBAPP_PORT:-4000}"
     networks:
