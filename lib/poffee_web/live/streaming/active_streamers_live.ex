@@ -29,8 +29,10 @@ defmodule PoffeeWeb.ActiveStreamersLive do
 
     socket =
       socket
-      |> assign(top_by_feedback_counts: top_by_feedback_counts)
-      |> assign(top_by_feedback_vote_counts: top_by_feedback_vote_counts)
+      |> assign(top_by_feedback_counts: top_by_feedback_counts |> Enum.take(@display_limit))
+      |> assign(
+        top_by_feedback_vote_counts: top_by_feedback_vote_counts |> Enum.take(@display_limit)
+      )
 
     {:noreply, socket}
   end
@@ -75,8 +77,8 @@ defmodule PoffeeWeb.ActiveStreamersLive do
           <div class="w-full font-semibold text-sm whitespace-nowrap pl-1">
             <%= @display_name %>
           </div>
-          <div class="min-w-[30px] text-black bg-white text-center whitespace-nowrap py-0.5 px-2 rounded-full text-xs font-normal">
-            <%= @value %>
+          <div class="min-w-[20px] flex justify-center">
+            <.count_display value={@value} />
           </div>
         </div>
       </.link>

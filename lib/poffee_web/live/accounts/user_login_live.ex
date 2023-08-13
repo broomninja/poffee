@@ -20,6 +20,7 @@ defmodule PoffeeWeb.UserLoginLive do
     </.modal>
   """
   def mount(_params, %{"current_uri" => current_uri} = session, socket) do
+    Logger.debug("[UserLoginLive.mount] current_uri = #{current_uri}")
     mount(%{"user_return_to" => current_uri}, Map.delete(session, "current_uri"), socket)
   end
 

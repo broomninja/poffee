@@ -27,16 +27,21 @@ defmodule Poffee.Services.CommentService do
   @doc """
   Gets a list of comment for a given feedback_id
   """
-  @spec get_comments_by_feedback_id(uuid) :: list(Comment.t())
-  def get_comments_by_feedback_id(nil), do: []
+  @spec get_comments_by_feedback_id(uuid, Keywords.t()) :: list(Comment.t())
+  def get_comments_by_feedback_id(feedback_id, options \\ %{})
+  def get_comments_by_feedback_id(nil, _), do: []
 
-  def get_comments_by_feedback_id(feedback_id) do
+  def get_comments_by_feedback_id(feedback_id, options) do
     Comment
     |> where([c], c.feedback_id == ^feedback_id and c.status == :comment_status_active)
     |> preload(:author)
-    |> order_by([c], asc: c.inserted_at)
+    |> order_by(^parse_sort_by(options["sort_by"]))
     |> Repo.all()
   end
+
+  defp parse_sort_by("oldest"), do: [asc: dynamic([c], c.inserted_at)]
+  defp parse_sort_by("newest"), do: [desc: dynamic([c], c.inserted_at)]
+  defp parse_sort_by(_), do: parse_sort_by(Poffee.Constant.comment_default_sort_by())
 
   @doc """
   Gets a single comment.

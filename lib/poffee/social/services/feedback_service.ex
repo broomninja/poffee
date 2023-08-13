@@ -123,37 +123,50 @@ defmodule Poffee.Services.FeedbackService do
     |> Repo.one()
   end
 
-  # @spec get_feedback_with_comments_and_votes_by_id(uuid) :: Feedback.t() | nil
-  # def get_feedback_with_comments_and_votes_by_id(
-  #       feedback_id,
-  #       sort_by \\ :inserted_at,
-  #       sort_order \\ :asc,
-  #       page \\ 1,
-  #       limit \\ 10
-  #     ) do
-
-  @spec get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id(uuid) :: [
-          Feedback.t()
-        ]
-  def get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id(brand_page_id) do
+  @spec get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id(uuid, Keywords.t()) ::
+          [
+            Feedback.t()
+          ]
+  def get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id(
+        brand_page_id,
+        options \\ %{}
+      ) do
     Feedback
     |> where([fb], fb.brand_page_id == ^brand_page_id and fb.status == :feedback_status_active)
     |> join(:left, [fb], v in assoc(fb, :voters))
     |> join(:left, [fb], c in Comment,
       on: c.feedback_id == fb.id and c.status == :comment_status_active
     )
-    |> join(:left, [fb], fb_a in User, on: fb.author_id == fb_a.id)
+    |> join(:left, [fb], fb_a in User, on: fb.author_id == fb_a.id, as: :authors)
     |> join(:left, [c], c_a in User, on: c.author_id == c_a.id)
-    |> order_by([fb], asc: fb.inserted_at)
-    # |> Sorting.sort_query(Post, params, :posts)
+    |> order_by(^parse_sort_by(options["sort_by"]))
     |> preload([_, _, _, fb_a, _], author: fb_a)
     |> group_by([fb, _, _, fb_a, c_a], [fb.id, fb_a.id, c_a.id])
     |> select_merge([_, v, c, _, _], %{
-      votes_count: count(v.id, :distinct),
-      comments_count: count(c.id, :distinct)
+      comments_count: count(c.id, :distinct) |> selected_as(:comments_count),
+      votes_count: count(v.id, :distinct) |> selected_as(:votes_count)
     })
     |> Repo.all()
   end
+
+  defp parse_sort_by("oldest"), do: [asc: dynamic([fb], fb.inserted_at)]
+  defp parse_sort_by("newest"), do: [desc: dynamic([fb], fb.inserted_at)]
+
+  defp parse_sort_by("most_comments"),
+    do: [
+      desc: dynamic([fb], selected_as(:comments_count)),
+      asc: dynamic([fb], fb.inserted_at)
+      # asc: dynamic([authors: a], a.username)
+    ]
+
+  defp parse_sort_by("most_votes"),
+    do: [
+      desc: dynamic([fb], selected_as(:votes_count)),
+      asc: dynamic([fb], fb.inserted_at)
+      # asc: dynamic([authors: a], a.username)
+    ]
+
+  defp parse_sort_by(_), do: parse_sort_by(Poffee.Constant.feedback_default_sort_by())
 
   # @spec get_feedback_voters_by_feedback_id(uuid) :: list(User.t())
   # def get_feedback_voters_by_feedback_id(nil), do: []
@@ -166,6 +179,9 @@ defmodule Poffee.Services.FeedbackService do
   #   |> Map.get(:voters)
   # end
 
+  @doc """
+  Loads all the votes and returns all the users who voted for this feedback.
+  """
   @spec get_feedback_votes_by_feedback_id(uuid) :: list(FeedbackVote.t())
   def get_feedback_votes_by_feedback_id(nil), do: []
 

@@ -1,5 +1,5 @@
 defmodule Poffee.SocialTest do
-  use Poffee.DataCase, async: true
+  use Poffee.DataCase, async: false
 
   alias Poffee.Social
   alias Poffee.Social.BrandPage
@@ -198,6 +198,81 @@ defmodule Poffee.SocialTest do
       assert %Ecto.Changeset{} = Social.change_feedback(feedback)
     end
 
+    test "get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id/2 with sorting", %{
+      user: user,
+      brand_page: brand_page
+    } do
+      feedback_1 = feedback_fixture(user, brand_page, %{title: "title 1", content: "content 1"})
+      feedback_2 = feedback_fixture(user, brand_page, %{title: "title 2", content: "content 2"})
+      feedback_3 = feedback_fixture(user, brand_page, %{title: "title 3", content: "content 3"})
+
+      options = nil
+
+      [loaded_feedback | _] =
+        Social.get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id(
+          brand_page.id,
+          options
+        )
+
+      assert loaded_feedback.id == feedback_1.id
+
+      options = %{"sort_by" => "oldest"}
+
+      [loaded_feedback | _] =
+        Social.get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id(
+          brand_page.id,
+          options
+        )
+
+      assert loaded_feedback.id == feedback_1.id
+
+      options = %{"sort_by" => "newest"}
+
+      [loaded_feedback | _] =
+        Social.get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id(
+          brand_page.id,
+          options
+        )
+
+      assert loaded_feedback.id == feedback_3.id
+
+      # invalid sort option, will default to oldest
+      options = %{"sort_by" => "invalid"}
+
+      [loaded_feedback | _] =
+        Social.get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id(
+          brand_page.id,
+          options
+        )
+
+      assert loaded_feedback.id == feedback_1.id
+
+      _comment = comment_fixture(user, feedback_2)
+      options = %{"sort_by" => "most_comments"}
+
+      [loaded_feedback | _] =
+        Social.get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id(
+          brand_page.id,
+          options
+        )
+
+      assert loaded_feedback.id == feedback_2.id
+      assert loaded_feedback.comments_count == 1
+
+      user_2 = user_fixture()
+      {:ok, _feedback_vote} = Social.vote_feedback(user_2.id, feedback_3.id)
+      options = %{"sort_by" => "most_votes"}
+
+      [loaded_feedback | _] =
+        Social.get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id(
+          brand_page.id,
+          options
+        )
+
+      assert loaded_feedback.id == feedback_3.id
+      assert loaded_feedback.votes_count == 1
+    end
+
     # test "get_user_with_brand_page_and_feedbacks/1 returns user with loaded brand_page and feedbacks",
     #      %{user: user, brand_page: brand_page} do
     #   _feedback = feedback_fixture(user, brand_page, %{title: "title 1", content: "content 1"})
@@ -328,6 +403,32 @@ defmodule Poffee.SocialTest do
     } do
       comment = comment_fixture(user, feedback)
       assert %Ecto.Changeset{} = Social.change_comment(comment)
+    end
+
+    test "get_comments_by_feedback_id/2 with sorting", %{
+      user: user,
+      feedback: feedback
+    } do
+      comment_1 = comment_fixture(user, feedback, %{content: "content 1"})
+      _comment_2 = comment_fixture(user, feedback, %{content: "content 2"})
+      comment_3 = comment_fixture(user, feedback, %{content: "content 3"})
+
+      options = nil
+      [loaded_comment | _] = Social.get_comments_by_feedback_id(feedback.id, options)
+      assert loaded_comment.id == comment_1.id
+
+      options = %{"sort_by" => "oldest"}
+      [loaded_comment | _] = Social.get_comments_by_feedback_id(feedback.id, options)
+      assert loaded_comment.id == comment_1.id
+
+      options = %{"sort_by" => "newest"}
+      [loaded_comment | _] = Social.get_comments_by_feedback_id(feedback.id, options)
+      assert loaded_comment.id == comment_3.id
+
+      # invalid sort option, will default to oldest
+      options = %{"sort_by" => "invalid"}
+      [loaded_comment | _] = Social.get_comments_by_feedback_id(feedback.id, options)
+      assert loaded_comment.id == comment_1.id
     end
   end
 

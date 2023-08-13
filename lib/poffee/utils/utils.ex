@@ -36,6 +36,13 @@ defmodule Poffee.Utils do
   end
 
   @doc """
+  converts IP in tuple format eg: {212, 21, 83, 15} to string "212.21.83.15"
+  """
+  @spec ip_tuple_to_string(Tuple.t()) :: String.t()
+  def ip_tuple_to_string(nil), do: nil
+  def ip_tuple_to_string(ip), do: ip |> :inet.ntoa() |> List.to_string()
+
+  @doc """
   returns true if result can be cached
   """
   def can_be_cached?(nil), do: false
@@ -46,13 +53,13 @@ defmodule Poffee.Utils do
   def can_be_cached?([]), do: false
   def can_be_cached?(_), do: true
 
-  # Get the relative time from now, nil if datetime is not in the correct format
-  @spec format_time(String.t()) :: String.t() | nil
-  def format_time(datetime) do
-    with {:ok, relative_str} <- Timex.format(datetime, "{relative}", :relative) do
-      relative_str
-    end
-  end
+  # # Get the relative time from now, nil if datetime is not in the correct format
+  # @spec format_time(String.t()) :: String.t() | nil
+  # def format_time(datetime) do
+  #   with {:ok, relative_str} <- Timex.format(datetime, "{relative}", :relative) do
+  #     relative_str
+  #   end
+  # end
 
   # show login modal when user is not logged in
   def get_modal_name(nil, _), do: "live-login-modal"
@@ -63,4 +70,25 @@ defmodule Poffee.Utils do
   @spec get_field(any, atom()) :: any | nil
   def get_field(nil, _field), do: nil
   def get_field(struct_or_map, field), do: Map.get(struct_or_map, field)
+
+  @doc """
+  Convert map atom keys to strings
+  """
+  def stringify_keys(nil), do: nil
+
+  def stringify_keys(map = %{}) do
+    map
+    |> Enum.map(fn {k, v} -> {Atom.to_string(k), stringify_keys(v)} end)
+    |> Enum.into(%{})
+  end
+
+  # Walk the list and stringify the keys of
+  # of any map members
+  def stringify_keys([head | rest]) do
+    [stringify_keys(head) | stringify_keys(rest)]
+  end
+
+  def stringify_keys(not_a_map) do
+    not_a_map
+  end
 end

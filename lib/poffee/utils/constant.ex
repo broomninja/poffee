@@ -17,8 +17,10 @@ defmodule Poffee.Constant do
   const(:feedback_title_max_length, 200)
   const(:feedback_content_min_length, 2)
   const(:feedback_content_max_length, 1000)
+  const(:feedback_default_sort_by, "oldest")
 
   # Comment
   const(:comment_content_min_length, 1)
   const(:comment_content_max_length, 500)
+  const(:comment_default_sort_by, "oldest")
 end

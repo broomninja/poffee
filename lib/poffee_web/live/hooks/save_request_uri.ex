@@ -24,7 +24,10 @@ defmodule PoffeeWeb.SaveRequestUri do
     %{path: path, query: query} = URI.parse(url)
 
     uri = path <> if query, do: "?" <> query, else: ""
-    # Logger.debug("[save_request_path] setting current_uri to #{uri}")
+
+    Logger.debug(
+      "[SaveRequestUri.save_request_path] setting socket.assigns.current_uri to #{uri}"
+    )
 
     {:cont, Phoenix.Component.assign(socket, :current_uri, uri)}
   end

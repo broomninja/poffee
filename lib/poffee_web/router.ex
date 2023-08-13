@@ -11,6 +11,7 @@ defmodule PoffeeWeb.Router do
     plug :protect_from_forgery
     plug :put_secure_browser_headers
     plug :fetch_current_user
+    plug :put_remote_ip
   end
 
   pipeline :api do
@@ -132,5 +133,9 @@ defmodule PoffeeWeb.Router do
       # TODO remove
       live "/demolive", DemoLive, :new
     end
+  end
+
+  defp put_remote_ip(conn, _) do
+    put_session(conn, :remote_ip, Poffee.Utils.ip_tuple_to_string(conn.remote_ip))
   end
 end

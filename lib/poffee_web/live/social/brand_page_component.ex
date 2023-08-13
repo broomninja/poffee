@@ -8,7 +8,15 @@ defmodule Poffee.Social.BrandPageComponent do
 
   require Logger
 
-  # @default_page_size 3
+  @default_assigns %{
+    sort_by_options: [
+      Oldest: "oldest",
+      Newest: "newest",
+      "Most Comments": "most_comments",
+      "Most Votes": "most_votes"
+    ],
+    sort_by_form: to_form(%{}, as: "sort_by_form")
+  }
 
   @impl Phoenix.LiveComponent
   def preload([%{live_action: :show_feedbacks} = assigns]) do
@@ -21,14 +29,16 @@ defmodule Poffee.Social.BrandPageComponent do
     current_user = assigns.current_user
 
     feedbacks =
-      Social.get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id(brand_page_id)
+      Social.get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id(
+        brand_page_id,
+        assigns.params
+      )
 
     user_voted_list = get_user_voted_list(current_user, feedbacks)
     subscribe_for_notifications(feedbacks)
 
     [
       Map.merge(assigns, %{
-        page: 1,
         feedbacks: feedbacks,
         user_voted_list: user_voted_list
       })
@@ -48,7 +58,7 @@ defmodule Poffee.Social.BrandPageComponent do
       Logger.warning("[BrandPageComponent.preload] Feedback not found for id #{feedback_id}")
     end
 
-    comments = Social.get_comments_by_feedback_id(feedback_id)
+    comments = Social.get_comments_by_feedback_id(feedback_id, assigns.params)
     feedback_votes = Social.get_feedback_votes_by_feedback_id(feedback_id)
     user_voted_list = get_user_voted_list(current_user, [feedback])
 
@@ -79,7 +89,7 @@ defmodule Poffee.Social.BrandPageComponent do
     |> assign_new(:comments, fn -> nil end)
     |> assign_new(:feedback_votes, fn -> nil end)
 
-    {:ok, socket, temporary_assigns: []}
+    {:ok, assign(socket, @default_assigns), temporary_assigns: []}
   end
 
   @impl Phoenix.LiveComponent
