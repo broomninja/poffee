@@ -1,4 +1,6 @@
 defmodule Poffee.Utils do
+  require Logger
+
   @spec blank?(String.t()) :: boolean()
   def blank?(nil), do: true
 
@@ -90,5 +92,28 @@ defmodule Poffee.Utils do
 
   def stringify_keys(not_a_map) do
     not_a_map
+  end
+
+  # Replace "page=1" with "page=:page" in query string
+  # If "page=XX" does not exist then simply add "page=:page" to query string
+  def get_pagination_path(current_uri) do
+    uri = URI.parse(current_uri)
+
+    # overwrite any existing "page" query string
+    query =
+      Plug.Conn.Query.decode(uri.query || "")
+      |> Map.put("page", "__COLON__page")
+      |> Plug.Conn.Query.encode()
+      |> String.replace("__COLON__page", ":page")
+
+    new_uri = Map.put(uri, :query, query)
+
+    path =
+      %{new_uri | scheme: nil, authority: nil, host: nil}
+      |> URI.to_string()
+
+    Logger.debug("[BrandPageComponent.get_pagination_path] returning path = #{path}")
+
+    path
   end
 end

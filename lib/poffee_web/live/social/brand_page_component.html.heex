@@ -3,7 +3,7 @@
     <div class="max-w-screen-lg min-w-min pr-2 md:pr-8 pt-2 md:pt-0 flex flex-col w-full h-full mx-auto">
       <div class="flex items-center justify-start">
         <%!-- Profile Image --%>
-        <div class="pr-3 w-[60px]">
+        <div class="pr-3 w-[140px]">
           <LiveSvelte.svelte name="TooltipDiv" ssr={true} props={%{text: "Visit Twitch channel"}}>
             <a href={"https://www.twitch.tv/#{@twitch_user.login}"} target="_blank">
               <.profile_image
@@ -74,7 +74,7 @@
         <%= @twitch_user.description %>
       </div>
       <%!-- End Description --%>
-      <%!-- :show_feedbacks --%>
+      <%!-- :show_feedbacks with pagination --%>
       <div :if={@live_action == :show_feedbacks and Utils.is_non_empty_list?(@feedbacks)}>
         <.live_component
           :for={feedback <- @feedbacks}
@@ -88,8 +88,17 @@
           live_action={@live_action}
           sort_by={@sort_by}
         />
+        <div :if={@pagination_meta.total_pages > 1} class="flex justify-center">
+          <Petal.Pagination.pagination
+            link_type="live_redirect"
+            class="my-8"
+            path={Utils.get_pagination_path(@current_uri)}
+            current_page={@pagination_meta.page_number}
+            total_pages={@pagination_meta.total_pages}
+          />
+        </div>
       </div>
-      <%!-- end :show_feedbacks --%>
+      <%!-- end :show_feedbacks with pagination --%>
       <%!-- :show_single_feedback --%>
       <div :if={@live_action == :show_single_feedback and !is_nil(@feedback)}>
         <.live_component
