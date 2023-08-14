@@ -5,6 +5,8 @@ defmodule Poffee.Repo do
 
   use ExAudit.Repo
 
+  use Scrivener, page_size: 10
+
   # require Logger
 
   # # Installs Postgres extensions

@@ -66,6 +66,16 @@ config :poffee, nebulex_adapter: Nebulex.Adapters.Nil
 config :logger, level: :warning
 # config :logger, :default_handler, false
 
+config :logger, :default_handler,
+  config: [
+    file: ~c"log/poffee_test.log",
+    filesync_repeat_interval: 5000,
+    file_check: 5000,
+    max_no_bytes: 10_000_000,
+    max_no_files: 5,
+    compress_on_rotate: true
+  ]
+
 ####################################
 # Misc
 ####################################

@@ -71,6 +71,7 @@ defmodule Poffee.MixProject do
       {:ecto_enum, "~> 1.4"},
       {:ecto_sql, "~> 3.10"},
       {:postgrex, ">= 0.0.0"},
+      {:scrivener_ecto, "~> 2.7"},
       {:nebulex, "~> 2.5"},
       {:ex_audit, "~> 0.10"},
 

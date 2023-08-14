@@ -11,6 +11,7 @@ defmodule Poffee.Services.FeedbackService do
   alias Poffee.Social.Feedback
   alias Poffee.Social.FeedbackVote
   alias Poffee.Social.Notifications
+  alias Poffee.Constant
   alias Poffee.EctoUtils
 
   @type changeset_error :: {:error, Ecto.Changeset.t()}
@@ -124,9 +125,7 @@ defmodule Poffee.Services.FeedbackService do
   end
 
   @spec get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id(uuid, Keywords.t()) ::
-          [
-            Feedback.t()
-          ]
+          Scrivener.Page.t()
   def get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id(
         brand_page_id,
         options \\ %{}
@@ -146,8 +145,17 @@ defmodule Poffee.Services.FeedbackService do
       comments_count: count(c.id, :distinct) |> selected_as(:comments_count),
       votes_count: count(v.id, :distinct) |> selected_as(:votes_count)
     })
-    |> Repo.all()
+    |> Repo.paginate(%{
+      page_size: parse_page_size(options["page_size"]),
+      page: parse_page(options["page"])
+    })
   end
+
+  defp parse_page_size(num) when is_integer(num) and num > 0, do: num
+  defp parse_page_size(_), do: Constant.feedback_default_page_size()
+
+  defp parse_page(num) when is_integer(num) and num > 0, do: num
+  defp parse_page(_), do: 1
 
   defp parse_sort_by("oldest"), do: [asc: dynamic([fb], fb.inserted_at)]
   defp parse_sort_by("newest"), do: [desc: dynamic([fb], fb.inserted_at)]
@@ -166,7 +174,7 @@ defmodule Poffee.Services.FeedbackService do
       # asc: dynamic([authors: a], a.username)
     ]
 
-  defp parse_sort_by(_), do: parse_sort_by(Poffee.Constant.feedback_default_sort_by())
+  defp parse_sort_by(_), do: parse_sort_by(Constant.feedback_default_sort_by())
 
   # @spec get_feedback_voters_by_feedback_id(uuid) :: list(User.t())
   # def get_feedback_voters_by_feedback_id(nil), do: []

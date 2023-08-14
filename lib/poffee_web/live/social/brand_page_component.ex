@@ -28,11 +28,20 @@ defmodule Poffee.Social.BrandPageComponent do
 
     current_user = assigns.current_user
 
-    feedbacks =
+    paginated_feedbacks =
       Social.get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id(
         brand_page_id,
         assigns.params
       )
+
+    feedbacks = paginated_feedbacks.entries
+    pagination_meta = Map.delete(paginated_feedbacks, :entries)
+
+    # Logger.debug("[BrandPageComponent.preload] pagination_meta: #{inspect(pagination_meta)}")
+    # Logger.debug(
+    #   "[BrandPageComponent.preload] loaded feedbacks for brand_page_id with params: #{inspect(assigns.params)}
+    #   \n#{inspect(feedbacks)}"
+    # )
 
     user_voted_list = get_user_voted_list(current_user, feedbacks)
     subscribe_for_notifications(feedbacks)
@@ -40,7 +49,8 @@ defmodule Poffee.Social.BrandPageComponent do
     [
       Map.merge(assigns, %{
         feedbacks: feedbacks,
-        user_voted_list: user_voted_list
+        user_voted_list: user_voted_list,
+        pagination_meta: pagination_meta
       })
     ]
   end

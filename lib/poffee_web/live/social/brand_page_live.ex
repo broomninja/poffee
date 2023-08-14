@@ -58,7 +58,6 @@ defmodule PoffeeWeb.BrandPageLive do
 
           socket
           |> assign_params(Map.merge(socket.assigns.params, new_sort_by_attrs))
-          |> assign_sort_by(new_sort_by_attrs)
           |> then(fn s ->
             # reference the latest sockets.assigns.params updated by assign_params above using get_in/2
             push_navigate_to_self(
@@ -200,9 +199,6 @@ defmodule PoffeeWeb.BrandPageLive do
     socket
     |> assign_streamer(username)
     |> assign_params(params)
-    |> assign_sort_by(params)
-
-    # |> assign_page(params)
   end
 
   # Loads a specific streamer based on the given username
@@ -237,17 +233,25 @@ defmodule PoffeeWeb.BrandPageLive do
     assign(socket, :page_title, brand_page.title)
   end
 
-  # only allow "page" and "sort_by" params
+  # only allow "page" and "sort_by" in socket.assigns.params
+  # the value be passed as options when retrieving data from database
   defp assign_params(socket, params) do
-    Logger.debug("[BrandPageLive.assign_params] new params = #{inspect(params)}")
+    socket =
+      socket
+      |> assign_sort_by(params)
+      |> assign_page(params)
 
-    params =
-      params
-      |> Map.take(["page", "sort_by"])
-      |> Enum.reject(fn {_k, v} -> Utils.blank?(v) end)
-      |> Map.new()
+    # reference the latest updated by assign_sort_by and assign_page above.
+    # value of "page" will be stored as an integer instead of a string
+    new_params =
+      ["sort_by", "page"]
+      |> Map.new(fn p ->
+        {p, get_in(Map.from_struct(socket), [:assigns, String.to_existing_atom(p)])}
+      end)
 
-    assign(socket, :params, params)
+    Logger.debug("[BrandPageLive.assign_params] assigning new params = #{inspect(new_params)}")
+
+    assign(socket, :params, new_params)
   end
 
   defp assign_sort_by(socket, %{"sort_by" => sort_by}) do
@@ -261,13 +265,27 @@ defmodule PoffeeWeb.BrandPageLive do
     assign(socket, :sort_by, default)
   end
 
-  # defp assign_page(socket, %{"page" => page}) do
-  #   assign(socket, :page, String.to_integer(page))
-  # end
+  # Only positive integers will be stored in socket.assigns.page
+  defp assign_page(socket, %{"page" => page}) when is_integer(page) and page > 0 do
+    assign(socket, :page, page)
+  end
 
-  # defp assign_page(socket, _params) do
-  #   assign(socket, :page, 1)
-  # end
+  defp assign_page(socket, %{"page" => page}) do
+    Logger.debug("[BrandPageLive.assign_page] selected page: #{page}")
+
+    case Integer.parse(page) do
+      {num, ""} ->
+        assign(socket, :page, num)
+
+      _ ->
+        assign_page(socket, nil)
+    end
+  end
+
+  defp assign_page(socket, _params) do
+    Logger.debug("[BrandPageLive.assign_page] default page to 1")
+    assign(socket, :page, 1)
+  end
 
   defp sort_by_changeset(%{} = attrs) do
     cast({%{}, %{sort_by: :string}}, attrs, [:sort_by])
