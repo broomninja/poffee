@@ -63,31 +63,23 @@ defmodule PoffeeWeb.HomeLive do
   def render(assigns) do
     ~H"""
     <div class="px-10 md:px-20 pt-3 pb-5">
-      <pre>
-    Quick Guide:
-
-    - Click on any of the profile icons above, a real-time display of streamers currently 
-      streaming live on Twitch.
-
-    - After login, users will be able to create feedbacks and reply with comments. 
-
-    - It is strongly encouraged to create an account, have two browser windows opened and
-      watch the real-time updates in action when voting or creating feedbacks.
-
-    Main features implemented:
-    [x] User login and registration
-    [x] Twitch API connection and subscription on streamer events
-    [x] Create Feedbacks and Comments
-    [x] Vote count and voter list will update in real-time for all users (via PubSub) 
-    [x] Time displayed is real-time and auto updated without page reloading (LiveSvelte)
-    [x] Basic user search (username only)
-    [x] Most Popular lists, a real-time display of the top ranked streamers. 
-    [x] Sorting for feedbacks and comments. 
-
-    To be implemented:
-    [ ] Pagination
-    [ ] Notification feed on new feedbacks, comments, votes etc for all users
-      </pre>
+      Quick Guide: <br /><br />
+      - Click on any of the profile icons above, a real-time display of streamers currently streaming live on Twitch.
+      <br /><br /> - After login, users will be able to create feedbacks and reply with comments.
+      <br /><br />
+      - It is strongly encouraged to create an account (use any dummy email address). Open two browser windows and watch the real-time updates in action after voting or creating feedbacks.
+      <br />
+      <br /> Main features implemented:<br />
+      [x] User login and registration, auto page redirection after login.<br />
+      [x] Twitch API connection and subscription on streamer events<br />
+      [x] Create Feedbacks and Comments<br />
+      [x] Vote count and voter list will update in real-time for all users (via PubSub)<br />
+      [x] Time ago displayed is in real-time and will auto update without page reloading (LiveSvelte)<br />
+      [x] Basic user search (username only)<br />
+      [x] Most Popular lists, a real-time display of the top ranked streamers.<br />
+      [x] Sorting for feedbacks and comments.<br /> [x] Pagination for feedbacks<br />
+      <br /> To be implemented:<br /> [ ] Pagination for comments<br />
+      [ ] Notification feed on new feedbacks, comments, votes etc for all users<br />
     </div>
     """
   end
