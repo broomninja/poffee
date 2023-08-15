@@ -96,7 +96,7 @@ defmodule Poffee.Utils do
 
   # Replace "page=1" with "page=:page" in query string
   # If "page=XX" does not exist then simply add "page=:page" to query string
-  def get_pagination_path(current_uri) do
+  def get_pagination_path(current_uri) when is_binary(current_uri) do
     uri = URI.parse(current_uri)
 
     # overwrite any existing "page" query string

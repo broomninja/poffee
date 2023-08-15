@@ -44,6 +44,7 @@ defmodule PoffeeWeb.BrandPageLive do
     {:noreply, put_flash(socket, String.to_existing_atom(level), message)}
   end
 
+  # changing sort_by will always reset "page" to 1
   def handle_event("sort_by_update", %{"sort_by_form" => sort_by_params}, socket) do
     Logger.debug(
       "[BrandPageLive.handle_event.sort_by_update] sort_by_form = #{inspect(sort_by_params)}"
@@ -55,9 +56,14 @@ defmodule PoffeeWeb.BrandPageLive do
       |> case do
         %{valid?: true} = changeset ->
           new_sort_by_attrs = Utils.stringify_keys(apply_changes(changeset))
+          # remove "page" param if any, so it will default to page 1
+          new_params =
+            socket.assigns.params
+            |> Map.merge(new_sort_by_attrs)
+            |> Map.delete("page")
 
           socket
-          |> assign_params(Map.merge(socket.assigns.params, new_sort_by_attrs))
+          |> assign_params(new_params)
           |> then(fn s ->
             # reference the latest sockets.assigns.params updated by assign_params above using get_in/2
             push_navigate_to_self(

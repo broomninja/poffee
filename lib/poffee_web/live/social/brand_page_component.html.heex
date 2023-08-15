@@ -78,7 +78,7 @@
         <%!-- End Feedback Sort By --%>
       </div>
 
-      <%!-- :show_feedbacks with pagination --%>
+      <%!-- :show_feedbacks --%>
       <div :if={@live_action == :show_feedbacks and Utils.is_non_empty_list?(@feedbacks)}>
         <.live_component
           :for={feedback <- @feedbacks}
@@ -92,6 +92,7 @@
           live_action={@live_action}
           sort_by={@sort_by}
         />
+        <%!-- pagination --%>
         <div :if={@pagination_meta.total_pages > 1} class="flex justify-center">
           <Petal.Pagination.pagination
             link_type="live_redirect"
@@ -101,8 +102,9 @@
             total_pages={@pagination_meta.total_pages}
           />
         </div>
+        <%!--End pagination --%>
       </div>
-      <%!-- end :show_feedbacks with pagination --%>
+      <%!-- end :show_feedbacks --%>
       <%!-- :show_single_feedback --%>
       <div :if={@live_action == :show_single_feedback and !is_nil(@feedback)}>
         <.live_component
@@ -117,6 +119,8 @@
           user_voted_list={@user_voted_list}
           live_action={@live_action}
           sort_by={@sort_by}
+          pagination_meta={@pagination_meta}
+          current_uri={@current_uri}
         />
       </div>
       <%!-- end :show_single_feedback --%>

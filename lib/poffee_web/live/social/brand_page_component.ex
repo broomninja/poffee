@@ -37,9 +37,9 @@ defmodule Poffee.Social.BrandPageComponent do
     feedbacks = paginated_feedbacks.entries
     pagination_meta = Map.delete(paginated_feedbacks, :entries)
 
-    # Logger.debug("[BrandPageComponent.preload] pagination_meta: #{inspect(pagination_meta)}")
+    # Logger.debug("[BrandPageComponent.preload.show_feedbacks] pagination_meta: #{inspect(pagination_meta)}")
     # Logger.debug(
-    #   "[BrandPageComponent.preload] loaded feedbacks for brand_page_id with params: #{inspect(assigns.params)}
+    #   "[BrandPageComponent.preload.show_feedbacks] loaded feedbacks for brand_page_id with params: #{inspect(assigns.params)}
     #   \n#{inspect(feedbacks)}"
     # )
 
@@ -68,7 +68,14 @@ defmodule Poffee.Social.BrandPageComponent do
       Logger.warning("[BrandPageComponent.preload] Feedback not found for id #{feedback_id}")
     end
 
-    comments = Social.get_comments_by_feedback_id(feedback_id, assigns.params)
+    paginated_comments = Social.get_comments_by_feedback_id(feedback_id, assigns.params)
+    comments = paginated_comments.entries
+    pagination_meta = Map.delete(paginated_comments, :entries)
+
+    # Logger.debug(
+    #   "[BrandPageComponent.preload.show_single_feedback] pagination_meta: #{inspect(pagination_meta)}"
+    # )
+
     feedback_votes = Social.get_feedback_votes_by_feedback_id(feedback_id)
     user_voted_list = get_user_voted_list(current_user, [feedback])
 
@@ -79,7 +86,8 @@ defmodule Poffee.Social.BrandPageComponent do
         feedback: feedback,
         comments: comments,
         feedback_votes: feedback_votes,
-        user_voted_list: user_voted_list
+        user_voted_list: user_voted_list,
+        pagination_meta: pagination_meta
       })
     ]
   end

@@ -70,5 +70,14 @@ defmodule Poffee.UtilsTest do
       assert %{"k" => "value"} == Utils.stringify_keys(%{k: "value"})
       assert %{"k1" => %{"k2" => "value"}} == Utils.stringify_keys(%{k1: %{k2: "value"}})
     end
+
+    test "get_pagination_path/1" do
+      Assertions.assert_raise(fn -> Utils.get_pagination_path(nil) end)
+      assert "/?page=:page" == Utils.get_pagination_path("/")
+      assert "/?page=:page" == Utils.get_pagination_path("/?")
+      assert "/?page=:page" == Utils.get_pagination_path("/?page=3")
+      assert "/?page=:page&sort_by=oldest" == Utils.get_pagination_path("/?page=3&sort_by=oldest")
+      assert "/?page=:page&sort_by=oldest" == Utils.get_pagination_path("/?sort_by=oldest")
+    end
   end
 end
