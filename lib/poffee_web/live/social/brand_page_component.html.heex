@@ -1,10 +1,10 @@
 <div id={get_container_id(@id)}>
   <%= if @twitch_user do %>
-    <div class="max-w-screen-lg min-w-min pr-2 md:pr-8 pt-2 md:pt-0 flex flex-col w-full h-full mx-auto">
+    <div class="pr-2 lg:pr-8 pt-2 lg:pt-0 flex flex-col max-w-xl sm:max-w-2xl md:max-w-4xl h-full mx-auto">
       <div class="flex items-center justify-start">
         <%!-- Profile Image --%>
-        <div class="pr-3 w-[140px]">
-          <LiveSvelte.svelte name="TooltipDiv" ssr={true} props={%{text: "Visit Twitch channel"}}>
+        <div class="h-[55px] shrink-0">
+          <LiveSvelte.svelte name="TooltipDiv" ssr={false} props={%{text: "Visit Twitch channel"}}>
             <a href={"https://www.twitch.tv/#{@twitch_user.login}"} target="_blank">
               <.profile_image
                 size={55}
@@ -16,21 +16,31 @@
         </div>
         <%!-- End Profile Image --%>
         <%!-- Display Name --%>
-        <div class="font-semibold whitespace-nowrap">
+        <div class="flex items-center justify-start ml-3 mr-5 font-semibold whitespace-nowrap">
           <.link navigate={~p"/u/#{@twitch_user.display_name}"}>
             <%= @twitch_user.display_name %>
           </.link>
         </div>
         <%!-- End Display Name --%>
         <%!-- Online Status --%>
-        <div class="pl-2 md:pl-5 whitespace-nowrap">
+        <div class="whitespace-nowrap">
           <a href={"https://www.twitch.tv/#{@twitch_user.login}"} target="_blank">
             <.online_status status={@streaming_status} />
           </a>
         </div>
         <%!-- End Online Status --%>
+      </div>
+      <%!-- Description --%>
+      <div
+        :if={!Utils.blank?(@twitch_user.description)}
+        class="flex w-full pl-1 pr-2 pt-3 text-gray-900 text-sm font-semibold"
+      >
+        <%= @twitch_user.description %>
+      </div>
+      <%!-- End Description --%>
+      <div class="flex items-center justify-stretch pt-5">
         <%!-- Create Feedback button --%>
-        <div class="pl-4 md:pl-10">
+        <div class="flex justify-start">
           <.tabler_icon_button
             icon="tabler-plus"
             label="Create Feedback"
@@ -46,12 +56,13 @@
           </.tabler_icon_button>
         </div>
         <%!-- End Create Feedback button --%>
+
         <%!-- Feedback Sort By --%>
         <div
           :if={@live_action == :show_feedbacks}
-          class="flex items-center justify-end w-full text-xs"
+          class="flex items-center justify-end flex-grow text-xs"
         >
-          <div class="pr-2 font-semibold whitespace-nowrap">Sort By</div>
+          <div class="pr-2 font-semibold whitespace-nowrap ">Sort By</div>
           <.form :let={f} for={@sort_by_form} phx-change="sort_by_update">
             <%= select(
               f,
@@ -66,14 +77,7 @@
         </div>
         <%!-- End Feedback Sort By --%>
       </div>
-      <%!-- Description --%>
-      <div
-        :if={!Utils.blank?(@twitch_user.description)}
-        class="flex w-full h-full pl-1 pr-2 pt-3 text-gray-900 text-sm font-semibold"
-      >
-        <%= @twitch_user.description %>
-      </div>
-      <%!-- End Description --%>
+
       <%!-- :show_feedbacks with pagination --%>
       <div :if={@live_action == :show_feedbacks and Utils.is_non_empty_list?(@feedbacks)}>
         <.live_component

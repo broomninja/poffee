@@ -68,16 +68,16 @@ defmodule PoffeeWeb.ActiveStreamersLive do
 
   defp top_streamer(assigns) do
     ~H"""
-    <div class="pb-1 md:pb-2">
+    <div class="pb-1 lg:pb-2">
       <.link navigate={~p"/u/#{@display_name}"}>
         <div class="flex items-center justify-start">
-          <div class="w-[60px]">
+          <div class="h-[30px] shrink-0">
             <.profile_image size={30} image_url={@image_url} name={@display_name} />
           </div>
-          <div class="w-full font-semibold text-sm whitespace-nowrap pl-1">
+          <div class="pl-2 w-full truncate font-semibold text-sm whitespace-nowrap">
             <%= @display_name %>
           </div>
-          <div class="min-w-[20px] flex justify-center">
+          <div class="pl-2 h-[20px]">
             <.count_display value={@value} />
           </div>
         </div>

@@ -1,3 +1,6 @@
+<div :if={Poffee.Env.compile_env() == :dev}>
+  <.responsive_indicator />
+</div>
 <nav class="bg-gray-800">
   <div class="px-2 mx-auto max-w-7xl sm:px-6 lg:px-8">
     <div class="relative flex items-center justify-between h-16">
@@ -49,6 +52,6 @@
   <%= @inner_content %>
 </div>
 
-<footer class="px-10 py-5 bg-gray-800 text-white text-sm">
+<footer class="mt-5 px-10 py-5 bg-gray-800 text-white text-sm">
   Copyright © 2023 Brand
 </footer>

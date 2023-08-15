@@ -103,12 +103,13 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
 
     streamers =
       case new_streamer do
-        %Streamer{} -> [new_streamer | streamers]
-        _ -> streamers
-      end
+        %Streamer{} ->
+          broadcast_online_streamer(new_streamer)
+          broadcast_new_streamers([new_streamer | streamers])
 
-    broadcast_new_streamers(streamers)
-    broadcast_online_streamer(new_streamer)
+        _ ->
+          streamers
+      end
 
     {:noreply, streamers}
   end
@@ -155,10 +156,14 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
         [head | _tail] ->
           Logger.debug("[get_live_streamers] New online streamers found.}")
 
-          # we are only interested in the first new streamer, for demo only 
-          list = [head | old_streamers]
-          broadcast_new_streamers(list)
-          list
+          # we are only interested in the first new streamer, for demo purposes only
+          case Enum.any?(old_streamers, fn s -> s.twitch_user_id == head.twitch_user_id end) do
+            true ->
+              old_streamers
+
+            false ->
+              broadcast_new_streamers([head | old_streamers])
+          end
 
         _ ->
           Logger.debug("[get_live_streamers] No new online streamers found")
@@ -287,6 +292,8 @@ defmodule Poffee.Streaming.TwitchLiveStreamers do
       @topic_live_streamers,
       {__MODULE__, :added_streamers, streamers}
     )
+
+    streamers
   end
 
   # only broadcast when streamers are removed from the list or other changes 
