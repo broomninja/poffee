@@ -273,18 +273,27 @@ defmodule Poffee.SocialTest do
       assert loaded_feedback.id == feedback_3.id
       assert loaded_feedback.votes_count == 1
     end
+  end
 
-    test "get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id/2 with pagination",
-         %{
-           user: user,
-           brand_page: brand_page
-         } do
+  describe "feedbacks pagination" do
+    setup do
+      user = user_fixture()
+      brand_page = brand_page_fixture(user)
+
       feedbacks =
-        1..7
+        1..9
         |> Enum.map(fn num ->
           feedback_fixture(user, brand_page, %{title: "title #{num}", content: "content #{num}"})
         end)
 
+      %{feedbacks: feedbacks, brand_page: brand_page}
+    end
+
+    test "get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id/2 with nil options",
+         %{
+           feedbacks: feedbacks,
+           brand_page: brand_page
+         } do
       options = nil
 
       paginated_feedbacks =
@@ -301,8 +310,13 @@ defmodule Poffee.SocialTest do
 
       assert paginated_feedbacks.total_pages ==
                ceil(length(feedbacks) / Constant.feedback_default_page_size())
+    end
 
-      # valid page_size and page number
+    test "get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id/2 with valid page_size and page 1",
+         %{
+           feedbacks: feedbacks,
+           brand_page: brand_page
+         } do
       options = %{"page_size" => 3, "page" => 1}
 
       paginated_feedbacks =
@@ -317,8 +331,13 @@ defmodule Poffee.SocialTest do
       assert paginated_feedbacks.page_size == options["page_size"]
       assert paginated_feedbacks.total_entries == length(feedbacks)
       assert paginated_feedbacks.total_pages == ceil(length(feedbacks) / options["page_size"])
+    end
 
-      # valid page_size and page number
+    test "get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id/2 with valid page_size and page 2",
+         %{
+           feedbacks: feedbacks,
+           brand_page: brand_page
+         } do
       options = %{"page_size" => 3, "page" => 2}
 
       paginated_feedbacks =
@@ -341,8 +360,13 @@ defmodule Poffee.SocialTest do
       assert paginated_feedbacks.page_size == options["page_size"]
       assert paginated_feedbacks.total_entries == length(feedbacks)
       assert paginated_feedbacks.total_pages == ceil(length(feedbacks) / options["page_size"])
+    end
 
-      # invalid page_size
+    test "get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id/2 with invalid page_size",
+         %{
+           feedbacks: feedbacks,
+           brand_page: brand_page
+         } do
       options = %{"page_size" => -5, "page" => 2}
 
       paginated_feedbacks =
@@ -367,8 +391,13 @@ defmodule Poffee.SocialTest do
 
       assert paginated_feedbacks.total_pages ==
                ceil(length(feedbacks) / Constant.feedback_default_page_size())
+    end
 
-      # invalid page_size and page number
+    test "get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id/2 with invalid page_size and page number",
+         %{
+           feedbacks: feedbacks,
+           brand_page: brand_page
+         } do
       options = %{"page_size" => -5, "page" => -2}
 
       paginated_feedbacks =
@@ -385,8 +414,13 @@ defmodule Poffee.SocialTest do
 
       assert paginated_feedbacks.total_pages ==
                ceil(length(feedbacks) / Constant.feedback_default_page_size())
+    end
 
-      # invalid page number
+    test "get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id/2 with invalid page number",
+         %{
+           feedbacks: feedbacks,
+           brand_page: brand_page
+         } do
       options = %{"page_size" => 5, "page" => -2}
 
       paginated_feedbacks =
@@ -401,8 +435,13 @@ defmodule Poffee.SocialTest do
       assert paginated_feedbacks.page_size == options["page_size"]
       assert paginated_feedbacks.total_entries == length(feedbacks)
       assert paginated_feedbacks.total_pages == ceil(length(feedbacks) / options["page_size"])
+    end
 
-      # Large page size
+    test "get_feedbacks_with_comments_count_and_voters_count_by_brand_page_id/2 with large page size",
+         %{
+           feedbacks: feedbacks,
+           brand_page: brand_page
+         } do
       options = %{"page_size" => 999, "page" => 999}
 
       paginated_feedbacks =
@@ -426,56 +465,55 @@ defmodule Poffee.SocialTest do
       assert paginated_feedbacks.total_entries == length(feedbacks)
       assert paginated_feedbacks.total_pages == ceil(length(feedbacks) / options["page_size"])
     end
-
-    # test "get_user_with_brand_page_and_feedbacks/1 returns user with loaded brand_page and feedbacks",
-    #      %{user: user, brand_page: brand_page} do
-    #   _feedback = feedback_fixture(user, brand_page, %{title: "title 1", content: "content 1"})
-    #   _feedback = feedback_fixture(user, brand_page, %{title: "title 2", content: "content 2"})
-
-    #   _feedback =
-    #     feedback_fixture(user, brand_page, %{
-    #       title: "title 3",
-    #       content: "content 3",
-    #       status: :feedback_status_removed
-    #     })
-
-    #   loaded_user = Social.get_user_with_brand_page_and_feedbacks_by_username(user.username)
-    #   assert loaded_user.brand_page.id == brand_page.id
-    #   assert loaded_user.brand_page.title == brand_page.title
-
-    #   loaded_user.brand_page.feedbacks
-    #   |> Enum.each(&assert(&1.status == :feedback_status_active))
-
-    #   assert length(loaded_user.brand_page.feedbacks) == 2
-    # end
-
-    # test "get_brand_page_with_feedbacks_by_user/1 returns user with loaded brand_page and feedbacks",
-    #      %{user: user, brand_page: brand_page} do
-    #   _feedback = feedback_fixture(user, brand_page, %{title: "title 1", content: "content 1"})
-    #   _feedback = feedback_fixture(user, brand_page, %{title: "title 2", content: "content 2"})
-
-    #   _feedback =
-    #     feedback_fixture(user, brand_page, %{
-    #       title: "title 3",
-    #       content: "content 3",
-    #       status: :feedback_status_removed
-    #     })
-
-    #   loaded_brand_page = Social.get_brand_page_with_feedbacks_by_user(user)
-    #   assert loaded_brand_page.id == brand_page.id
-    #   assert loaded_brand_page.title == brand_page.title
-
-    #   loaded_brand_page.feedbacks
-    #   |> Enum.each(&assert(&1.status == :feedback_status_active))
-
-    #   assert length(loaded_brand_page.feedbacks) == 2
-    # end
   end
+
+  # test "get_user_with_brand_page_and_feedbacks/1 returns user with loaded brand_page and feedbacks",
+  #      %{user: user, brand_page: brand_page} do
+  #   _feedback = feedback_fixture(user, brand_page, %{title: "title 1", content: "content 1"})
+  #   _feedback = feedback_fixture(user, brand_page, %{title: "title 2", content: "content 2"})
+
+  #   _feedback =
+  #     feedback_fixture(user, brand_page, %{
+  #       title: "title 3",
+  #       content: "content 3",
+  #       status: :feedback_status_removed
+  #     })
+
+  #   loaded_user = Social.get_user_with_brand_page_and_feedbacks_by_username(user.username)
+  #   assert loaded_user.brand_page.id == brand_page.id
+  #   assert loaded_user.brand_page.title == brand_page.title
+
+  #   loaded_user.brand_page.feedbacks
+  #   |> Enum.each(&assert(&1.status == :feedback_status_active))
+
+  #   assert length(loaded_user.brand_page.feedbacks) == 2
+  # end
+
+  # test "get_brand_page_with_feedbacks_by_user/1 returns user with loaded brand_page and feedbacks",
+  #      %{user: user, brand_page: brand_page} do
+  #   _feedback = feedback_fixture(user, brand_page, %{title: "title 1", content: "content 1"})
+  #   _feedback = feedback_fixture(user, brand_page, %{title: "title 2", content: "content 2"})
+
+  #   _feedback =
+  #     feedback_fixture(user, brand_page, %{
+  #       title: "title 3",
+  #       content: "content 3",
+  #       status: :feedback_status_removed
+  #     })
+
+  #   loaded_brand_page = Social.get_brand_page_with_feedbacks_by_user(user)
+  #   assert loaded_brand_page.id == brand_page.id
+  #   assert loaded_brand_page.title == brand_page.title
+
+  #   loaded_brand_page.feedbacks
+  #   |> Enum.each(&assert(&1.status == :feedback_status_active))
+
+  #   assert length(loaded_brand_page.feedbacks) == 2
+  # end
+  # end
 
   describe "comments" do
     alias Poffee.Social.Comment
-
-    import Poffee.SocialFixtures
 
     @invalid_attrs %{content: nil}
 
@@ -568,21 +606,165 @@ defmodule Poffee.SocialTest do
       comment_3 = comment_fixture(user, feedback, %{content: "content 3"})
 
       options = nil
-      [loaded_comment | _] = Social.get_comments_by_feedback_id(feedback.id, options)
+      [loaded_comment | _] = Social.get_comments_by_feedback_id(feedback.id, options).entries
       assert loaded_comment.id == comment_1.id
 
       options = %{"sort_by" => "oldest"}
-      [loaded_comment | _] = Social.get_comments_by_feedback_id(feedback.id, options)
+      [loaded_comment | _] = Social.get_comments_by_feedback_id(feedback.id, options).entries
       assert loaded_comment.id == comment_1.id
 
       options = %{"sort_by" => "newest"}
-      [loaded_comment | _] = Social.get_comments_by_feedback_id(feedback.id, options)
+      [loaded_comment | _] = Social.get_comments_by_feedback_id(feedback.id, options).entries
       assert loaded_comment.id == comment_3.id
 
       # invalid sort option, will default to oldest
       options = %{"sort_by" => "invalid"}
-      [loaded_comment | _] = Social.get_comments_by_feedback_id(feedback.id, options)
+      [loaded_comment | _] = Social.get_comments_by_feedback_id(feedback.id, options).entries
       assert loaded_comment.id == comment_1.id
+    end
+  end
+
+  describe "comments pagination" do
+    setup do
+      user = user_fixture()
+      brand_page = brand_page_fixture(user)
+      feedback = feedback_fixture(user, brand_page)
+
+      comments =
+        1..9
+        |> Enum.map(fn num ->
+          comment_fixture(user, feedback, %{content: "dummy content #{num}"})
+        end)
+
+      %{comments: comments, feedback: feedback}
+    end
+
+    test "get_comments_by_feedback_id/2 with nil options", %{
+      comments: comments,
+      feedback: feedback
+    } do
+      options = nil
+      paginated_comments = Social.get_comments_by_feedback_id(feedback.id, options)
+      [loaded_comment | _] = paginated_comments.entries
+      assert loaded_comment.id == comments |> List.first() |> Map.get(:id)
+      assert paginated_comments.page_number == 1
+      assert paginated_comments.page_size == Constant.comment_default_page_size()
+      assert paginated_comments.total_entries == length(comments)
+
+      assert paginated_comments.total_pages ==
+               ceil(length(comments) / Constant.comment_default_page_size())
+    end
+
+    test "get_comments_by_feedback_id/2 with valid page size and page 1", %{
+      comments: comments,
+      feedback: feedback
+    } do
+      options = %{"page_size" => 3, "page" => 1}
+      paginated_comments = Social.get_comments_by_feedback_id(feedback.id, options)
+      [loaded_comment | _] = paginated_comments.entries
+      assert loaded_comment.id == comments |> List.first() |> Map.get(:id)
+      assert paginated_comments.page_number == options["page"]
+      assert paginated_comments.page_size == options["page_size"]
+      assert paginated_comments.total_entries == length(comments)
+      assert paginated_comments.total_pages == ceil(length(comments) / options["page_size"])
+    end
+
+    test "get_comments_by_feedback_id/2 with valid page size and page 2", %{
+      comments: comments,
+      feedback: feedback
+    } do
+      options = %{"page_size" => 3, "page" => 2}
+      paginated_comments = Social.get_comments_by_feedback_id(feedback.id, options)
+      [loaded_comment | _] = paginated_comments.entries
+      page_size = options["page_size"]
+
+      index =
+        cond do
+          length(comments) <= page_size -> 0
+          length(comments) > page_size -> page_size * (options["page"] - 1)
+        end
+
+      assert loaded_comment.id == comments |> Enum.at(index) |> Map.get(:id)
+      assert paginated_comments.page_number == options["page"]
+      assert paginated_comments.page_size == options["page_size"]
+      assert paginated_comments.total_entries == length(comments)
+      assert paginated_comments.total_pages == ceil(length(comments) / options["page_size"])
+    end
+
+    test "get_comments_by_feedback_id/2 with invalid page_size", %{
+      comments: comments,
+      feedback: feedback
+    } do
+      options = %{"page_size" => -5, "page" => 2}
+      paginated_comments = Social.get_comments_by_feedback_id(feedback.id, options)
+      [loaded_comment | _] = paginated_comments.entries
+      page_size = Constant.comment_default_page_size()
+
+      {index, expected_page_number} =
+        cond do
+          length(comments) <= page_size -> {0, 1}
+          length(comments) > page_size -> {page_size * (options["page"] - 1), options["page"]}
+        end
+
+      assert loaded_comment.id == comments |> Enum.at(index) |> Map.get(:id)
+      assert paginated_comments.page_number == expected_page_number
+      assert paginated_comments.page_size == Constant.comment_default_page_size()
+      assert paginated_comments.total_entries == length(comments)
+
+      assert paginated_comments.total_pages ==
+               ceil(length(comments) / Constant.comment_default_page_size())
+    end
+
+    test "get_comments_by_feedback_id/2 with invalid page_size and page number", %{
+      comments: comments,
+      feedback: feedback
+    } do
+      options = %{"page_size" => -5, "page" => -2}
+      paginated_comments = Social.get_comments_by_feedback_id(feedback.id, options)
+      [loaded_comment | _] = paginated_comments.entries
+      assert loaded_comment.id == comments |> List.first() |> Map.get(:id)
+      assert paginated_comments.page_number == 1
+      assert paginated_comments.page_size == Constant.feedback_default_page_size()
+      assert paginated_comments.total_entries == length(comments)
+
+      assert paginated_comments.total_pages ==
+               ceil(length(comments) / Constant.feedback_default_page_size())
+    end
+
+    test "get_comments_by_feedback_id/2 with invalid page number", %{
+      comments: comments,
+      feedback: feedback
+    } do
+      options = %{"page_size" => 5, "page" => -2}
+      paginated_comments = Social.get_comments_by_feedback_id(feedback.id, options)
+      [loaded_comment | _] = paginated_comments.entries
+      assert loaded_comment.id == comments |> List.first() |> Map.get(:id)
+      assert paginated_comments.page_number == 1
+      assert paginated_comments.page_size == options["page_size"]
+      assert paginated_comments.total_entries == length(comments)
+      assert paginated_comments.total_pages == ceil(length(comments) / options["page_size"])
+    end
+
+    test "get_comments_by_feedback_id/2 with large page size", %{
+      comments: comments,
+      feedback: feedback
+    } do
+      options = %{"page_size" => 999, "page" => 999}
+      paginated_comments = Social.get_comments_by_feedback_id(feedback.id, options)
+      [loaded_comment | _] = paginated_comments.entries
+      page_size = options["page_size"]
+
+      index =
+        cond do
+          length(comments) <= page_size -> 0
+          length(comments) > page_size -> page_size * (options["page"] - 1)
+        end
+
+      assert loaded_comment.id == comments |> Enum.at(index) |> Map.get(:id)
+      assert paginated_comments.page_number == 1
+      assert paginated_comments.page_size == options["page_size"]
+      assert paginated_comments.total_entries == length(comments)
+      assert paginated_comments.total_pages == ceil(length(comments) / options["page_size"])
     end
   end
 

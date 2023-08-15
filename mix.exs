@@ -123,6 +123,7 @@ defmodule Poffee.MixProject do
       {:ex_machina, "~> 2.7", only: :test},
       {:mox, "~> 1.0", only: :test},
       {:rewire, "~> 0.9", only: :test},
+      {:assertions, "~> 0.19", only: :test},
       {:wallaby, "~> 0.30", only: :test, runtime: false}
     ]
   end

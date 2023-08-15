@@ -63,13 +63,13 @@ defmodule PoffeeWeb.HomeLive do
   def render(assigns) do
     ~H"""
     <div class="px-10 md:px-20 pt-3 pb-5">
-      Quick Guide: <br /><br />
+      <div class="font-semibold">Quick Guide:</div>
+      <br />
       - Click on any of the profile icons above, a real-time display of streamers currently streaming live on Twitch.
       <br /><br /> - After login, users will be able to create feedbacks and reply with comments.
       <br /><br />
-      - It is strongly encouraged to create an account (use any dummy email address). Open two browser windows and watch the real-time updates in action after voting or creating feedbacks.
-      <br />
-      <br /> Main features implemented:<br />
+      - Strongly encouraged to create an account (use any dummy email address). Open two browser windows and watch the real-time updates in action after voting or creating feedbacks.
+      <div class="mt-5 font-semibold">Main features implemented:</div>
       [x] User login and registration, auto page redirection after login.<br />
       [x] Twitch API connection and subscription on streamer events<br />
       [x] Create Feedbacks and Comments<br />
@@ -77,8 +77,9 @@ defmodule PoffeeWeb.HomeLive do
       [x] Time ago displayed is in real-time and will auto update without page reloading (LiveSvelte)<br />
       [x] Basic user search (username only)<br />
       [x] Most Popular lists, a real-time display of the top ranked streamers.<br />
-      [x] Sorting for feedbacks and comments.<br /> [x] Pagination for feedbacks<br />
-      <br /> To be implemented:<br /> [ ] Pagination for comments<br />
+      [x] Sorting for feedbacks and comments.<br /> [x] Pagination for feedbacks and comments<br />
+
+      <div class="mt-5 font-semibold">To be implemented:</div>
       [ ] Notification feed on new feedbacks, comments, votes etc for all users<br />
     </div>
     """
