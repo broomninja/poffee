@@ -93,12 +93,12 @@
             <div class="pr-2 font-semibold whitespace-nowrap">
               Sort By
             </div>
-            <.form :let={f} for={@sort_by_form} phx-change="sort_by_update">
+            <.form :let={f} for={@sort_by_form} phx-change="sort_by_update" id="sort_by_form">
               <%= select(
                 f,
                 :sort_by,
                 @sort_by_options,
-                selected: @sort_by,
+                selected: @params["sort_by"],
                 class:
                   "text-xs rounded-md border border-gray-300 bg-white shadow-sm focus:border-zinc-400 focus:ring-0",
                 id: "sort_by_dropdown"

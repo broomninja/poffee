@@ -1,5 +1,9 @@
 import Config
 
+[__DIR__ | ~w(config_helper.exs)]
+|> Path.join()
+|> Code.eval_file()
+
 # config/runtime.exs is executed for all environments, including
 # during releases. It is executed after compilation and before the
 # system starts, so it is typically used to load production configuration
@@ -20,34 +24,27 @@ if System.get_env("PHX_SERVER") do
   config :poffee, PoffeeWeb.Endpoint, server: true
 end
 
-defmodule RuntimeConfig do
-  def get_env!(name) do
-    System.get_env(name) ||
-      raise "environment variable #{name} is missing."
-  end
-
-  def get_boolean_env(name, default \\ false) do
-    case String.downcase(System.get_env(name) || "") do
-      "true" -> true
-      "false" -> false
-      _ -> default
-    end
-  end
-end
-
 config :poffee, compile_env: config_env()
 
 ########################
 ### LiveSvelte
 ########################
 config :poffee, :live_svelte,
-  enable_ssr: RuntimeConfig.get_boolean_env("LIVESVELTE_ENABLE_SSR", false)
+  enable_ssr: ConfigHelper.get_boolean_env("LIVESVELTE_ENABLE_SSR", false)
+
+########################
+### Socket Check Origin
+########################
+if config_env() == :dev do
+  config :poffee, PoffeeWeb.Endpoint,
+    check_origin: ConfigHelper.get_list_env!("ENDPOINT_CHECK_ORIGIN")
+end
 
 ########################
 ### PRODUCTION ENV
 ########################
 if config_env() == :prod do
-  database_url = RuntimeConfig.get_env!("DATABASE_URL")
+  database_url = ConfigHelper.get_env!("DATABASE_URL")
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
@@ -72,13 +69,14 @@ if config_env() == :prod do
   # want to use a different value for prod and you most likely don't want
   # to check this value into version control, so we use an environment
   # variable instead.
-  secret_key_base = RuntimeConfig.get_env!("SECRET_KEY_BASE")
+  secret_key_base = ConfigHelper.get_env!("SECRET_KEY_BASE")
 
   host = System.get_env("PHX_HOST") || "example.com"
   port = String.to_integer(System.get_env("PORT") || "4000")
 
   config :poffee, PoffeeWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
+    check_origin: ConfigHelper.get_list_env!("ENDPOINT_CHECK_ORIGIN"),
     http: [
       # Enable IPv6 and bind on all interfaces.
       # Set it to  {0, 0, 0, 0, 0, 0, 0, 1} for local network only access.
@@ -93,9 +91,9 @@ if config_env() == :prod do
   ### Twitch
   ########################
   config :poffee, :twitch,
-    client_id: RuntimeConfig.get_env!("TWITCH_CLIENT_ID"),
-    client_secret: RuntimeConfig.get_env!("TWITCH_CLIENT_SECRET"),
-    callback_webhook_uri: RuntimeConfig.get_env!("TWITCH_CALLBACK_WEBHOOK_URI")
+    client_id: ConfigHelper.get_env!("TWITCH_CLIENT_ID"),
+    client_secret: ConfigHelper.get_env!("TWITCH_CLIENT_SECRET"),
+    callback_webhook_uri: ConfigHelper.get_env!("TWITCH_CALLBACK_WEBHOOK_URI")
 
   # ## SSL Support
   #

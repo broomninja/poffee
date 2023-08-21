@@ -1,5 +1,5 @@
 defmodule PoffeeWeb.ErrorJSONTest do
-  use PoffeeWeb.ConnCase, async: true
+  use PoffeeWeb.ConnCase, async: false
 
   test "renders 404" do
     assert PoffeeWeb.ErrorJSON.render("404.json", %{}) == %{errors: %{detail: "Not Found"}}

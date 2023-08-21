@@ -1,5 +1,5 @@
 defmodule PoffeeWeb.UserLoginLiveTest do
-  use PoffeeWeb.ConnCase
+  use PoffeeWeb.ConnCase, async: false
 
   import Phoenix.LiveViewTest
   import Poffee.AccountsFixtures

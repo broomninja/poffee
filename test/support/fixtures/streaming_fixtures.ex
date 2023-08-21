@@ -12,7 +12,7 @@ defmodule Poffee.StreamingFixtures do
       attrs
       |> Enum.into(%{
         description: "some description",
-        display_name: "some display_name",
+        display_name: user.username,
         login: "some login",
         profile_image_url: "https://some.website.com/profile_image_url",
         twitch_user_id: "42"

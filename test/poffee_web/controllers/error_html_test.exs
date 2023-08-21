@@ -1,5 +1,5 @@
 defmodule PoffeeWeb.ErrorHTMLTest do
-  use PoffeeWeb.ConnCase, async: true
+  use PoffeeWeb.ConnCase, async: false
 
   # Bring render_to_string/4 for testing custom views
   import Phoenix.Template

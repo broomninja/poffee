@@ -63,12 +63,12 @@
           class="flex items-center justify-end flex-grow text-xs"
         >
           <div class="pr-2 font-semibold whitespace-nowrap ">Sort By</div>
-          <.form :let={f} for={@sort_by_form} phx-change="sort_by_update">
+          <.form :let={f} for={@sort_by_form} phx-change="sort_by_update" id="sort_by_form">
             <%= select(
               f,
               :sort_by,
               @sort_by_options,
-              selected: @sort_by,
+              selected: @params["sort_by"],
               class:
                 "text-xs rounded-md border border-gray-300 bg-white shadow-sm focus:border-zinc-400 focus:ring-0",
               id: "sort_by_dropdown"
@@ -90,7 +90,7 @@
           current_user={@current_user}
           user_voted_list={@user_voted_list}
           live_action={@live_action}
-          sort_by={@sort_by}
+          params={@params}
         />
         <%!-- pagination --%>
         <div :if={@pagination_meta.total_pages > 1} class="flex justify-center">
@@ -118,7 +118,7 @@
           feedback_votes={@feedback_votes}
           user_voted_list={@user_voted_list}
           live_action={@live_action}
-          sort_by={@sort_by}
+          params={@params}
           pagination_meta={@pagination_meta}
           current_uri={@current_uri}
         />

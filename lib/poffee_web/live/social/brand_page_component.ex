@@ -37,11 +37,13 @@ defmodule Poffee.Social.BrandPageComponent do
     feedbacks = paginated_feedbacks.entries
     pagination_meta = Map.delete(paginated_feedbacks, :entries)
 
-    # Logger.debug("[BrandPageComponent.preload.show_feedbacks] pagination_meta: #{inspect(pagination_meta)}")
-    # Logger.debug(
-    #   "[BrandPageComponent.preload.show_feedbacks] loaded feedbacks for brand_page_id with params: #{inspect(assigns.params)}
-    #   \n#{inspect(feedbacks)}"
-    # )
+    Logger.debug(
+      "[BrandPageComponent.preload.show_feedbacks] pagination_meta: #{inspect(pagination_meta)}"
+    )
+
+    Logger.debug(
+      "[BrandPageComponent.preload.show_feedbacks] assigns.params: #{inspect(assigns.params)}"
+    )
 
     user_voted_list = get_user_voted_list(current_user, feedbacks)
     subscribe_for_notifications(feedbacks)
@@ -72,9 +74,13 @@ defmodule Poffee.Social.BrandPageComponent do
     comments = paginated_comments.entries
     pagination_meta = Map.delete(paginated_comments, :entries)
 
-    # Logger.debug(
-    #   "[BrandPageComponent.preload.show_single_feedback] pagination_meta: #{inspect(pagination_meta)}"
-    # )
+    Logger.debug(
+      "[BrandPageComponent.preload.show_single_feedback] pagination_meta: #{inspect(pagination_meta)}"
+    )
+
+    Logger.debug(
+      "[BrandPageComponent.preload.show_single_feedback] assigns.params: #{inspect(assigns.params)}"
+    )
 
     feedback_votes = Social.get_feedback_votes_by_feedback_id(feedback_id)
     user_voted_list = get_user_voted_list(current_user, [feedback])

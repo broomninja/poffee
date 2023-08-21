@@ -1,5 +1,5 @@
 defmodule Poffee.StreamingTest do
-  use Poffee.DataCase
+  use Poffee.DataCase, async: false
 
   alias Poffee.Streaming
   alias Poffee.Streaming.TwitchUser

@@ -4,7 +4,10 @@
     <div class="font-semibold text-md whitespace-nowrap mb-2 lg:mb-4 text-left lg:text-center">
       Most Feedbacks
     </div>
-    <div>
+    <div :if={!Utils.is_non_empty_list?(@top_by_feedback_counts)}>
+      Empty List
+    </div>
+    <div :if={Utils.is_non_empty_list?(@top_by_feedback_counts)}>
       <%= for brand_page <- @top_by_feedback_counts do %>
         <.top_streamer
           display_name={brand_page.twitch_user.display_name}
@@ -19,7 +22,10 @@
     <div class="font-semibold text-md whitespace-nowrap mb-2 lg:mb-4 text-left lg:text-center">
       Most Total Votes
     </div>
-    <div>
+    <div :if={!Utils.is_non_empty_list?(@top_by_feedback_counts)}>
+      Empty List
+    </div>
+    <div :if={Utils.is_non_empty_list?(@top_by_feedback_counts)}>
       <%= for brand_page <- @top_by_feedback_vote_counts do %>
         <.top_streamer
           display_name={brand_page.twitch_user.display_name}
