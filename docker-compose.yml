@@ -8,6 +8,7 @@ services:
       - PHX_SERVER=true
       - PHX_HOST=${PHX_HOST}
       - DATABASE_URL=${DATABASE_URL}
+      - ENDPOINT_CHECK_ORIGIN=${ENDPOINT_CHECK_ORIGIN}
       - SECRET_KEY_BASE=${SECRET_KEY_BASE}
       - TWITCH_CLIENT_ID=${TWITCH_CLIENT_ID}
       - TWITCH_CLIENT_SECRET=${TWITCH_CLIENT_SECRET}
@@ -32,5 +33,5 @@ services:
 
 networks:
   caddy_network:
-    name: main_baas
+    name: caddy_baas
     external: true

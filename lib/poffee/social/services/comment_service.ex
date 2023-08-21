@@ -7,6 +7,7 @@ defmodule Poffee.Services.CommentService do
   alias Poffee.Repo
 
   alias Poffee.Constant
+  alias Poffee.EctoUtils
   alias Poffee.Social.Comment
 
   @type changeset_error :: {:error, Ecto.Changeset.t()}
@@ -38,20 +39,15 @@ defmodule Poffee.Services.CommentService do
     |> preload(:author)
     |> order_by(^parse_sort_by(options["sort_by"]))
     |> Repo.paginate(%{
-      page_size: parse_page_size(options["page_size"]),
-      page: parse_page(options["page"])
+      page: EctoUtils.parse_number(options["page"], 1),
+      page_size:
+        EctoUtils.parse_number(options["page_size"], Constant.comment_default_page_size())
     })
   end
 
-  defp parse_page_size(num) when is_integer(num) and num > 0, do: num
-  defp parse_page_size(_), do: Constant.comment_default_page_size()
-
-  defp parse_page(num) when is_integer(num) and num > 0, do: num
-  defp parse_page(_), do: 1
-
   defp parse_sort_by("oldest"), do: [asc: dynamic([c], c.inserted_at)]
   defp parse_sort_by("newest"), do: [desc: dynamic([c], c.inserted_at)]
-  defp parse_sort_by(_), do: parse_sort_by(Poffee.Constant.comment_default_sort_by())
+  defp parse_sort_by(_), do: parse_sort_by(Constant.comment_default_sort_by())
 
   @doc """
   Gets a single comment.

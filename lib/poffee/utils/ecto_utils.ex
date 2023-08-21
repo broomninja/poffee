@@ -31,4 +31,20 @@ defmodule Poffee.EctoUtils do
 
   @spec binary_to_ecto_uuid(uuid) :: Ecto.UUID.t()
   def binary_to_ecto_uuid(uuid) when is_binary(uuid), do: uuid |> Ecto.UUID.dump() |> elem(1)
+
+  # the first argument can be in integer or numeric string format, however default will be  
+  # returned if num is not a positive integer
+  @spec parse_number(Integer.t() | String.t(), Integer.t()) :: Integer.t()
+  def parse_number(num, _default) when is_integer(num) and num > 0, do: num
+
+  def parse_number(num_string, default) when is_binary(num_string) do
+    with {num, ""} <- Integer.parse(num_string),
+         true <- num > 0 do
+      num
+    else
+      _ -> default
+    end
+  end
+
+  def parse_number(_, default), do: default
 end

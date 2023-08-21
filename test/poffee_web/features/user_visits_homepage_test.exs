@@ -1,5 +1,5 @@
 defmodule PoffeeWeb.Features.UserVisitsHomepageTest do
-  use PoffeeWeb.FeatureCase, async: true
+  use PoffeeWeb.FeatureCase, async: false
 
   describe "home page" do
     feature "Sign in button will be displayed",

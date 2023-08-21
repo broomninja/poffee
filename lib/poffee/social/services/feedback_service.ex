@@ -146,16 +146,11 @@ defmodule Poffee.Services.FeedbackService do
       votes_count: count(v.id, :distinct) |> selected_as(:votes_count)
     })
     |> Repo.paginate(%{
-      page_size: parse_page_size(options["page_size"]),
-      page: parse_page(options["page"])
+      page: EctoUtils.parse_number(options["page"], 1),
+      page_size:
+        EctoUtils.parse_number(options["page_size"], Constant.feedback_default_page_size())
     })
   end
-
-  defp parse_page_size(num) when is_integer(num) and num > 0, do: num
-  defp parse_page_size(_), do: Constant.feedback_default_page_size()
-
-  defp parse_page(num) when is_integer(num) and num > 0, do: num
-  defp parse_page(_), do: 1
 
   defp parse_sort_by("oldest"), do: [asc: dynamic([fb], fb.inserted_at)]
   defp parse_sort_by("newest"), do: [desc: dynamic([fb], fb.inserted_at)]

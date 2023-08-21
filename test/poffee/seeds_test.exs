@@ -1,5 +1,5 @@
 defmodule Poffee.SeedsTest do
-  use Poffee.DataCase, async: true
+  use Poffee.DataCase, async: false
 
   alias Poffee.Accounts.User
 

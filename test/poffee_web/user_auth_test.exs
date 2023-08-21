@@ -1,5 +1,5 @@
 defmodule PoffeeWeb.UserAuthTest do
-  use PoffeeWeb.ConnCase, async: true
+  use PoffeeWeb.ConnCase, async: false
 
   alias Phoenix.LiveView
   alias Poffee.Accounts

@@ -65,6 +65,7 @@ RUN npm install --prefix assets
 ARG SECRET_KEY_BASE
 
 # Changes to config/runtime.exs don't require recompiling the code
+COPY config/config_helper.exs config/
 COPY config/runtime.exs config/
 
 # compile assets

@@ -15,6 +15,9 @@ defmodule PoffeeWeb.BrandPageLive do
 
   require Logger
 
+  # only allow "page" and "sort_by" in socket.assigns.params
+  @allowed_params ["sort_by", "page"]
+
   @default_assigns %{
     feedback_id: nil,
     twitch_user: nil,
@@ -56,7 +59,9 @@ defmodule PoffeeWeb.BrandPageLive do
       |> case do
         %{valid?: true} = changeset ->
           new_sort_by_attrs = Utils.stringify_keys(apply_changes(changeset))
-          # remove "page" param if any, so it will default to page 1
+
+          # remove assigns.page and "page" in assigns.params when new sort_by is selected
+          # socket = %{socket | assigns: Map.delete(socket.assigns, :page)}
           new_params =
             socket.assigns.params
             |> Map.merge(new_sort_by_attrs)
@@ -239,58 +244,17 @@ defmodule PoffeeWeb.BrandPageLive do
     assign(socket, :page_title, brand_page.title)
   end
 
-  # only allow "page" and "sort_by" in socket.assigns.params
-  # the value be passed as options when retrieving data from database
+  # params is the query string params
   defp assign_params(socket, params) do
-    socket =
-      socket
-      |> assign_sort_by(params)
-      |> assign_page(params)
-
-    # reference the latest updated by assign_sort_by and assign_page above.
-    # value of "page" will be stored as an integer instead of a string
     new_params =
-      ["sort_by", "page"]
-      |> Map.new(fn p ->
-        {p, get_in(Map.from_struct(socket), [:assigns, String.to_existing_atom(p)])}
-      end)
+      params
+      |> Map.take(@allowed_params)
+      # TODO: add validation and flash error to user
+      |> Map.reject(fn {_k, v} -> Utils.blank?(v) end)
 
     Logger.debug("[BrandPageLive.assign_params] assigning new params = #{inspect(new_params)}")
 
     assign(socket, :params, new_params)
-  end
-
-  defp assign_sort_by(socket, %{"sort_by" => sort_by}) do
-    Logger.debug("[BrandPageLive.assign_sort_by] selected sort_by: #{sort_by}")
-    assign(socket, :sort_by, sort_by)
-  end
-
-  defp assign_sort_by(socket, _params) do
-    default = Poffee.Constant.feedback_default_sort_by()
-    Logger.debug("[BrandPageLive.assign_sort_by] default sort_by: #{inspect(default)}")
-    assign(socket, :sort_by, default)
-  end
-
-  # Only positive integers will be stored in socket.assigns.page
-  defp assign_page(socket, %{"page" => page}) when is_integer(page) and page > 0 do
-    assign(socket, :page, page)
-  end
-
-  defp assign_page(socket, %{"page" => page}) do
-    Logger.debug("[BrandPageLive.assign_page] selected page: #{page}")
-
-    case Integer.parse(page) do
-      {num, ""} ->
-        assign(socket, :page, num)
-
-      _ ->
-        assign_page(socket, nil)
-    end
-  end
-
-  defp assign_page(socket, _params) do
-    Logger.debug("[BrandPageLive.assign_page] default page to 1")
-    assign(socket, :page, 1)
   end
 
   defp sort_by_changeset(%{} = attrs) do

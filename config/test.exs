@@ -64,7 +64,6 @@ config :poffee, nebulex_adapter: Nebulex.Adapters.Nil
 ####################################
 # Print only warnings and errors during test
 config :logger, level: :warning
-# config :logger, :default_handler, false
 
 config :logger, :default_handler,
   config: [
@@ -75,6 +74,11 @@ config :logger, :default_handler,
     max_no_files: 5,
     compress_on_rotate: true
   ]
+
+####################################
+# Wallaby
+####################################
+# config :wallaby, hackney_options: [timeout: :infinity, recv_timeout: :infinity]
 
 ####################################
 # Misc

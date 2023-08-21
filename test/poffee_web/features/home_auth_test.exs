@@ -1,5 +1,5 @@
 defmodule PoffeeWeb.Features.HomeAuthTest do
-  use PoffeeWeb.FeatureCase, async: true
+  use PoffeeWeb.FeatureCase, async: false
 
   # setup do
   # create a registered user

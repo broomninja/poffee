@@ -1,5 +1,5 @@
 defmodule PoffeeWeb.PageControllerTest do
-  use PoffeeWeb.ConnCase
+  use PoffeeWeb.ConnCase, async: false
 
   test "GET /", %{conn: conn} do
     conn = get(conn, ~p"/")

@@ -1,5 +1,5 @@
 defmodule PoffeeWeb.UserSessionControllerTest do
-  use PoffeeWeb.ConnCase, async: true
+  use PoffeeWeb.ConnCase, async: false
 
   import Poffee.AccountsFixtures
 

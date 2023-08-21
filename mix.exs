@@ -19,13 +19,28 @@ defmodule Poffee.MixProject do
         "coveralls.html": :test
       ],
       test_coverage: [tool: ExCoveralls, test_task: "test.all"],
-      deps: deps()
+      deps: deps(),
+      releases: [
+        poffee: [
+          steps: [:assemble, &copy_prod_runtime_config/1]
+          # validate_compile_env: false
+        ]
+      ]
     ]
   end
 
-  def version do
+  defp version do
     # Use dummy version for dev and test
     System.get_env("VERSION", "0.0.1")
+  end
+
+  defp copy_prod_runtime_config(%Mix.Release{version_path: path} = release) do
+    File.cp!(
+      Path.join(["config", "config_helper.exs"]),
+      Path.join([path, "config_helper.exs"])
+    )
+
+    release
   end
 
   # Configuration for the OTP application.
@@ -115,8 +130,8 @@ defmodule Poffee.MixProject do
 
       # dev and test deps
       {:benchee, "~> 1.0", only: :dev},
-      {:dialyxir, "~> 1.3", only: [:dev], runtime: false},
-      {:gradient, github: "esl/gradient", only: [:dev], runtime: false},
+      {:dialyxir, "~> 1.3", only: :dev, runtime: false},
+      {:gradient, github: "esl/gradient", only: :dev, runtime: false},
       {:typed_ecto_schema, "~> 0.4.1", runtime: false},
       {:floki, ">= 0.34.2", only: :test},
       {:excoveralls, "~> 0.16", only: :test},
@@ -124,6 +139,7 @@ defmodule Poffee.MixProject do
       {:mox, "~> 1.0", only: :test},
       {:rewire, "~> 0.9", only: :test},
       {:assertions, "~> 0.19", only: :test},
+      {:live_isolated_component, "~> 0.6.5", only: :test},
       {:wallaby, "~> 0.30", only: :test, runtime: false}
     ]
   end
