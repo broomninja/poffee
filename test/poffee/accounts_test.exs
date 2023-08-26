@@ -617,12 +617,12 @@ defmodule Poffee.AccountsTest do
     end
 
     test "find users using empty string username", %{user: _user} do
-      assert {:ok, []} = Accounts.user_search(nil)
-      assert {:ok, []} = Accounts.user_search("")
+      assert [] = Accounts.user_search(nil).entries
+      assert [] = Accounts.user_search("").entries
     end
 
     test "find users using username", %{user: user} do
-      {:ok, [found_user]} = Accounts.user_search("user_")
+      [found_user] = Accounts.user_search("user_").entries
 
       assert user.id == found_user.id
       assert is_nil(user.password)

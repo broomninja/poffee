@@ -63,7 +63,9 @@ config :poffee, nebulex_adapter: Nebulex.Adapters.Nil
 # Logger
 ####################################
 # Print only warnings and errors during test
-config :logger, level: :warning
+config :logger, level: :debug
+config :logger, backends: [:console], compile_time_purge_matching: [[level_lower_than: :debug]]
+# config :logger, :default_handler, false
 
 config :logger, :default_handler,
   config: [

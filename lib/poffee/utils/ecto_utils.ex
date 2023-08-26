@@ -47,4 +47,16 @@ defmodule Poffee.EctoUtils do
   end
 
   def parse_number(_, default), do: default
+
+  @spec escape_search_string(String.t()) :: String.t()
+  def escape_search_string(str) when is_binary(str) do
+    str
+    |> String.replace("_", "\\_")
+    |> String.replace("%", "\\%")
+  end
+
+  @spec pagination_empty_list() :: Scrivener.Page.t()
+  def pagination_empty_list() do
+    %Scrivener.Page{entries: [], page_number: 0, page_size: 0, total_entries: 0, total_pages: 0}
+  end
 end

@@ -7,7 +7,7 @@ defmodule Poffee.Accounts do
   import Ecto.Query, warn: false
   import Ecto.Changeset
 
-  alias Poffee.{Repo, Utils, DBCache}
+  alias Poffee.{Repo, Constant, EctoUtils, Utils, DBCache}
 
   alias Poffee.Accounts.{User, UserToken, UserNotifier}
 
@@ -433,30 +433,31 @@ defmodule Poffee.Accounts do
   def admin?(_user), do: false
 
   @doc """
-  Returns a list of users matching the query
+  Returns a `%Scrivener.Page{}` with paginated users.
   """
   @decorate cacheable(
               cache: DBCache,
               opts: [ttl: @ttl],
               match: &Utils.can_be_cached?/1
             )
-  @spec user_search(String.t(), number) :: {:ok, list(User.t())}
-  def user_search(search_query, limit \\ 10)
-  def user_search(nil, _limit), do: {:ok, []}
-  def user_search("", _limit), do: {:ok, []}
+  @spec user_search(String.t(), map()) :: Scrivener.Page.t()
+  def user_search(search_query, options \\ %{})
+  def user_search(nil, _options), do: EctoUtils.pagination_empty_list()
+  def user_search("", _options), do: EctoUtils.pagination_empty_list()
 
-  def user_search(search_query, limit) when is_binary(search_query) do
+  def user_search(search_query, options) when is_binary(search_query) do
+    search_query = EctoUtils.escape_search_string(search_query)
     search_query = "%#{search_query}%"
 
-    users =
-      User
-      |> order_by(asc: :username)
-      |> select([:id, :username])
-      |> where(role: :role_user)
-      |> where([u], ilike(u.username, ^search_query))
-      |> limit(^limit)
-      |> Repo.all()
-
-    {:ok, users}
+    User
+    |> order_by(asc: :username)
+    |> select([:id, :username])
+    |> where(role: :role_user)
+    |> where([u], ilike(u.username, ^search_query))
+    |> Repo.paginate(%{
+      page: EctoUtils.parse_number(options["page"], 1),
+      page_size:
+        EctoUtils.parse_number(options["page_size"], Constant.user_search_default_page_size())
+    })
   end
 end
