@@ -1,15 +1,17 @@
 <div>
   <div
-    id="searchbox_container"
+    id="searchbox-container"
     class="mx-auto overflow-hidden rounded-lg bg-zinc-50 shadow-xl ring-zinc-900/7.5 sm:max-w-xl opacity-100 scale-100"
     phx-hook="SearchBarHook"
   >
+    <%!-- Combobox --%>
     <div role="combobox" aria-haspopup="listbox">
       <form
+        id="search-bar-form"
         action=""
         novalidate=""
         role="search"
-        phx-change={JS.push("change")}
+        phx-change="search_event"
         onkeydown="return event.key != 'Enter';"
       >
         <div class="group relative flex h-12 items-center">
@@ -25,7 +27,7 @@
           <% end %>
           <input
             id="search-input"
-            name="search[query]"
+            name="search_query"
             class="flex-auto pl-8 rounded-lg appearance-none bg-transparent text-zinc-900 outline-none 
                    border-white focus:border-white md:border-zinc-400 md:focus:border-zinc-400 
                    focus:outline-none focus:ring-0 focus:shadow-none placeholder:text-zinc-500 focus:w-full 
@@ -40,7 +42,7 @@
             spellcheck="false"
             placeholder="Find something..."
             type="search"
-            value=""
+            value={@search_query}
             tabindex="0"
             maxlength="100"
             phx-debounce="350"
@@ -56,15 +58,19 @@
         </div>
       </form>
 
-      <div :if={!is_nil(@search_result)} class="h-[25rem] text-sm text-gray-800 overflow-y-auto">
+      <div
+        :if={!is_nil(@search_result)}
+        id="search-result"
+        class="h-[25rem] text-sm text-gray-800 overflow-y-auto"
+      >
         <div class="font-semibold px-4 py-1">
           Users
         </div>
-        <%= if @search_result[:users] == [] do %>
-          <div class="px-4 py-2">
-            No results found
-          </div>
-        <% else %>
+        <div :if={!Utils.is_non_empty_list?(@search_result[:users])} class="px-4 py-2">
+          No results found
+        </div>
+        <%!-- User list display --%>
+        <div :if={Utils.is_non_empty_list?(@search_result[:users])}>
           <ul
             class="divide-y divide-slate-200 rounded-b-lg border-t border-slate-200 text-sm leading-6"
             id="searchbox__results_list"
@@ -81,8 +87,25 @@
               </li>
             <% end %>
           </ul>
-        <% end %>
+        </div>
+        <%!-- End User list display --%>
       </div>
+
+      <%!-- pagination --%>
+      <div
+        :if={
+          Utils.is_non_empty_list?(@search_result[:users]) and @pagination_meta.total_pages > 1
+        }
+        class="flex align-end justify-center mt-2 mb-5"
+      >
+        <Petal.Pagination.pagination
+          event={true}
+          current_page={@pagination_meta.page_number}
+          total_pages={@pagination_meta.total_pages}
+        />
+      </div>
+      <%!--End pagination --%>
     </div>
+    <%!-- End Combobox --%>
   </div>
 </div>

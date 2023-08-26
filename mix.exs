@@ -103,7 +103,7 @@ defmodule Poffee.MixProject do
       # UI
       {:tailwind, "~> 0.2.0", runtime: Mix.env() == :dev},
       {:live_svelte, "~> 0.8.0"},
-      {:petal_components, "~> 1.2.8"},
+      {:petal_components, "~> 1.4.7"},
 
       # metrics
       {:telemetry, "~> 1.2"},

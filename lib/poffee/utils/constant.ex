@@ -8,6 +8,9 @@ defmodule Poffee.Constant do
   const(:password_min_length, 8)
   const(:password_max_length, 125)
 
+  # User Search
+  const(:user_search_default_page_size, 9)
+
   # UserAuth
   const(:require_authenticated_text, "Please login to proceed.")
   const(:require_admin_text, "You do not have permission to view the requested page.")

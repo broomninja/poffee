@@ -68,7 +68,7 @@ defmodule PoffeeWeb.BrandPageLiveTest do
 
       {:ok, view, _} =
         view
-        |> element("#sort_by_form")
+        |> element("#sort-by-form")
         |> render_change(%{"sort_by_form" => %{"sort_by" => new_sort_by}})
         |> follow_redirect(conn, ~p"/u/#{twitch_user.display_name}?sort_by=#{new_sort_by}")
 
@@ -86,7 +86,7 @@ defmodule PoffeeWeb.BrandPageLiveTest do
       new_sort_by = "newest"
 
       view
-      |> element("#sort_by_form")
+      |> element("#sort-by-form")
       |> render_change(%{"sort_by_form" => %{"sort_by" => new_sort_by}})
 
       {new_path, _flash} = assert_redirect(view)
@@ -126,7 +126,7 @@ defmodule PoffeeWeb.BrandPageLiveTest do
       new_sort_by = "newest"
 
       view
-      |> element("#sort_by_form")
+      |> element("form#sort-by-form")
       |> render_change(%{"sort_by_form" => %{"sort_by" => new_sort_by}})
 
       {new_path, _flash} = assert_redirect(view)
