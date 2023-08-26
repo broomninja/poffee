@@ -76,6 +76,7 @@ defmodule Poffee.Utils do
   @doc """
   Convert map atom keys to strings
   """
+  @spec stringify_keys(map() | nil) :: map()
   def stringify_keys(nil), do: nil
 
   def stringify_keys(map = %{}) do
@@ -96,6 +97,7 @@ defmodule Poffee.Utils do
 
   # Replace "page=1" with "page=:page" in query string
   # If "page=XX" does not exist then simply add "page=:page" to query string
+  @spec get_pagination_path(String.t()) :: String.t()
   def get_pagination_path(current_uri) when is_binary(current_uri) do
     uri = URI.parse(current_uri)
 
@@ -115,5 +117,12 @@ defmodule Poffee.Utils do
     Logger.debug("[BrandPageComponent.get_pagination_path] returning path = #{path}")
 
     path
+  end
+
+  @spec format_to_html(String.t()) :: String.t()
+  def format_to_html(str) do
+    # TODO: convert http links to ahref
+    str
+    |> Phoenix.HTML.raw()
   end
 end

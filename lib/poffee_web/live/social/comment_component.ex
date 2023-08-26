@@ -1,6 +1,8 @@
 defmodule Poffee.Social.CommentComponent do
   use PoffeeWeb, :live_component
 
+  alias Poffee.Utils
+  
   require Logger
 
   @default_assigns %{}

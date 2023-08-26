@@ -220,23 +220,6 @@ defmodule Poffee.Social.BrandPageComponent do
     {:noreply, socket}
   end
 
-  # def handle_event("paginate", %{}, socket) do
-  #   if socket.assigns.page == socket.assigns.feedback_meta.total_pages do
-  #     {:noreply, socket}
-  #   else
-  #     page = socket.assigns.page + 1
-
-  #     tracks = list_tracks(page, socket.assigns)
-  #     feedbacks_meta = track_meta(tracks)
-
-  #     {:noreply,
-  #      socket
-  #      |> assign(:page, page)
-  #      |> assign(:feedbacks_meta, feedbacks_meta)
-  #      |> assign(:tracks, tracks.entries |> Enum.map(fn item -> item.track end))}
-  #   end
-  # end
-
   ##########################################
   # Helper functions for data loading
   ##########################################
