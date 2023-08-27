@@ -29,9 +29,9 @@ defmodule Poffee.Services.CommentService do
   @doc """
   Gets a list of comment for a given feedback_id
   """
-  @spec get_comments_by_feedback_id(uuid, Keywords.t()) :: list(Comment.t())
+  @spec get_comments_by_feedback_id(uuid, Keywords.t()) :: Scrivener.Page.t()
   def get_comments_by_feedback_id(feedback_id, options \\ %{})
-  def get_comments_by_feedback_id(nil, _), do: []
+  def get_comments_by_feedback_id(nil, _), do: EctoUtils.pagination_empty_list()
 
   def get_comments_by_feedback_id(feedback_id, options) do
     Comment

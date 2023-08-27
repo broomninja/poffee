@@ -68,6 +68,7 @@
 
 <div>
   <form
+    id="create-comment-form"
     method="POST"
     on:submit|preventDefault={submitCreateComment} 
     class="flex flex-col gap-4 mt-2 md:flex-row md:items-start"
