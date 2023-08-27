@@ -59,10 +59,16 @@ defmodule Poffee.Social.FeedbackComponent do
           # put_flash will not work when we are in the LC, so forward the flash
           # message to the parent LV
           send(self(), {__MODULE__, :flash, %{level: :info, message: "Comment created!"}})
-          comments = Social.get_comments_by_feedback_id(feedback_id, socket.assigns.params)
+
+          paginated_comments =
+            Social.get_comments_by_feedback_id(feedback_id, socket.assigns.params)
+
+          comments = paginated_comments.entries
+          pagination_meta = Map.delete(paginated_comments, :entries)
 
           socket
           |> assign(:comments, comments)
+          |> assign(:pagination_meta, pagination_meta)
 
         _ ->
           send(

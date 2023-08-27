@@ -1,8 +1,6 @@
 defmodule PoffeeWeb.SearchBarLiveTest do
   use PoffeeWeb.ConnCase, async: false
 
-  alias PoffeeWeb.SearchBarLive
-
   import Poffee.AccountsFixtures
 
   import Phoenix.LiveViewTest
@@ -32,9 +30,7 @@ defmodule PoffeeWeb.SearchBarLiveTest do
       # sent the event
       # see https://github.com/phoenixframework/phoenix_live_view/issues/2483
 
-      search_bar_liveview =
-        live_children(view)
-        |> Enum.find(fn v -> v.module == SearchBarLive end)
+      search_bar_liveview = find_live_child(view, "live-search")
 
       search_bar_liveview
       |> element("#search-bar-form")

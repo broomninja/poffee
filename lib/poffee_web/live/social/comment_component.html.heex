@@ -8,8 +8,8 @@
     </div>
     <%!-- End Comment author --%>
     <%!-- Comment content --%>
-    <div class="col-span-9 ml-1 mt-3 mr-5 mb-1 md:mr-16 text-sm text-gray-800 lg:leading-relaxed">
-      <%= @comment.content %>
+    <div class="col-span-9 ml-1 mt-3 mr-5 mb-1 md:mr-16 text-sm text-gray-800">
+      <span class="whitespace-pre-wrap"><%= Utils.format_to_html(@comment.content) %></span>
     </div>
     <%!-- End Comment content --%>
     <%!-- Comment creation time --%>
