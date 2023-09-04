@@ -220,6 +220,51 @@ defmodule Poffee.Social.BrandPageComponent do
     {:noreply, socket}
   end
 
+  # called from CreateComment.svelte
+  def handle_event(
+        "create_comment",
+        %{"content" => comment_content, "user_id" => user_id, "feedback_id" => feedback_id},
+        socket
+      )
+      when not is_nil(user_id) do
+    Logger.debug("[BrandPageComponent.handle_event.create_comment] user_id = #{user_id}")
+
+    create_result = Social.create_comment(%{content: comment_content}, user_id, feedback_id)
+
+    socket =
+      case create_result do
+        {:ok, _comment} ->
+          # put_flash will not work when we are in the LC, so forward the flash
+          # message to the parent LV
+          send(self(), {__MODULE__, :flash, %{level: :info, message: "Comment created!"}})
+
+          paginated_comments =
+            Social.get_comments_by_feedback_id(feedback_id, socket.assigns.params)
+
+          comments = paginated_comments.entries
+          pagination_meta = Map.delete(paginated_comments, :entries)
+
+          socket
+          |> assign(:comments, comments)
+          |> assign(:pagination_meta, pagination_meta)
+
+        _ ->
+          send(
+            self(),
+            {__MODULE__, :flash, %{level: :error, message: "Error when creating comment!"}}
+          )
+
+          socket
+      end
+
+    {:reply, %{create_comment_reply: Map.new([create_result])}, socket}
+  end
+
+  def handle_event("create_comment", _, socket) do
+    Logger.warning("[BrandPageComponent.handle_event.create_comment] user_id is nil")
+    {:reply, %{create_comment_reply: %{error: "User not logged in"}}, socket}
+  end
+
   ##########################################
   # Helper functions for data loading
   ##########################################
@@ -270,7 +315,7 @@ defmodule Poffee.Social.BrandPageComponent do
   ##########################################
 
   defp get_container_id(brand_page_id) do
-    "brandpage-#{brand_page_id}"
+    "brand_page-#{brand_page_id}"
   end
 
   # Renders a badge showing online or offline status

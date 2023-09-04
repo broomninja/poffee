@@ -16,7 +16,7 @@
         <div class="col-span-2 row-span-2 text-right">
           <LiveSvelte.svelte
             name="VoteCounter"
-            ssr={false}
+            ssr={true}
             props={
               %{
                 current_user: @current_user,
@@ -119,6 +119,7 @@
             props={
               %{
                 feedback: @feedback,
+                brand_page_id: @brand_page_id,
                 current_user: @current_user,
                 max_content_length: Constant.comment_content_max_length()
               }

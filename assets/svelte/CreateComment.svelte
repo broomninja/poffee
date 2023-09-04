@@ -2,6 +2,7 @@
   import { has as __has } from "lodash";
 
   export let feedback;
+  export let brand_page_id;
   export let current_user;
   export let pushEventTo;
   export let max_content_length: number = 500;
@@ -24,8 +25,8 @@
     // disable submit button
     document.querySelector(`#${submit_button_id}`).disabled = true;
 
-    // send to server and wait for callback
-    pushEventTo(`#feedback-${feedback.id}`,
+    // send event to BrandPageComponent and wait for callback
+    pushEventTo(`#brand_page-${brand_page_id}`,
                 "create_comment", 
                 {content: formData.content, user_id: formData.user_id, feedback_id: formData.feedback_id},
                 (reply, ref) => reply_callback(reply, ref));

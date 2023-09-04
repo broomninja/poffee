@@ -29,8 +29,10 @@ config :poffee, compile_env: config_env()
 ########################
 ### LiveSvelte
 ########################
-config :poffee, :live_svelte,
-  enable_ssr: ConfigHelper.get_boolean_env("LIVESVELTE_ENABLE_SSR", false)
+if config_env() in [:dev, :prod] do
+  config :poffee, :live_svelte,
+    enable_ssr: ConfigHelper.get_boolean_env("LIVESVELTE_ENABLE_SSR", false)
+end
 
 ########################
 ### Socket Check Origin

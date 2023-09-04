@@ -3,7 +3,6 @@ defmodule Poffee.Social.FeedbackComponent do
 
   alias Poffee.Accounts.User
   alias Poffee.Constant
-  alias Poffee.Social
   alias Poffee.Utils
 
   require Logger
@@ -24,9 +23,8 @@ defmodule Poffee.Social.FeedbackComponent do
   @impl Phoenix.LiveComponent
   # update invoked from BrandPageComponent.html.heex
   def update(%{feedback: feedback, user_voted_list: user_voted_list} = assigns, socket) do
-    Logger.debug("[FeedbackComponent.update.feedback] has_already_voted: #{feedback.id}")
-
     has_already_voted = Enum.member?(user_voted_list, feedback.id)
+    Logger.debug("[FeedbackComponent.update.feedback] has_already_voted: #{has_already_voted} for #{feedback.id}")
 
     socket =
       socket
@@ -39,52 +37,6 @@ defmodule Poffee.Social.FeedbackComponent do
   def update(assigns, socket) do
     Logger.debug("[FeedbackComponent.update.default]")
     {:ok, socket |> assign(assigns)}
-  end
-
-  @impl Phoenix.LiveComponent
-  # called from CreateComment.svelte
-  def handle_event(
-        "create_comment",
-        %{"content" => comment_content, "user_id" => user_id, "feedback_id" => feedback_id},
-        socket
-      )
-      when not is_nil(user_id) do
-    Logger.debug("[FeedbackComponent.handle_event.create_comment] user_id = #{user_id}")
-
-    create_result = Social.create_comment(%{content: comment_content}, user_id, feedback_id)
-
-    socket =
-      case create_result do
-        {:ok, _comment} ->
-          # put_flash will not work when we are in the LC, so forward the flash
-          # message to the parent LV
-          send(self(), {__MODULE__, :flash, %{level: :info, message: "Comment created!"}})
-
-          paginated_comments =
-            Social.get_comments_by_feedback_id(feedback_id, socket.assigns.params)
-
-          comments = paginated_comments.entries
-          pagination_meta = Map.delete(paginated_comments, :entries)
-
-          socket
-          |> assign(:comments, comments)
-          |> assign(:pagination_meta, pagination_meta)
-
-        _ ->
-          send(
-            self(),
-            {__MODULE__, :flash, %{level: :error, message: "Error when creating comment!"}}
-          )
-
-          socket
-      end
-
-    {:reply, %{create_comment_reply: Map.new([create_result])}, socket}
-  end
-
-  def handle_event("create_comment", _, socket) do
-    Logger.warning("[FeedbackComponent.handle_event.create_comment] user_id is nil")
-    {:reply, %{create_comment_reply: %{error: "User not logged in"}}, socket}
   end
 
   ##########################################

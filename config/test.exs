@@ -31,6 +31,12 @@ config :poffee, :twitch,
   callback_webhook_uri: "https://wwwdev.descafe.com/webhooks/twitch/callback"
 
 ####################################
+# LiveSvelte
+####################################
+# uncomment below to enable ssr in test only for testing rendered values
+# config :poffee, :live_svelte, enable_ssr: true
+
+####################################
 # Wallaby E2E
 ####################################
 config :poffee, use_sandbox: true

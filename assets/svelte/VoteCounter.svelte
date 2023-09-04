@@ -23,7 +23,7 @@
       return;
     }
     // send event to BrandPageComponent
-    pushEventTo(`#brandpage-${brand_page_id}`, "vote", {user_id: user.id, feedback_id: feedback.id});
+    pushEventTo(`#brand_page-${brand_page_id}`, "vote", {user_id: user.id, feedback_id: feedback.id});
   }
 
   const clickUnvote = (user, feedback_id) => {
@@ -36,7 +36,7 @@
       return;
     }
     // send event to BrandPageComponent
-    pushEventTo(`#brandpage-${brand_page_id}`, "unvote", {user_id: user.id, feedback_id: feedback.id});
+    pushEventTo(`#brand_page-${brand_page_id}`, "unvote", {user_id: user.id, feedback_id: feedback.id});
   }
 
 </script>
@@ -51,7 +51,7 @@
       <path d="M12.354 8.854l5.792 5.792a.5.5 0 01-.353.854H6.207a.5.5 0 01-.353-.854l5.792-5.792a.5.5 0 01.708 0z"></path>
     </svg>
     {#key feedback.votes_count}
-      <span class="mx-auto inline-block" in:scale>
+      <span id="feedback-votes-count" class="mx-auto inline-block" in:scale>
         {feedback.votes_count}
       </span>
     {/key}
