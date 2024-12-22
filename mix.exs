@@ -119,6 +119,7 @@ defmodule Poffee.MixProject do
       {:decorator, "~> 1.4"},
       {:slugify, "~> 1.3"},
       {:remote_ip, "~> 1.1"},
+      {:tzdata, "~> 1.1.2"},
 
       # twitch
       {:twitch_api, github: "broomninja/twitch_api"},
