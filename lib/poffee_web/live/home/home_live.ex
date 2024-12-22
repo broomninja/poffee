@@ -80,7 +80,7 @@ defmodule PoffeeWeb.HomeLive do
       [x] Sorting for feedbacks and comments.<br /> [x] Pagination for feedbacks and comments<br />
 
       <div class="mt-5 font-semibold">To be implemented:</div>
-      [ ] Reply to comments<br /> [ ] Followers<br />
+      <!--[ ] Reply to comments<br /> [ ] Followers<br /> -->
       [ ] Notification feed on new feedbacks, comments, votes etc for all users<br />
     </div>
     """

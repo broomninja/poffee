@@ -133,7 +133,7 @@ defmodule Poffee.Social.FeedbackComponent do
     ~H"""
     <div
       :if={@live_action == :show_feedbacks}
-      class="col-span-7 ml-1 mb-2 text-lg font-bold text-gray-800 hover:text-blue-700 lg:leading-tight dark:text-white"
+      class="col-span-7 ml-1 mb-2 text-lg font-bold text-gray-800 hover:text-blue-700 lg:leading-tight"
     >
       <.link navigate={~p"/u/#{@brandpage_username}/#{@feedback.id}"}>
         <%= @feedback.title %>
@@ -141,7 +141,7 @@ defmodule Poffee.Social.FeedbackComponent do
     </div>
     <div
       :if={@live_action == :show_single_feedback}
-      class="col-span-7 ml-1 mb-2 text-lg font-bold text-gray-800 lg:leading-tight dark:text-white"
+      class="col-span-7 ml-1 mb-2 text-lg font-bold text-gray-800 lg:leading-tight"
     >
       <%= @feedback.title %>
     </div>
